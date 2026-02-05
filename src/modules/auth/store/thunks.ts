@@ -1,0 +1,197 @@
+import { AppDispatch } from '../../../store';
+import { loginWithEmailPassword, logoutFirebase, registerUserWithEmailPassword, singInWithGoogle } from '../../../firebase/providers';
+import { getRole, getProfileCompleted, updateProfileCompleted, checkOrCreateUser, getUserByUID } from '../firebase/authQueries';
+import { chekingCredentials, login, logout, setRole, setProfileCompleted } from './authSlice';
+
+export const checkingAuthentication = () => {
+    return async (dispatch: AppDispatch) => {
+        dispatch(chekingCredentials());
+    };
+};
+
+export const startGoogleSignIn = () => {
+    return async (dispatch: AppDispatch) => {
+        dispatch(chekingCredentials());
+        const result = await singInWithGoogle();
+
+        if (!result.ok) {
+            dispatch(logout({ errorMessage: result.errorMessage }));
+            return;
+        }
+
+        // Asegurar que el usuario exista en Firestore
+        await checkOrCreateUser({
+            uid: result.uid!,
+            displayName: result.displayName!,
+            photoURL: result.photoURL,
+            email: result.email!
+        });
+
+        // Obtener TODOS los datos del usuario desde Firestore
+        const userDataResult = await getUserByUID({ uid: result.uid! });
+
+        if (userDataResult.ok && userDataResult.user) {
+            const userData = userDataResult.user;
+
+            dispatch(login({
+                uid: result.uid!,
+                email: result.email!,
+                displayName: result.displayName!,
+                photoURL: result.photoURL,
+                birthdate: userData.birthdate || null,
+                nationality: userData.nationality || null,
+                isMember: userData.isMember || false,
+                profileCompleted: userData.profileCompleted || false
+            }));
+
+            dispatch(setRole({ role: userData.role || 'user' }));
+        } else {
+            dispatch(login(result));
+            dispatch(setRole({ role: 'user' }));
+            dispatch(setProfileCompleted({ profileCompleted: false }));
+        }
+    };
+};
+
+interface CreateUserParams {
+    displayName: string;
+    email: string;
+    password: string;
+}
+
+export const startCreatingUserWithEmailPassword = ({ displayName, email, password }: CreateUserParams) => {
+    return async (dispatch: AppDispatch) => {
+        dispatch(chekingCredentials());
+
+        const { ok, uid, photoURL, errorMessage } = await registerUserWithEmailPassword({ displayName, email, password });
+        
+        if (!ok) {
+            dispatch(logout({ errorMessage }));
+            return;
+        }
+
+        dispatch(login({ ok, uid: uid!, displayName, email, photoURL }));
+    };
+};
+
+interface LoginParams {
+    email: string;
+    password: string;
+}
+
+export const startLoginWithEmailPassword = ({ email, password }: LoginParams) => {
+    return async (dispatch: AppDispatch) => {
+        dispatch(chekingCredentials());
+
+        const { ok, uid, displayName, photoURL, errorMessage } = await loginWithEmailPassword({ email, password });
+        
+        if (!ok) {
+            dispatch(logout({ errorMessage }));
+            return;
+        }
+
+        // Asegurar que el usuario exista en Firestore
+        await checkOrCreateUser({
+            uid: uid!,
+            displayName: displayName!,
+            photoURL,
+            email
+        });
+
+        // Obtener TODOS los datos del usuario desde Firestore (igual que en useCheckAuth)
+        const userDataResult = await getUserByUID({ uid: uid! });
+
+        if (userDataResult.ok && userDataResult.user) {
+            const userData = userDataResult.user;
+
+            dispatch(login({
+                uid: uid!,
+                email: email,
+                displayName: displayName!,
+                photoURL: photoURL,
+                birthdate: userData.birthdate || null,
+                nationality: userData.nationality || null,
+                isMember: userData.isMember || false,
+                profileCompleted: userData.profileCompleted || false
+            }));
+
+            dispatch(setRole({ role: userData.role || 'user' }));
+        } else {
+            // Si no se pudo obtener los datos de Firestore, usar los datos básicos
+            dispatch(login({
+                uid: uid!,
+                email: email,
+                displayName: displayName!,
+                photoURL: photoURL
+            }));
+
+            dispatch(setRole({ role: 'user' }));
+            dispatch(setProfileCompleted({ profileCompleted: false }));
+        }
+    };
+};
+
+export const startLogOut = () => {
+    return async (dispatch: AppDispatch) => {
+        await logoutFirebase();
+        dispatch(logout());
+    };
+};
+
+interface GetRoleParams {
+    uid: string;
+}
+
+export const startGetRole = ({ uid }: GetRoleParams) => {
+    return async (dispatch: AppDispatch) => {
+        try {
+            const { ok, role } = await getRole({ uid });
+            if (!ok) {
+                dispatch(setRole({ role: 'user' }));
+            } else {
+                dispatch(setRole({ role: role || 'user' }));
+            }
+        } catch {
+            dispatch(setRole({ role: 'user' }));
+        }
+    };
+};
+
+interface GetProfileCompletedParams {
+    uid: string;
+}
+
+export const startGetProfileCompleted = ({ uid }: GetProfileCompletedParams) => {
+    return async (dispatch: AppDispatch) => {
+        try {
+            const { ok, profileCompleted } = await getProfileCompleted({ uid });
+            if (ok) {
+                dispatch(setProfileCompleted({ profileCompleted: profileCompleted || false }));
+            } else {
+                dispatch(setProfileCompleted({ profileCompleted: false }));
+            }
+        } catch {
+            dispatch(setProfileCompleted({ profileCompleted: false }));
+        }
+    };
+};
+
+interface UpdateProfileCompletedParams {
+    uid: string;
+    profileCompleted?: boolean;
+}
+
+export const startUpdateProfileCompleted = ({ uid, profileCompleted = true }: UpdateProfileCompletedParams) => {
+    return async (dispatch: AppDispatch) => {
+        try {
+            const result = await updateProfileCompleted({ uid, profileCompleted });
+            if (result.ok) {
+                dispatch(setProfileCompleted({ profileCompleted }));
+                return { ok: true };
+            }
+            return { ok: false, error: result.error };
+        } catch (error: any) {
+            return { ok: false, error: error.message };
+        }
+    };
+};

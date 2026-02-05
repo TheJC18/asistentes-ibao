@@ -1,0 +1,191 @@
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import Badge from '../../../components/ui/badge/Badge';
+import FloatingAddButton from '../../../components/ui/FloatingAddButton';
+import UserModal from '../components/UserModal';
+import EntityList from '../../../components/ui/table/EntityList';
+import { getCountryNameByCode } from '../helpers/userUtils';
+import { useUserManagement } from '../hooks/useUserManagement';
+import { User } from '../../../types';
+
+export default function UserListPage() {
+  // Hook de gestión de usuarios (contiene toda la lógica)
+  const {
+    users,
+    isLoading,
+    error,
+    isDeleting,
+    modalOpen,
+    modalMode,
+    selectedUser,
+    handleSave,
+    handleDelete,
+    handleView,
+    handleEdit,
+    handleCreate,
+    handleClose,
+    handleRetry,
+    handlePasswordReset,
+  } = useUserManagement();
+
+  const columns = [
+    {
+      key: 'avatar',
+      label: 'Avatar',
+      className: 'text-start',
+      visibleOn: ["xs", "ss", "sm", "md", "lg", "xl"], // Visible desde xs en adelante
+      render: (userItem: User) => (
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 overflow-hidden rounded-full border-2 border-blue-400 shadow">
+            <img 
+              width={40} 
+              height={40} 
+              src={userItem.photoURL || userItem.avatar || '/user_default.png'} 
+              alt={userItem.displayName || userItem.name} 
+            />
+          </div>
+        </div>
+      ),
+    },
+    {
+      key: 'displayName',
+      label: 'Nombre',
+      className: 'text-start font-semibold text-base md:text-lg text-gray-900 dark:text-gray-100',
+      visibleOn: ["base", "2xs", "xs", "ss", "sm", "md", "lg", "xl"], // Siempre visible
+      render: (userItem: User) => userItem.displayName || userItem.name || 'Sin nombre',
+    },
+    {
+      key: 'role',
+      label: 'Rol',
+      className: 'text-start',
+      visibleOn: ["md", "lg", "xl"], // Visible desde ss en adelante
+      render: (userItem: User) => (
+        <Badge size="sm" color={userItem.role === 'admin' ? 'primary' : 'warning'}>
+          {userItem.role === 'admin' ? 'ADMIN' : 'USUARIO'}
+        </Badge>
+      ),
+    },
+    {
+      key: 'isMember',
+      label: '¿Es miembro?',
+      className: 'text-start',
+      visibleOn: ["sm", "md", "lg", "xl"], // Visible desde sm en adelante
+      render: (userItem: User) => (
+        <Badge size="xl" color={userItem.isMember === true ? 'success' : 'error'} variant="solid">
+          {userItem.isMember === true ? <FontAwesomeIcon icon={["fas", "check"]} /> : <FontAwesomeIcon icon={["fas", "times"]} />}
+        </Badge>
+      ),
+    },
+    { 
+      key: 'nationality', 
+      label: 'Nacionalidad',  
+      className: 'text-start text-gray-800 dark:text-gray-200', 
+      visibleOn: ["md", "lg", "xl"],
+      render: (userItem: User) => {
+        const nationality = userItem.nationality;
+        if (!nationality) return <span className="text-gray-400 dark:text-gray-500">-</span>;
+        
+        // Si tiene 2 caracteres, asumimos que es un código
+        if (nationality.length === 2) {
+          const countryName = getCountryNameByCode(nationality);
+          return countryName || nationality || '-';
+        }
+        
+        // Si es más largo, asumimos que ya es el nombre del país
+        return nationality || '-';
+      }
+    },
+    { 
+      key: 'email', 
+      label: 'Correo', 
+      className: 'text-start text-gray-800 dark:text-gray-200', 
+      visibleOn: ["lg", "xl"],
+      render: (userItem: User) => userItem.email || <span className="text-gray-400 dark:text-gray-500">-</span>
+    },
+    { 
+      key: 'birthdate', 
+      label: 'Nacimiento', 
+      className: 'text-start text-gray-800 dark:text-gray-200', 
+      visibleOn: ["lg", "xl"],
+      render: (userItem: User) => {
+        if (!userItem.birthdate) return <span className="text-gray-400 dark:text-gray-500">-</span>;
+        try {
+          const date = new Date(userItem.birthdate);
+          return date.toLocaleDateString('es-ES', { year: 'numeric', month: '2-digit', day: '2-digit' });
+        } catch {
+          return <span className="text-gray-400 dark:text-gray-500">-</span>;
+        }
+      }
+    },
+  ];
+
+  const filterFunction = (u: User, search: string) => {
+    const name = u.displayName || u.name || '';
+    const email = u.email || '';
+    return name.toLowerCase().includes(search.toLowerCase()) ||
+           email.toLowerCase().includes(search.toLowerCase());
+  };
+
+  const renderActions = (userItem: User) => (
+    <div className="flex flex-row gap-1 items-center justify-center">
+      <button 
+        className="p-1 h-7 w-7 text-xs rounded-full bg-blue-500/80 hover:bg-blue-700 text-white transition" 
+        title="Ver detalles" 
+        onClick={() => handleView(userItem)}
+        disabled={isDeleting}
+      >
+        <FontAwesomeIcon icon={["fas", "eye"]} />
+      </button>
+      <button 
+        className="p-1 h-7 w-7 text-xs rounded-full bg-green-500/80 hover:bg-green-700 text-white transition" 
+        title="Editar usuario" 
+        onClick={() => handleEdit(userItem)}
+        disabled={isDeleting}
+      >
+        <FontAwesomeIcon icon={["fas", "edit"]} />
+      </button>
+      <button 
+        className={`p-1 h-7 w-7 text-xs rounded-full transition ${
+          isDeleting 
+            ? 'bg-gray-400 cursor-not-allowed' 
+            : 'bg-red-500/80 hover:bg-red-700'
+        } text-white`}
+        title="Eliminar usuario" 
+        onClick={() => handleDelete(userItem)}
+        disabled={isDeleting}
+      >
+        {isDeleting ? (
+          <FontAwesomeIcon icon={["fas", "spinner"]} className="animate-spin" />
+        ) : (
+          <FontAwesomeIcon icon={["fas", "trash"]} />
+        )}
+      </button>
+    </div>
+  );
+
+  return (
+    <>
+      <EntityList<User>
+        title="Gestión de usuarios"
+        description="Usuarios registrados en la aplicación"
+        data={users}
+        columns={columns}
+        renderActions={renderActions}
+        filterFunction={filterFunction}
+        isLoading={isLoading}
+        error={error}
+        onRetry={handleRetry}
+        noDataMessage="No hay usuarios registrados"
+      />
+
+      <FloatingAddButton onClick={handleCreate} />
+
+      <UserModal
+        open={modalOpen}
+        onClose={handleClose}
+        mode={modalMode}
+        user={selectedUser}
+        onSave={handleSave}
+      />
+    </>
+  );
+}

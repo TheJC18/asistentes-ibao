@@ -52,40 +52,40 @@ function TableDefault<T extends { id?: string | number }>({
     <div className="w-full max-w-full overflow-x-auto relative" style={{ WebkitOverflowScrolling: 'touch' }}>
       {/* Sombra sutil a la derecha para indicar scroll */}
       <div className="pointer-events-none absolute top-0 right-0 h-full w-6 dark:from-gray-900/80 to-transparent z-10" />
-      <table className="min-w-fit w-full border-2 border-blue-400 rounded-xl overflow-hidden shadow-lg dark:border-blue-500 bg-white dark:bg-gray-800">
-        <thead className="border-b-2 border-blue-400 dark:border-blue-200 bg-gray-200 dark:bg-gray-600">
+      <table className="min-w-fit w-full border-2 border-blue-400 rounded-xl overflow-hidden shadow-lg dark:border-blue-600 bg-white dark:bg-gray-800">
+        <thead className="border-b-2 border-blue-400 dark:border-blue-500 bg-gray-200 dark:bg-gray-700">
           <tr>
             {visibleColumns.map((col) => (
               <th
                 key={String(col.key)}
-                className={`px-4 py-3 font-bold text-black dark:text-white text-base border-b-2 border-blue-400 dark:border-blue-500 ${col.className || ""}`}
+                className={`px-4 py-3 font-bold text-black dark:text-gray-100 text-base border-b-2 border-blue-400 dark:border-blue-500 ${col.className || ""}`}
               >
                 {col.label}
               </th>
             ))}
             {showActions && (
               <th
-                className="px-4 py-3 font-bold text-black dark:text-white text-center text-base border-b-2 border-blue-400 dark:border-blue-500 whitespace-nowrap"
+                className="px-4 py-3 font-bold text-black dark:text-gray-100 text-center text-base border-b-2 border-blue-400 dark:border-blue-500 whitespace-nowrap"
               >
                 Acciones
               </th>
             )}
           </tr>
         </thead>
-        <tbody className="divide-y divide-blue-200 dark:divide-blue-900">
+        <tbody className="divide-y divide-blue-200 dark:divide-gray-700">
           {data.map((item) => (
-            <tr key={item.id || JSON.stringify(item)} className="hover:bg-blue-50 dark:hover:bg-blue-900/30 transition">
+            <tr key={item.id || JSON.stringify(item)} className="hover:bg-blue-50 dark:hover:bg-gray-700/50 transition">
               {visibleColumns.map((col) => (
                 <td
                   key={String(col.key)}
-                  className={`px-4 py-3 text-start border-b border-blue-200 dark:border-blue-900 ${col.className || ""}`}
+                  className={`px-4 py-3 text-start border-b border-blue-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 ${col.className || ""}`}
                 >
                   {col.render ? col.render(item) : (item[col.key] as React.ReactNode)}
                 </td>
               ))}
               {showActions && (
                 <td
-                  className="px-2 py-3 border-b border-blue-200 dark:border-blue-900 text-center whitespace-nowrap"
+                  className="px-2 py-3 border-b border-blue-200 dark:border-gray-700 text-center whitespace-nowrap"
                 >
                   {actions(item)}
                 </td>
