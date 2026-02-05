@@ -1,40 +1,32 @@
-import { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import Badge from '../../../components/ui/badge/Badge';
 import FloatingAddButton from '../../../components/ui/FloatingAddButton';
 import UserModal from '../components/UserModal';
-import { useUserModal } from '../hooks/useUserModal';
-import { useUserStore } from '../hooks/useUserStore';
 import EntityList from '../../../components/ui/table/EntityList';
 import { getCountryNameByCode } from '../helpers/userUtils';
 import { formatDate } from '../../../helpers/dateUtils';
+import { useUserManagement } from '../hooks/useUserManagement';
 
 export default function UserListPage() {
-  // Hook del store de usuarios
+  // Hook de gestión de usuarios (contiene toda la lógica)
   const {
     users,
     isLoading,
     error,
     isDeleting,
-    loadUsers,
-    deleteUser,
-    refreshUsers
-  } = useUserStore();
-
-  // Hook para el modal (mantenemos la funcionalidad existente)
-  const {
-    open,
-    mode,
-    user,
-    handleOpen,
+    modalOpen,
+    modalMode,
+    selectedUser,
+    handleSave,
+    handleDelete,
+    handleView,
+    handleEdit,
+    handleCreate,
     handleClose,
-  } = useUserModal();
-
-  // Cargar usuarios al montar el componente
-  useEffect(() => {
-    loadUsers();
-  }, []);
+    handleRetry,
+    handlePasswordReset,
+  } = useUserManagement();
 
   const columns = [
     {
@@ -86,7 +78,7 @@ export default function UserListPage() {
     },
     { 
       key: 'nationality', 
-      label: 'Ubicación',  
+      label: 'Nacionalidad',  
       className: 'text-start', 
       visibleOn: ["md", "lg", "xl"],
       render: (userItem) => {
@@ -131,7 +123,7 @@ export default function UserListPage() {
       <button 
         className="p-1 h-7 w-7 text-xs rounded-full bg-blue-500/80 hover:bg-blue-700 text-white transition" 
         title="Ver detalles" 
-        onClick={() => handleOpen('view', userItem)}
+        onClick={() => handleView(userItem)}
         disabled={isDeleting}
       >
         <FontAwesomeIcon icon={["fas", "eye"]} />
@@ -139,7 +131,7 @@ export default function UserListPage() {
       <button 
         className="p-1 h-7 w-7 text-xs rounded-full bg-green-500/80 hover:bg-green-700 text-white transition" 
         title="Editar usuario" 
-        onClick={() => handleOpen('edit', userItem)}
+        onClick={() => handleEdit(userItem)}
         disabled={isDeleting}
       >
         <FontAwesomeIcon icon={["fas", "edit"]} />
@@ -163,40 +155,6 @@ export default function UserListPage() {
     </div>
   );
 
-  // Función para eliminar usuario
-  const handleDelete = async (userItem) => {
-    if (window.confirm(`¿Estás seguro de eliminar al usuario "${userItem.name}"?`)) {
-      try {
-        const result = await deleteUser(userItem.id);
-        if (result.ok) {
-          // Mostrar mensaje de éxito (opcional)
-          console.log('Usuario eliminado exitosamente');
-        } else {
-          alert('Error al eliminar usuario: ' + result.errorMessage);
-        }
-      } catch (error) {
-        alert('Error inesperado al eliminar usuario');
-        console.error('Error:', error);
-      }
-    }
-  };
-
-  // Función para guardar usuario
-  const handleSave = async (data) => {
-    try {
-      // Aquí puedes agregar lógica para crear/actualizar según el mode
-      console.log('Datos a guardar:', data);
-      console.log('Modo:', mode);
-      
-      // Refrescar la lista después de guardar
-      await refreshUsers();
-      
-      handleClose();
-    } catch (error) {
-      console.error('Error al guardar:', error);
-    }
-  };
-
   // Mostrar estado de carga
   if (isLoading) {
     return (
@@ -216,7 +174,7 @@ export default function UserListPage() {
             <strong>Error:</strong> {error}
           </div>
           <button 
-            onClick={() => loadUsers()} 
+            onClick={handleRetry}
             className="ml-4 px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 transition"
           >
             Reintentar
@@ -241,27 +199,18 @@ export default function UserListPage() {
       FloatingButton={
         <FloatingAddButton
           title="Agregar usuario"
-          onClick={() => handleOpen('create', { 
-            name: '',
-            displayName: '', 
-            email: '', 
-            role: 'user', 
-            nationality: '',
-            birthdate: '',
-            avatar: '',
-            photoURL: '',
-            isMember: false
-          })}
+          onClick={handleCreate}
           disabled={isLoading || isDeleting}
         />
       }
       ModalComponent={
         <UserModal 
-          open={open} 
+          open={modalOpen}
           onClose={handleClose} 
-          mode={mode} 
-          user={user} 
-          onSave={handleSave} 
+          mode={modalMode}
+          user={selectedUser}
+          onSave={handleSave}
+          onPasswordReset={handlePasswordReset}
         />
       }
     />

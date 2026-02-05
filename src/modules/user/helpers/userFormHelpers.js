@@ -21,8 +21,13 @@ export function createFileUploadHandler(setFormData, setFileInputValue) {
 export function createBirthdateUpdater(fieldUpdater) {
   return (selectedDates) => {
     if (Array.isArray(selectedDates) && selectedDates[0]) {
-      // Convertir la fecha a cadena ISO para consistencia
-      const dateString = selectedDates[0].toISOString().split('T')[0];
+      const date = selectedDates[0];
+      // Usar los métodos locales para evitar problemas de zona horaria
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const dateString = `${year}-${month}-${day}`;
+      
       fieldUpdater("birthdate", dateString);
     }
   };

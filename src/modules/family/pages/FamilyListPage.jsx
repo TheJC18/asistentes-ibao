@@ -1,89 +1,100 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import FamilyMemberModal from "./FamilyMemberModal";
+import UserModal from "../../user/components/UserModal";
 import FamilyMemberCard from "./FamilyMemberCard";
 import { useModal } from "../../../hooks/useModal";
-
-const initialFamilyMembers = [
-  {
-    id: 1,
-    name: "Carlos Pérez",
-    relation: "Padre",
-    avatar: "https://randomuser.me/api/portraits/men/1.jpg",
-    age: 45,
-    type: "Miembro",
-    email: "carlos.perez@email.com",
-    birthdate: "1980-03-15",
-    phone: "+58 412-1234567"
-  },
-  {
-    id: 2,
-    name: "Lucía Fernández",
-    relation: "Madre",
-    avatar: "https://randomuser.me/api/portraits/women/6.jpg",
-    age: 43,
-    type: "Miembro",
-    email: "lucia.fernandez@email.com",
-    birthdate: "1982-07-22",
-    phone: "+58 414-7654321"
-  },
-  {
-    id: 3,
-    name: "Javier Morales",
-    relation: "Hijo",
-    avatar: "https://randomuser.me/api/portraits/men/7.jpg",
-    age: 18,
-    type: "Asistente",
-    email: "javier.morales@email.com",
-    birthdate: "2007-01-10",
-    phone: "+58 424-1112233"
-  },
-  {
-    id: 4,
-    name: "Marta Iglesias",
-    relation: "Hija",
-    avatar: "https://randomuser.me/api/portraits/women/42.jpg",
-    age: 15,
-    type: "Asistente",
-    email: "marta.iglesias@email.com",
-    birthdate: "2010-11-05",
-    phone: "+58 426-3344556"
-  },
-  {
-    id: 5,
-    name: "Samuel Duarte",
-    relation: "Hermano",
-    avatar: "https://randomuser.me/api/portraits/men/45.jpg",
-    age: 20,
-    type: "Miembro",
-    email: "samuel.duarte@email.com",
-    birthdate: "2005-05-30",
-    phone: "+58 412-9988776"
-  }
-];
+import { useUserActions } from "../../user/hooks/useUserActions";
+import { createFamily, getFamilyMembers, getUserFamilies } from "../firebase/familyQueries";
+import { useSelector } from 'react-redux';
 
 export default function FamilyListPage() {
   const [search, setSearch] = useState("");
-  const [members, setMembers] = useState(initialFamilyMembers);
+  const [members, setMembers] = useState([]);
+  const [familyId, setFamilyId] = useState(null);
+  const [loading, setLoading] = useState(true);
   const { isOpen, openModal, closeModal } = useModal();
+  const { createUser, sendPasswordReset } = useUserActions();
+  const { uid: currentUserId } = useSelector(state => state.auth);
 
-  const filteredMembers = members.filter(m => m.name.toLowerCase().includes(search.toLowerCase()) || m.relation.toLowerCase().includes(search.toLowerCase()));
+  // Inicializar familia al cargar
+  useEffect(() => {
+    const initializeFamily = async () => {
+      if (!currentUserId) return;
+      
+      // 1. Verificar si el usuario ya tiene familias
+      const userFamiliesResult = await getUserFamilies(currentUserId);
+      
+      if (userFamiliesResult.ok && userFamiliesResult.families.length > 0) {
+        // Ya tiene familias, usar la primera
+        const firstFamily = userFamiliesResult.families[0];
+        setFamilyId(firstFamily.id);
+        loadFamilyMembers(firstFamily.id);
+      } else {
+        // No tiene familias, crear una nueva
+        const result = await createFamily({ name: 'Mi Familia' }, currentUserId);
+        
+        if (result.ok) {
+          setFamilyId(result.familyId);
+          loadFamilyMembers(result.familyId);
+        }
+      }
+      
+      setLoading(false);
+    };
+    
+    initializeFamily();
+  }, [currentUserId]);
 
-  const handleAddMember = (member) => {
-    setMembers(prev => [...prev, {
-      ...member,
-    }]);
+  const loadFamilyMembers = async (fId) => {
+    const result = await getFamilyMembers(fId);
+    if (result.ok) {
+      setMembers(result.members);
+    }
   };
 
+  const filteredMembers = members.filter(m => 
+    m.name.toLowerCase().includes(search.toLowerCase()) || 
+    m.relation?.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const handleAddMember = async (memberData) => {
+    if (!familyId) {
+      console.error('No hay familia creada');
+      return;
+    }
+    
+    // Agregar familyId y createdBy al memberData
+    const dataWithFamily = {
+      ...memberData,
+      familyId,
+      createdBy: currentUserId
+    };
+    
+    // Usar el flujo normal de creación de usuarios
+    const result = await createUser(dataWithFamily);
+    
+    if (result.ok) {
+      // Recargar miembros de la familia
+      await loadFamilyMembers(familyId);
+      closeModal();
+    }
+  };
+
+  if (loading) {
+    return <div className="flex justify-center items-center min-h-[80vh]">
+      <div className="text-xl">Cargando familia...</div>
+    </div>;
+  }
+
   return (
-    <div className="relative min-h-[80vh] dark:from-gray-900 dark:via-gray-950 dark:to-gray-900">
+    <div className="relative min-h-[80vh]">
       <div className="p-4 md:p-6">
         <h2 className="text-4xl font-extrabold mb-8 text-black dark:text-white text-center drop-shadow">
           <FontAwesomeIcon icon={["fas", "users"]} className="text-blue-700 px-3" />
           Mi Familia
         </h2>
         <input
-          className="mb-10 w-full rounded-xl border px-5 py-4 text-lg focus:ring-2 focus:ring-blue-400 dark:bg-gray-900 dark:text-white/90 dark:border-gray-700 shadow-sm"
+          className="mb-10 w-full rounded-xl border border-gray-300 px-5 py-4 text-lg focus:ring-2 focus:ring-blue-400 bg-white dark:bg-gray-800 dark:text-white/90 dark:border-gray-600 shadow-sm"
           placeholder="Buscar miembro, relación..."
           value={search}
           onChange={e => setSearch(e.target.value)}
@@ -103,7 +114,13 @@ export default function FamilyListPage() {
         <FontAwesomeIcon icon={["fas", "plus"]} />
       </button>
       {/* Modal para crear nuevo integrante */}
-      <FamilyMemberModal isOpen={isOpen} onClose={closeModal} onAdd={handleAddMember} />
+      <UserModal 
+        open={isOpen} 
+        onClose={closeModal} 
+        mode="family"
+        onSave={handleAddMember}
+        onPasswordReset={sendPasswordReset}
+      />
     </div>
   );
 }

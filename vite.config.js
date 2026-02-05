@@ -24,42 +24,42 @@ export default defineConfig({
         lang: 'es',
         icons: [
           {
-            src: '/logo.svg',
+            src: '/logo.webp',
             sizes: '48x48',
             type: 'image/svg+xml',
           },
           {
-            src: '/logo.svg',
+            src: '/logo.webp',
             sizes: '72x72',
             type: 'image/svg+xml',
           },
           {
-            src: '/logo.svg',
+            src: '/logo.webp',
             sizes: '96x96',
             type: 'image/svg+xml',
           },
           {
-            src: '/logo.svg',
+            src: '/logo.webp',
             sizes: '144x144',
             type: 'image/svg+xml',
           },
           {
-            src: '/logo.svg',
+            src: '/logo.webp',
             sizes: '192x192',
             type: 'image/svg+xml',
           },
           {
-            src: '/logo.svg',
+            src: '/logo.webp',
             sizes: '256x256',
             type: 'image/svg+xml',
           },
           {
-            src: '/logo.svg',
+            src: '/logo.webp',
             sizes: '384x384',
             type: 'image/svg+xml',
           },
           {
-            src: '/logo.svg',
+            src: '/logo.webp',
             sizes: '512x512',
             type: 'image/svg+xml',
           },

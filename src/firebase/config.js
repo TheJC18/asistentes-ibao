@@ -16,5 +16,9 @@ export const FirebaseApp  = initializeApp(firebaseConfig);
 export const FirebaseAuth = getAuth( FirebaseApp );
 export const FirebaseDB   = getFirestore( FirebaseApp );
 
+// Segunda instancia de Firebase Auth para crear usuarios sin afectar la sesión principal
+export const SecondaryFirebaseApp = initializeApp(firebaseConfig, "Secondary");
+export const SecondaryFirebaseAuth = getAuth(SecondaryFirebaseApp);
+
 /* Para que el login funcione en el navegador en prod tienes que:
    añadir el dominio de tu app (Authentication/Configuracion/Dominios) */

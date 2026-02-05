@@ -12,6 +12,9 @@ export const authSlice = createSlice({
         photoURL: null,
         errorMessage: null,
         role: null,
+        profileCompleted: null, // null = no verificado, true/false = verificado
+        nationality: null,
+        isMember: false,
     },
     
     reducers: {
@@ -23,6 +26,9 @@ export const authSlice = createSlice({
             state.displayName = payload.displayName;
             state.photoURL = payload.photoURL;
             state.errorMessage = null;
+            state.profileCompleted = payload.profileCompleted || false;
+            state.nationality = payload.nationality || null;
+            state.isMember = payload.isMember || false;
         },
 
         logout: (state ) => {
@@ -34,6 +40,9 @@ export const authSlice = createSlice({
             state.photoURL = null;
             state.errorMessage = null;
             state.role = null;
+            state.profileCompleted = null;
+            state.nationality = null;
+            state.isMember = false;
         },
 
         chekingCredentials: (state) => {
@@ -43,6 +52,10 @@ export const authSlice = createSlice({
         setRole: (state, { payload }) => {
             state.role = payload.role;
         },
+
+        setProfileCompleted: (state, { payload }) => {
+            state.profileCompleted = payload.profileCompleted;
+        },
     }
 });
 
@@ -51,6 +64,7 @@ export const authSlice = createSlice({
 export const { 
     chekingCredentials, 
     login, 
-    logout, 
+    logout,
     setRole,
+    setProfileCompleted,
 } = authSlice.actions;

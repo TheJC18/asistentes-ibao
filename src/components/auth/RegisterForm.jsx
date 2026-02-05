@@ -54,7 +54,9 @@ export default function RegisterForm() {
       <div className="flex flex-col justify-center flex-1 w-full max-w-md mx-auto">
         <div>
           <div className="mb-5 sm:mb-8">
-            <img src="/logo.svg" alt="Logo" className="w-32 h-32 mx-auto mb-10 rounded-full border-2 border-brand-500"/>
+            <div className="w-32 h-32 mx-auto mb-10 flex items-center justify-center">
+              <img src="/logo.webp" alt="Logo" className="w-full h-full object-contain"/>
+            </div>
             <h1 className="mb-2 font-semibold text-gray-800 text-title-sm dark:text-white/90 sm:text-title-md">
               Crear cuenta
             </h1>

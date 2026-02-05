@@ -10,11 +10,12 @@ import {
     where, 
     orderBy, 
     limit, 
-    startAfter,
-    getCountFromServer
+    getCountFromServer,
+    setDoc
 } from 'firebase/firestore';
 import { FirebaseDB } from '../../../firebase/config';
-import { formatDateFields, convertDateFieldsToISO, dateToISOString } from '../../../helpers';
+import { createAuthUser, cleanupOrphanAuthUser, updateUserPassword, checkEmailExists } from '../../auth/firebase/authQueries';
+import { formatDateFields, convertDateFieldsToISO, dateToISOString, getInverseRelation } from '../../../helpers';
 
 // === OBTENER LISTA DE USUARIOS ===
 export const getUsersFromFirebase = async (params = {}) => {
@@ -59,12 +60,24 @@ export const getUsersFromFirebase = async (params = {}) => {
         let users = querySnapshot.docs.map(doc => {
             const data = doc.data();
             
-            return {
+            const userData = {
                 id: doc.id,
                 ...formatDateFields(data, ['createdAt', 'updatedAt']),
                 // Convertir birthdate a ISO string para ser serializable
-                birthdate: data.birthdate ? dateToISOString(data.birthdate) : null
+                birthdate: data.birthdate ? dateToISOString(data.birthdate) : null,
+                // Asegurar que todos los campos importantes estén incluidos
+                profileCompleted: data.profileCompleted ?? false,
+                role: data.role || 'user',
+                name: data.name || data.displayName || '',
+                displayName: data.displayName || data.name || '',
+                email: data.email || '',
+                nationality: data.nationality || '',
+                isMember: data.isMember || false,
+                avatar: data.avatar || data.photoURL || '/user_default.png',
+                photoURL: data.photoURL || data.avatar || '/user_default.png',
             };
+            
+            return userData;
         });
         
         // Aplicar filtro de búsqueda en el lado del cliente
@@ -141,36 +154,183 @@ export const getUserByIdFromFirebase = async (userId) => {
 // === CREAR USUARIO ===
 export const createUserInFirebase = async (userData) => {
     try {
-        // Preparar datos del usuario
-        const newUserData = {
-            ...userData,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-            // Asegurar campos por defecto
-            status: userData.status || 'active',
-            role: userData.role || 'user'
-        };
+        const hasWebAccess = userData.hasWebAccess !== false; // Por defecto true
         
-        // Crear documento en Firestore
-        const usersRef = collection(FirebaseDB, 'users');
-        const docRef = await addDoc(usersRef, newUserData);
+        // Si tiene acceso web, necesita email y contraseña
+        if (hasWebAccess) {
+            if (!userData.email || !userData.password) {
+                return {
+                    ok: false,
+                    errorMessage: 'Email y contraseña son obligatorios para crear un usuario con acceso web'
+                };
+            }
+
+            // ✅ VERIFICAR SI EL EMAIL YA EXISTE EN AUTHENTICATION
+            const emailExists = await checkEmailExists(userData.email);
+            if (emailExists) {
+                return {
+                    ok: false,
+                    errorMessage: `El email ${userData.email} ya está registrado en el sistema. Si deseas reutilizarlo, primero elimina el usuario existente desde Firebase Console > Authentication.`,
+                    email: userData.email
+                };
+            }
+
+            // 1. Crear usuario en Authentication (authQueries)
+            const authResult = await createAuthUser(userData.email, userData.password);
+            
+            if (!authResult.ok) {
+                return authResult; // Retornar error con canCleanup si aplica
+            }
+            
+            const { uid } = authResult;
+
+            // 2. Preparar datos para Firestore (sin contraseña)
+            const { password, familyId, relation, ...userDataWithoutPassword } = userData;
+            
+            const newUserData = {
+                ...userDataWithoutPassword,
+                uid,
+                name: userData.name || userData.displayName || '',
+                displayName: userData.displayName || userData.name || '',
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                profileCompleted: false,
+                status: userData.status || 'active',
+                role: userData.role || 'user',
+                avatar: userData.avatar || userData.photoURL || '/user_default.png',
+                photoURL: userData.photoURL || userData.avatar || '/user_default.png',
+                hasWebAccess: true, // Tiene acceso web
+                families: [], // Array de IDs de familias a las que pertenece
+            };
+            
+            // 3. Crear documento en Firestore
+            const userDocRef = doc(FirebaseDB, 'users', uid);
+            await setDoc(userDocRef, newUserData);
+            
+            // 4. Crear familia propia del usuario (siempre)
+            const { createFamily, addUserToFamily, getUserById } = await import('../../family/firebase/familyQueries');
+            const userName = userData.name || userData.displayName || 'Usuario';
+            const ownFamilyResult = await createFamily({ name: `Familia de ${userName}` }, uid);
+            const ownFamilyId = ownFamilyResult.familyId;
+            
+            // 5. Si se proporcionó familyId, agregar a esa familia Y traer al titular a mi familia
+            if (familyId && relation) {
+                const currentUserId = userData.createdBy || uid;
+                
+                // Agregar el nuevo usuario a la familia del creador
+                await addUserToFamily(familyId, uid, {
+                    relation,
+                    role: 'member',
+                    addedBy: currentUserId
+                });
+                
+                // Obtener el titular de esa familia (quien lo agregó)
+                const titularData = await getUserById(currentUserId);
+                if (titularData.ok && titularData.user) {
+                    // Agregar al titular a MI familia (relación bidireccional)
+                    // Obtener el género del nuevo usuario para determinar la relación inversa
+                    const newUserGender = userData.gender || 'male'; // Por defecto masculino si no se especifica
+                    const inverseRelation = getInverseRelation(relation, newUserGender);
+                    
+                    await addUserToFamily(ownFamilyId, currentUserId, {
+                        relation: inverseRelation,
+                        role: 'member',
+                        addedBy: uid
+                    });
+                }
+            }
+            
+            // 5. Retornar usuario creado
+            const createdUser = {
+                id: uid,
+                ...convertDateFieldsToISO(newUserData, ['createdAt', 'updatedAt', 'birthdate'])
+            };
+            
+            return {
+                ok: true,
+                user: createdUser,
+                message: 'Usuario creado correctamente. Ahora puede iniciar sesión.'
+            };
+        } 
         
-        // Obtener el documento creado con el ID
-        const createdUser = {
-            id: docRef.id,
-            ...convertDateFieldsToISO(newUserData, ['createdAt', 'updatedAt', 'birthdate'])
-        };
-        
-        return {
-            ok: true,
-            user: createdUser
-        };
+        // Sin acceso web - solo guardar en Firestore (familiar sin login)
+        else {
+            const { password, familyId, relation, ...userDataWithoutPassword } = userData;
+            
+            // Generar ID único para el documento
+            const userDocRef = doc(collection(FirebaseDB, 'users'));
+            const uid = userDocRef.id;
+            
+            const newUserData = {
+                ...userDataWithoutPassword,
+                uid,
+                name: userData.name || userData.displayName || '',
+                displayName: userData.displayName || userData.name || '',
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                profileCompleted: false,
+                status: userData.status || 'active',
+                role: userData.role || 'user',
+                avatar: userData.avatar || userData.photoURL || '/user_default.png',
+                photoURL: userData.photoURL || userData.avatar || '/user_default.png',
+                hasWebAccess: false, // NO tiene acceso web
+                families: [], // Array de IDs de familias a las que pertenece
+            };
+            
+            // Crear documento en Firestore
+            await setDoc(userDocRef, newUserData);
+            
+            // Crear familia propia del usuario (siempre)
+            const { createFamily, addUserToFamily, getUserById } = await import('../../family/firebase/familyQueries');
+            const userName = userData.name || userData.displayName || 'Usuario';
+            const ownFamilyResult = await createFamily({ name: `Familia de ${userName}` }, uid);
+            const ownFamilyId = ownFamilyResult.familyId;
+            
+            // Si se proporcionó familyId, agregar a esa familia Y traer al titular a mi familia
+            if (familyId && relation) {
+                const currentUserId = userData.createdBy || uid;
+                
+                // Agregar el nuevo usuario a la familia del creador
+                await addUserToFamily(familyId, uid, {
+                    relation,
+                    role: 'member',
+                    addedBy: currentUserId
+                });
+                
+                // Obtener el titular de esa familia (quien lo agregó)
+                const titularData = await getUserById(currentUserId);
+                if (titularData.ok && titularData.user) {
+                    // Agregar al titular a MI familia (relación bidireccional)
+                    // Obtener el género del nuevo usuario para determinar la relación inversa
+                    const newUserGender = userData.gender || 'male'; // Por defecto masculino si no se especifica
+                    const inverseRelation = getInverseRelation(relation, newUserGender);
+                    
+                    await addUserToFamily(ownFamilyId, currentUserId, {
+                        relation: inverseRelation,
+                        role: 'member',
+                        addedBy: uid
+                    });
+                }
+            }
+            
+            // Retornar usuario creado
+            const createdUser = {
+                id: uid,
+                ...convertDateFieldsToISO(newUserData, ['createdAt', 'updatedAt', 'birthdate'])
+            };
+            
+            return {
+                ok: true,
+                user: createdUser,
+                message: 'Familiar agregado correctamente.'
+            };
+        }
         
     } catch (error) {
-        console.error('Error al crear usuario en Firebase:', error);
+        console.error('Error al crear usuario:', error);
         return {
             ok: false,
-            errorMessage: `Error al crear usuario: ${error.message}`
+            errorMessage: error.message || 'Error al crear usuario'
         };
     }
 };
@@ -178,17 +338,110 @@ export const createUserInFirebase = async (userData) => {
 // === ACTUALIZAR USUARIO ===
 export const updateUserInFirebase = async (userId, userData) => {
     try {
-        // Preparar datos de actualización
+        // Obtener datos actuales del usuario
+        const userDocRef = doc(FirebaseDB, 'users', userId);
+        const userSnapshot = await getDoc(userDocRef);
+        
+        if (!userSnapshot.exists()) {
+            return {
+                ok: false,
+                errorMessage: 'Usuario no encontrado'
+            };
+        }
+        
+        const currentUserData = userSnapshot.data();
+        const wasWebAccessEnabled = currentUserData.hasWebAccess || false;
+        const isWebAccessNowEnabled = userData.hasWebAccess !== false;
+        
+        // Separar contraseña y email de los otros datos
+        const { password, email, ...dataWithoutPassword } = userData;
+        
+        // CASO 1: Usuario NO tenía acceso web y ahora SÍ (necesita crear en Authentication)
+        if (!wasWebAccessEnabled && isWebAccessNowEnabled && email && password) {
+            // Verificar si el email ya existe
+            const emailExists = await checkEmailExists(email);
+            if (emailExists) {
+                return {
+                    ok: false,
+                    errorMessage: `El email ${email} ya está registrado en Authentication.`,
+                };
+            }
+            
+            // Crear usuario en Authentication
+            const authResult = await createAuthUser(email, password);
+            
+            if (!authResult.ok) {
+                return authResult;
+            }
+            
+            const newAuthUid = authResult.uid;
+            
+            // IMPORTANTE: El usuario tiene un UID de Firestore diferente al de Authentication
+            // Necesitamos migrar los datos al nuevo UID
+            
+            // 1. Copiar todos los datos del usuario actual al nuevo UID
+            const newUserDocRef = doc(FirebaseDB, 'users', newAuthUid);
+            const migratedData = {
+                ...currentUserData,
+                ...dataWithoutPassword,
+                uid: newAuthUid, // Nuevo UID de Authentication
+                email: email,
+                hasWebAccess: true,
+                updatedAt: new Date(),
+            };
+            
+            await setDoc(newUserDocRef, migratedData);
+            
+            // 2. Actualizar las referencias en las familias
+            if (currentUserData.families && currentUserData.families.length > 0) {
+                const { updateUserIdInFamilies } = await import('../../family/firebase/familyQueries');
+                await updateUserIdInFamilies(userId, newAuthUid, currentUserData.families);
+            }
+            
+            // 3. Eliminar el documento viejo
+            await deleteDoc(userDocRef);
+            
+            // 4. Obtener el usuario migrado
+            const migratedSnapshot = await getDoc(newUserDocRef);
+            const migratedUserData = migratedSnapshot.data();
+            const migratedUser = {
+                id: migratedSnapshot.id,
+                ...convertDateFieldsToISO(migratedUserData, ['createdAt', 'updatedAt', 'birthdate'])
+            };
+            
+            return {
+                ok: true,
+                user: migratedUser,
+                migrated: true, // Indicador de que se migró
+                oldId: userId,
+                newId: newAuthUid
+            };
+        }
+        // CASO 2: Usuario YA tenía acceso web y quiere cambiar contraseña
+        else if (wasWebAccessEnabled && password && password.trim() !== '') {
+            const passwordResult = await updateUserPassword(password);
+            if (!passwordResult.ok) {
+                return passwordResult;
+            }
+        }
+        
+        // Preparar datos para Firestore (sin contraseña)
         const updateData = {
-            ...userData,
-            updatedAt: new Date()
+            ...dataWithoutPassword,
+            name: dataWithoutPassword.name || dataWithoutPassword.displayName || '',
+            displayName: dataWithoutPassword.displayName || dataWithoutPassword.name || '',
+            avatar: dataWithoutPassword.avatar || dataWithoutPassword.photoURL || '/user_default.png',
+            photoURL: dataWithoutPassword.photoURL || dataWithoutPassword.avatar || '/user_default.png',
+            profileCompleted: true,
+            updatedAt: new Date(),
+            // Actualizar hasWebAccess si viene en los datos
+            ...(userData.hasWebAccess !== undefined && { hasWebAccess: userData.hasWebAccess })
         };
         
-        // Actualizar documento en Firestore
-        const userDocRef = doc(FirebaseDB, 'users', userId);
+        // Actualizar en Firestore
         await updateDoc(userDocRef, updateData);
         
-        // Obtener el documento actualizado
+        // Obtener documento actualizado
         const updatedSnapshot = await getDoc(userDocRef);
         
         if (updatedSnapshot.exists()) {
@@ -219,9 +472,9 @@ export const updateUserInFirebase = async (userId, userData) => {
 };
 
 // === ELIMINAR USUARIO ===
+// Solo elimina de Firestore. Authentication debe eliminarse manualmente o con Cloud Functions
 export const deleteUserFromFirebase = async (userId) => {
     try {
-        // Verificar que el usuario existe antes de eliminar
         const userDocRef = doc(FirebaseDB, 'users', userId);
         const userSnapshot = await getDoc(userDocRef);
         
@@ -231,12 +484,38 @@ export const deleteUserFromFirebase = async (userId) => {
                 errorMessage: 'Usuario no encontrado'
             };
         }
+
+        const userData = userSnapshot.data();
+        const userFamilies = userData.families || [];
         
-        // Eliminar documento de Firestore
+        // 1. Eliminar usuario de todas sus familias
+        if (userFamilies.length > 0) {
+            const { removeUserFromFamily } = await import('../../family/firebase/familyQueries');
+            
+            const deletePromises = userFamilies.map(async (familyId) => {
+                try {
+                    await removeUserFromFamily(familyId, userId);
+                    console.log(`Usuario ${userId} eliminado de familia ${familyId}`);
+                } catch (error) {
+                    console.error(`Error al eliminar usuario de familia ${familyId}:`, error);
+                }
+            });
+            
+            await Promise.all(deletePromises);
+        }
+        
+        // 2. Advertencia: Authentication debe eliminarse por separado
+        if (userData.email) {
+            console.warn(`⚠️ El usuario ${userData.email} debe ser eliminado de Firebase Authentication manualmente`);
+        }
+        
+        // 3. Eliminar documento del usuario de Firestore
         await deleteDoc(userDocRef);
         
         return {
-            ok: true
+            ok: true,
+            warning: userData.email ? 'Usuario eliminado de Firestore. Authentication debe eliminarse manualmente.' : null,
+            familiesCleanedUp: userFamilies.length
         };
         
     } catch (error) {

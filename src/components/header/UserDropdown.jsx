@@ -1,13 +1,20 @@
 import { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { DropdownItem } from '../ui/dropdown/DropdownItem';
 import { Dropdown } from '../ui/dropdown/Dropdown';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { startLogOut } from '../../modules/auth/store';
+import UserModal from '../../modules/user/components/UserModal';
+import { updateUserInFirebase } from '../../modules/user/firebase/userQueries';
+import { showToast, showErrorAlert } from '../../helpers/sweetAlertHelper';
 
 const UserDropdown = ({ displayName, email, photoURL, role }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
   const dispatch = useDispatch();
+  
+  // Obtener datos completos del usuario desde el store
+  const { uid, birthdate, nationality, isMember } = useSelector((state) => state.auth);
 
   function toggleDropdown() {
     setIsOpen(!isOpen);
@@ -20,7 +27,36 @@ const UserDropdown = ({ displayName, email, photoURL, role }) => {
   function handleLogout() {
     dispatch(startLogOut());
     closeDropdown();
-  };
+  }
+  
+  function handleEditProfile() {
+    setShowEditModal(true);
+    closeDropdown();
+  }
+  
+  async function handleSaveProfile(data) {
+    try {
+      const result = await updateUserInFirebase(uid, data);
+      
+      if (result.ok) {
+        showToast('success', 'Perfil actualizado correctamente');
+        setShowEditModal(false);
+        // Recargar la página para actualizar los datos en el header
+        window.location.reload();
+      } else {
+        showErrorAlert(
+          'Error al guardar',
+          result.errorMessage || 'No se pudo actualizar el perfil'
+        );
+      }
+    } catch (error) {
+      console.error('Error al guardar perfil:', error);
+      showErrorAlert(
+        'Error al guardar',
+        'Ocurrió un error al actualizar el perfil'
+      );
+    }
+  }
 
   return (
     <div className="relative">
@@ -58,15 +94,13 @@ const UserDropdown = ({ displayName, email, photoURL, role }) => {
 
         <ul className="flex flex-col gap-1 pt-4 pb-3 border-b border-gray-200 dark:border-gray-800">
           <li>
-            <DropdownItem
-              onItemClick={closeDropdown}
-              tag="a"
-              to="/profile"
-              className="flex items-center gap-3 px-3 py-2 font-medium text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
+            <button
+              onClick={handleEditProfile}
+              className="flex items-center gap-3 px-3 py-2 font-medium text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300 w-full text-left"
             >
               <FontAwesomeIcon icon={["fas", "user"]} className="text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-300" />
               Editar mi perfil
-            </DropdownItem>
+            </button>
           </li>
           <li>
             <DropdownItem
@@ -89,6 +123,27 @@ const UserDropdown = ({ displayName, email, photoURL, role }) => {
           Cerrar sesión
         </button>
       </Dropdown>
+      
+      {/* Modal de edición de perfil */}
+      <UserModal
+        open={showEditModal}
+        onClose={() => setShowEditModal(false)}
+        mode="edit"
+        user={{
+          id: uid,
+          uid,
+          name: displayName,
+          displayName,
+          email,
+          avatar: photoURL,
+          photoURL,
+          role,
+          birthdate,
+          nationality,
+          isMember
+        }}
+        onSave={handleSaveProfile}
+      />
     </div>
   );
 };

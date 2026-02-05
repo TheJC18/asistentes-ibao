@@ -63,11 +63,25 @@ export const dateToISOString = (date) => {
 };
 
 /**
- * Formatea múltiples campos de fecha en un objeto
- * @param {Object} data - Objeto con campos de fecha
- * @param {Array<string>} dateFields - Array con los nombres de los campos de fecha a formatear
- * @returns {Object} - Objeto con las fechas formateadas
+ * Convierte un string ISO a objeto Date para componentes que requieren Date
+ * @param {string|null|undefined} isoString - String ISO de fecha
+ * @returns {Date|null} - Objeto Date o null si no es válido
  */
+export const convertISOToDate = (isoString) => {
+    if (!isoString) return null;
+    
+    try {
+        const date = new Date(isoString);
+        // Verificar que la fecha sea válida
+        if (isNaN(date.getTime())) {
+            return null;
+        }
+        return date;
+    } catch {
+        return null;
+    }
+};
+
 export const formatDateFields = (data, dateFields = ['createdAt', 'updatedAt', 'birthdate']) => {
     const formattedData = { ...data };
     
@@ -83,7 +97,7 @@ export const formatDateFields = (data, dateFields = ['createdAt', 'updatedAt', '
 /**
  * Convierte múltiples campos de fecha a formato ISO en un objeto
  * @param {Object} data - Objeto con campos de fecha
- * @param {Array<string>} dateFields - Array con los nombres de los campos de fecha a convertir
+ * @param {Array} dateFields - Array con los nombres de los campos de fecha a convertir
  * @returns {Object} - Objeto con las fechas en formato ISO
  */
 export const convertDateFieldsToISO = (data, dateFields = ['createdAt', 'updatedAt', 'birthdate']) => {

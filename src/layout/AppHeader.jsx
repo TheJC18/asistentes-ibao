@@ -5,7 +5,6 @@ import { Link } from 'react-router-dom';
 import { useSidebar } from '../context/SidebarContext.tsx';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ThemeToggleButton } from '../components/common/ThemeToggleButton';
-import NotificationDropdown from '../components/header/NotificationDropdown';
 import UserDropdown from '../components/header/UserDropdown.jsx';
 
 const AppHeader = () => {
@@ -68,13 +67,8 @@ const AppHeader = () => {
 
           <Link to="/" className="lg:hidden">
             <img
-              className="dark:hidden h-8 w-auto"
-              src="/logob.webp"
-              alt="Logo"
-            />
-            <img
-              className="hidden dark:block h-8 w-auto"
-              src="/logow.webp"
+              className="h-8 w-auto"
+              src="/logo.webp"
               alt="Logo"
             />
           </Link>
@@ -93,7 +87,6 @@ const AppHeader = () => {
           } items-center justify-between w-full gap-4 px-5 py-4 lg:flex shadow-theme-md lg:justify-end lg:px-0 lg:shadow-none`}
         >
           <div className="flex items-center gap-2 2xsm:gap-3">
-            <NotificationDropdown />
             <ThemeToggleButton />
           </div>
           <UserDropdown uid={uid} displayName={displayName} email={email} photoURL={photoURL} role={role} />

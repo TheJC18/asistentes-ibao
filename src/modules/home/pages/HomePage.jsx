@@ -1,18 +1,38 @@
-import DemographicCard from '../../../components/ecommerce/DemographicCard';
-import EcommerceMetrics from '../../../components/ecommerce/EcommerceMetrics';
+import { useSelector } from 'react-redux';
+import Calendar from '../../../components/ui/calendar/Calendar';
+import CompleteProfileCard from '../components/CompleteProfileCard';
 
 export default function Home() {
-  return (
-    <>
-      <div className="grid grid-cols-12 gap-4 md:gap-6">
-        <div className="col-span-12 space-y-6 xl:col-span-7">
-          <EcommerceMetrics />
-        </div>
+  const { profileCompleted } = useSelector((state) => state.auth);
 
-        <div className="col-span-12 xl:col-span-5">
-          <DemographicCard />
-        </div>
+  const handleDateClick = (date) => {
+    console.log('Fecha clickeada:', date);
+  };
+
+  const handleEventClick = (event) => {
+    console.log('Evento clickeado:', event);
+  };
+
+  // Si el perfil no está completado, mostrar solo el card de completar perfil
+  if (profileCompleted === false) {
+    return (
+      <div className="p-6">
+        <CompleteProfileCard />
       </div>
-    </>
+    );
+  }
+
+  return (
+    <div className="p-6">
+      <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">
+        Inicio
+      </h1>
+      
+      <Calendar 
+        events={[]}
+        onDateClick={handleDateClick}
+        onEventClick={handleEventClick}
+      />
+    </div>
   );
 }

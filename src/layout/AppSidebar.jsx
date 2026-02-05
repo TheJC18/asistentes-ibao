@@ -2,6 +2,7 @@ import { useCallback, useState, useRef, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useSidebar } from "../context/SidebarContext.tsx";
+import { useSelector } from "react-redux";
 
 // Secciones dinámicas del sidebar
 const sections = {
@@ -17,11 +18,6 @@ const sections = {
       path: "/familia",
     },
     {
-      icon: <FontAwesomeIcon icon={["fas", "users-rectangle"]} />, // Ícono sólido
-      name: "Asistentes",
-      path: "/asistentes",
-    },
-    {
       icon: <FontAwesomeIcon icon={["fas", "user-check"]} />, // Ícono sólido
       name: "Miembros",
       path: "/miembros",
@@ -30,6 +26,7 @@ const sections = {
       icon: <FontAwesomeIcon icon={["fas", "address-book"]} />, // Ícono sólido
       name: "Usuarios",
       path: "/usuarios",
+      roles: ['admin'], // Solo visible para admin
     },
   ],
 };
@@ -37,6 +34,7 @@ const sections = {
 const AppSidebar = () => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
   const location = useLocation();
+  const { role } = useSelector((state) => state.auth); // Obtener rol del usuario
 
   const [openSubmenu, setOpenSubmenu] = useState(null);
   const [subMenuHeight, setSubMenuHeight] = useState({});
@@ -91,6 +89,21 @@ const AppSidebar = () => {
       }
       return { section, index };
     });
+  };
+
+  // Función para verificar si el usuario tiene permiso para ver un item
+  const hasPermission = (item) => {
+    // Si no tiene roles especificados, es visible para todos
+    if (!item.roles || item.roles.length === 0) {
+      return true;
+    }
+    // Verificar si el rol del usuario está en la lista de roles permitidos
+    return item.roles.includes(role);
+  };
+
+  // Filtrar items del menú según permisos
+  const filterMenuItems = (items) => {
+    return items.filter(hasPermission);
   };
 
   const renderSectionTitle = (sectionName, isExpanded, isHovered, isMobileOpen) => (
@@ -263,30 +276,32 @@ const AppSidebar = () => {
                 <>
                   <img
                     className="dark:hidden w-[32px] h-auto"
-                    src="/logob.webp"
-                    alt="Logo"
-                  />
-                  <img
-                    className="hidden dark:block w-[32px] h-auto"
-                    src="/logow.webp"
+                    src="/logo.webp"
                     alt="Logo"
                   />
                 </>
               ) : (
                 <img
-                  src="/logob.webp"
+                  src="/logo.webp"
                   alt="Logo Icon"
                   className="w-[32px] h-[32px]"
                 />
               )}
             </Link>
             
-            {Object.entries(sections).map(([sectionName, items]) => (
-              <div key={sectionName}>
-                {renderSectionTitle(sectionName, isExpanded, isHovered, isMobileOpen)}
-                {renderMenuItems(items, sectionName)}
-              </div>
-            ))}
+            {Object.entries(sections).map(([sectionName, items]) => {
+              const filteredItems = filterMenuItems(items);
+              
+              // No mostrar la sección si no hay items visibles
+              if (filteredItems.length === 0) return null;
+              
+              return (
+                <div key={sectionName}>
+                  {renderSectionTitle(sectionName, isExpanded, isHovered, isMobileOpen)}
+                  {renderMenuItems(filteredItems, sectionName)}
+                </div>
+              );
+            })}
           </div>
         </nav>
       </div>

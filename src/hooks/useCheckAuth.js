@@ -5,7 +5,7 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { FirebaseAuth } from '../firebase/config';
 
 import { login, logout, setRole } from '../modules/auth/store/authSlice';
-import { getRole } from '../modules/auth/firebase/authQueries';
+import { checkOrCreateUser, getUserByUID } from '../modules/auth/firebase/authQueries';
 
 export const useCheckAuth = () => {
  
@@ -18,20 +18,47 @@ export const useCheckAuth = () => {
             if( !user ) return dispatch( logout() );
 
             const { uid, email, displayName, photoURL } = user;
-            dispatch( login({ uid, email, displayName, photoURL }) );
-
+            
             try {
-                const roleResult = await getRole({ uid });
-
-                if (roleResult.ok) {
-                    dispatch( setRole( {role: roleResult.role} ) );
+                // Primero asegurar que el usuario exista en Firestore
+                await checkOrCreateUser({ uid, email, displayName, photoURL });
+                
+                // Obtener TODOS los datos del usuario desde Firestore
+                const userResult = await getUserByUID({ uid });
+                
+                if (userResult.ok && userResult.data) {
+                    const userData = userResult.data;
+                    
+                    // Hacer login con TODOS los datos de una vez
+                    dispatch( login({ 
+                        uid, 
+                        email: userData.email || email,
+                        displayName: userData.displayName || displayName,
+                        photoURL: userData.photoURL || photoURL,
+                        birthdate: userData.birthdate || null,
+                        nationality: userData.nationality || null,
+                        isMember: userData.isMember || false,
+                        profileCompleted: userData.profileCompleted || false
+                    }) );
+                    
+                    // Setear el rol
+                    dispatch( setRole( {role: userData.role || 'user'} ) );
                 } else {
-                    console.warn('No se pudo obtener el rol, usando rol por defecto:', roleResult.error);
+                    // Si no se pueden obtener datos, hacer login con valores básicos
+                    dispatch( login({ 
+                        uid, 
+                        email, 
+                        displayName, 
+                        photoURL,
+                        profileCompleted: false 
+                    }) );
                     dispatch( setRole( {role: 'user'} ) );
                 }
+                
             } catch (error) {
-                console.error('Error obteniendo el rol del usuario:', error);
-                // Establecer rol por defecto en caso de error
+                console.error('Error en el proceso de autenticación:', error);
+                // En caso de error, hacer login con valores por defecto
+                dispatch( login({ uid, email, displayName, photoURL, profileCompleted: false }) );
                 dispatch( setRole( {role: 'user'} ) );
             }
         });
