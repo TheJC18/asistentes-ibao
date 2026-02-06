@@ -13,7 +13,7 @@ import {
     signInWithPopup,
     User
 } from 'firebase/auth';
-import { FirebaseDB, FirebaseAuth, SecondaryFirebaseAuth } from '../../../firebase/config';
+import { FirebaseDB, FirebaseAuth, SecondaryFirebaseAuth } from '@/firebase/config';
 
 interface CheckOrCreateUserParams {
     uid: string;

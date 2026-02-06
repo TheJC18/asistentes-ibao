@@ -2,12 +2,12 @@ import { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 
-import { useSidebar } from '../context/SidebarContext';
+import { useSidebar } from '@/core/context/SidebarContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { ThemeToggleButton } from '../components/common/ThemeToggleButton';
-import { LanguageToggleButton } from '../components/common/LanguageToggleButton';
-import UserDropdown from '../components/header/UserDropdown';
-import { RootState } from '../store';
+import { ThemeToggleButton } from '@/core/components/common/ThemeToggleButton';
+import { LanguageToggleButton } from '@/core/components/common/LanguageToggleButton';
+import UserDropdown from '@/core/components/header/UserDropdown';
+import { RootState } from '@/core/store';
 
 const AppHeader = () => {
   const [isApplicationMenuOpen, setApplicationMenuOpen] = useState(false);

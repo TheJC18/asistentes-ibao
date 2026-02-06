@@ -10,9 +10,9 @@ import {
   setCurrentPage,
   clearCurrentUser,
   clearUserState
-} from '../store';
-import { RootState, AppDispatch } from '../../../store';
-import { User, UserFilters, Pagination } from '../../../types';
+} from '@/modules/user/store';
+import { RootState, AppDispatch } from '@/core/store';
+import { User, UserFilters, Pagination } from '@/types';
 
 export const useUserStore = () => {
   const dispatch = useDispatch<AppDispatch>();

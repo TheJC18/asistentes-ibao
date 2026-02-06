@@ -4,7 +4,7 @@ export const es = {
     home: 'Inicio',
     users: 'Usuarios',
     family: 'Mi Familia',
-    members: 'Asistentes',
+    members: 'Miembros',
   },
 
   // Común
@@ -113,8 +113,15 @@ export const es = {
       searchPlaceholder: 'Buscar miembro, relación...',
     },
     members: {
-      title: 'Asistentes',
-      searchPlaceholder: 'Buscar asistentes...',
+      title: 'Miembros',
+      searchPlaceholder: 'Buscar miembros...',
+      all: 'Todos',
+      members: 'Miembros',
+      attendees: 'Asistentes',
+      noMembersFound: 'No hay miembros registrados',
+      noAttendeesFound: 'No hay asistentes',
+      noUsersFound: 'No hay usuarios registrados',
+      noSearchResults: 'No se encontraron usuarios con ese término de búsqueda',
     },
   },
 
@@ -184,6 +191,17 @@ export const es = {
     grandmother: 'Abuela',
     grandson: 'Nieto',
     granddaughter: 'Nieta',
+  },
+
+  // Calendario
+  calendar: {
+    today: 'Hoy',
+    more: 'más',
+    months: [
+      'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+      'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+    ],
+    days: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
   },
 };
 

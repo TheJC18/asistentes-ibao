@@ -1,6 +1,6 @@
 // Utilidades para validación de datos de usuario
-import { countriesES, countriesEN } from "../../../helpers";
-import { Country } from "../../../types";
+import { countriesES, countriesEN } from "@/i18n/countries";
+import { Country } from "@/types";
 
 export const USER_ROLES = {
   USER: 'user',

@@ -7,8 +7,8 @@ import {
   signOut
 } from 'firebase/auth';
 import { FirebaseAuth } from './config';
-import { checkOrCreateUser } from '../modules/auth/firebase/authQueries';
-import { FirebaseResponse } from '../types';
+import { checkOrCreateUser } from '@/modules/auth/firebase/authQueries';
+import { FirebaseResponse } from '@/types';
 
 const googleProvider = new GoogleAuthProvider();
 

@@ -1,5 +1,5 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
-import UserListPage from '../pages/UserListPage';
+import UserListPage from '@/modules/user/pages/UserListPage';
 
 export const UsersRoutes = () => {
   return (

@@ -1,6 +1,6 @@
-import { createUserInFirebase, updateUserInFirebase, deleteUserFromFirebase, getUserByIdFromFirebase } from '../firebase/userQueries';
-import { cleanupOrphanAuthUser, sendPasswordResetEmailToUser } from '../../auth/firebase/authQueries';
-import { showDeleteConfirmAlert, showSuccessAlert, showErrorAlert, showToast } from '../../../helpers/sweetAlertHelper';
+import { createUserInFirebase, updateUserInFirebase, deleteUserFromFirebase, getUserByIdFromFirebase } from '@/modules/user/firebase/userQueries';
+import { cleanupOrphanAuthUser, sendPasswordResetEmailToUser } from '@/modules/auth/firebase/authQueries';
+import { showDeleteConfirmAlert, showSuccessAlert, showErrorAlert, showToast } from '@/core/helpers/sweetAlertHelper';
 
 interface CreateUserResult {
   ok: boolean;

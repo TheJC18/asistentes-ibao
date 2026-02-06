@@ -1,12 +1,12 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useTranslation } from '../../../context/LanguageContext';
-import Badge from '../../../components/ui/badge/Badge';
-import FloatingAddButton from '../../../components/ui/FloatingAddButton';
-import UserModal from '../components/UserModal';
-import EntityList from '../../../components/ui/table/EntityList';
-import { getCountryNameByCode } from '../helpers/userUtils';
-import { useUserManagement } from '../hooks/useUserManagement';
-import { User } from '../../../types';
+import { useTranslation } from '@/core/context/LanguageContext';
+import Badge from '@/core/components/ui/badge/Badge';
+import FloatingActionButtons from '@/core/components/ui/FloatingActionButtons';
+import UserModal from '@/modules/user/components/UserModal';
+import EntityList from '@/core/components/ui/table/EntityList';
+import { getCountryNameByCode } from '@/modules/user/helpers/userUtils';
+import { useUserManagement } from '@/modules/user/hooks/useUserManagement';
+import { User } from '@/types';
 
 export default function UserListPage() {
   const translate = useTranslation();
@@ -168,7 +168,12 @@ export default function UserListPage() {
   return (
     <>
       <EntityList<User>
-        title={translate.pages.users.title}
+        title={
+          <div className="flex items-center gap-3">
+            <FontAwesomeIcon icon={["fas", "address-book"]} className="text-purple-600 dark:text-purple-400 text-3xl" />
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white">{translate.pages.users.title}</h2>
+          </div>
+        }
         description={translate.pages.users.description}
         data={users}
         columns={columns}
@@ -180,7 +185,17 @@ export default function UserListPage() {
         noDataMessage={translate.pages.users.noUsers}
       />
 
-      <FloatingAddButton onClick={handleCreate} />
+      <FloatingActionButtons 
+        buttons={[
+          {
+            icon: ["fas", "plus"],
+            onClick: handleCreate,
+            title: "Crear usuario",
+            tooltip: "Nuevo usuario",
+            color: "blue"
+          }
+        ]}
+      />
 
       <UserModal
         open={modalOpen}

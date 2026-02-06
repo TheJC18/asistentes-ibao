@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useUserStore } from './useUserStore';
 import { useUserModal } from './useUserModal';
 import { useUserActions } from './useUserActions';
-import { User } from '../../../types';
+import { User } from '@/types';
 
 /**
  * Hook orquestador para la gestión completa de usuarios

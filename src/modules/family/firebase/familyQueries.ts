@@ -10,8 +10,8 @@ import {
     arrayRemove,
     serverTimestamp
 } from 'firebase/firestore';
-import { FirebaseDB } from '../../../firebase/config';
-import { User, Family, FamilyMember } from '../../../types';
+import { FirebaseDB } from '@/firebase/config';
+import { User, Family, FamilyMember } from '@/types';
 
 // === INTERFACES ===
 
@@ -374,6 +374,125 @@ export const getUserById = async (userId: string): Promise<GetUserByIdResult> =>
         console.error('Error al obtener usuario:', error);
         return {
             ok: false,
+            errorMessage: error.message
+        };
+    }
+};
+
+/**
+ * Eliminar familiar con lógica inteligente
+ * Si el usuario solo está en esta familia, lo elimina completamente
+ * Si está en otras familias, solo lo remueve de esta familia
+ */
+export const deleteFamilyMember = async (familyId: string, userId: string): Promise<RemoveUserFromFamilyResult> => {
+    try {
+        // 1. Obtener las familias del usuario
+        const userRef = doc(FirebaseDB, 'users', userId);
+        const userSnap = await getDoc(userRef);
+        
+        if (!userSnap.exists()) {
+            return {
+                ok: false,
+                errorMessage: 'Usuario no encontrado'
+            };
+        }
+        
+        const userData = userSnap.data();
+        const userFamilies = userData.families || [];
+        
+        // 2. Verificar si el usuario está en otras familias
+        if (userFamilies.length <= 1) {
+            // Solo está en esta familia → Eliminar usuario completamente
+            
+            // Eliminar de la familia
+            const memberRef = doc(FirebaseDB, `families/${familyId}/members`, userId);
+            await deleteDoc(memberRef);
+            
+            // Eliminar usuario de la colección users
+            await deleteDoc(userRef);
+            
+            return {
+                ok: true,
+                message: 'Usuario eliminado completamente (no pertenecía a otras familias)'
+            };
+        } else {
+            // Está en otras familias → Solo remover de esta familia
+            
+            // Eliminar de families/{familyId}/members/{userId}
+            const memberRef = doc(FirebaseDB, `families/${familyId}/members`, userId);
+            await deleteDoc(memberRef);
+            
+            // Remover familyId del array families en users/{userId}
+            await updateDoc(userRef, {
+                families: arrayRemove(familyId),
+                updatedAt: serverTimestamp()
+            });
+            
+            return {
+                ok: true,
+                message: 'Usuario removido de la familia (aún pertenece a otras familias)'
+            };
+        }
+    } catch (error: any) {
+        console.error('Error al eliminar familiar:', error);
+        return {
+            ok: false,
+            errorMessage: error.message
+        };
+    }
+};
+
+/**
+ * Buscar usuarios disponibles para agregar a la familia
+ */
+export const searchUsersToAddToFamily = async (
+    familyId: string,
+    searchTerm: string = ''
+): Promise<{ ok: boolean; users: any[]; errorMessage?: string }> => {
+    try {
+        // 1. Obtener todos los usuarios
+        const usersRef = collection(FirebaseDB, 'users');
+        const usersSnapshot = await getDocs(usersRef);
+        
+        // 2. Obtener miembros actuales de la familia
+        const membersRef = collection(FirebaseDB, `families/${familyId}/members`);
+        const membersSnapshot = await getDocs(membersRef);
+        const currentMemberIds = membersSnapshot.docs.map(doc => doc.id);
+        
+        // 3. Filtrar usuarios que no están en la familia
+        let availableUsers = usersSnapshot.docs
+            .filter(doc => !currentMemberIds.includes(doc.id))
+            .map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+        
+        // 4. Aplicar búsqueda si hay término
+        if (searchTerm.trim()) {
+            const term = searchTerm.toLowerCase();
+            availableUsers = availableUsers.filter(user => {
+                const name = (user.name || '').toLowerCase();
+                const email = (user.email || '').toLowerCase();
+                return name.includes(term) || email.includes(term);
+            });
+        }
+        
+        // 5. Ordenar por nombre
+        availableUsers.sort((a, b) => {
+            const nameA = (a.name || '').toLowerCase();
+            const nameB = (b.name || '').toLowerCase();
+            return nameA.localeCompare(nameB);
+        });
+        
+        return {
+            ok: true,
+            users: availableUsers
+        };
+    } catch (error: any) {
+        console.error('Error al buscar usuarios:', error);
+        return {
+            ok: false,
+            users: [],
             errorMessage: error.message
         };
     }

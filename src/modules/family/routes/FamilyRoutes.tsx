@@ -1,5 +1,5 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
-import FamilyListPage from '../pages/FamilyListPage';
+import FamilyListPage from '@/modules/family/pages/FamilyListPage';
 
 export const FamilyRoutes = () => {
   return (

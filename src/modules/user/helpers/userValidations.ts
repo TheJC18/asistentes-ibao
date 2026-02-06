@@ -45,8 +45,8 @@ export const validateUserForm = ({
     errors.push('• La nacionalidad es obligatoria');
   }
 
-  // Validar email (obligatorio en create, o en family con acceso web)
-  if (isCreate && (!formData.email || formData.email.trim() === '')) {
+  // Validar email (obligatorio solo si tiene acceso web)
+  if (isCreate && hasWebAccess && (!formData.email || formData.email.trim() === '')) {
     errors.push('• El correo electrónico es obligatorio');
   }
 
@@ -54,8 +54,8 @@ export const validateUserForm = ({
     errors.push('• El correo electrónico es obligatorio para dar acceso a la web');
   }
 
-  // Validar contraseñas en modo creación
-  if (isCreate) {
+  // Validar contraseñas en modo creación solo si tiene acceso web
+  if (isCreate && hasWebAccess) {
     const passwordErrors = validatePassword(password, confirmPassword, true);
     errors.push(...passwordErrors);
   }
@@ -135,10 +135,11 @@ export const prepareUserDataForSave = ({
     }
 
     // Agregar hasWebAccess
-    if (isFamily) {
+    if (isFamily || isCreate) {
         dataToSave.hasWebAccess = hasWebAccess;
-    } else if (isCreate) {
-        dataToSave.hasWebAccess = true; // Usuario normal siempre tiene acceso web
+    } else if (isEdit) {
+        // En edición, incluir hasWebAccess explícitamente para que se actualice
+        dataToSave.hasWebAccess = hasWebAccess;
     }
 
     return dataToSave;

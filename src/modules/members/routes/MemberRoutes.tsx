@@ -1,5 +1,5 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
-import MemberListPage from '../pages/MemberListPage';
+import MemberListPage from '@/modules/members/pages/MemberListPage';
 
 export const MemberRoutes = () => {
   return (

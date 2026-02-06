@@ -1,10 +1,10 @@
 import { useCallback, useState, useRef, useEffect, ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useTranslation } from '../context/LanguageContext';
-import { useSidebar } from "../context/SidebarContext";
+import { useTranslation } from '@/core/context/LanguageContext';
+import { useSidebar } from "@/core/context/SidebarContext";
 import { useSelector } from "react-redux";
-import { RootState } from "../store";
+import { RootState } from "@/core/store";
 
 interface SubItem {
   name: string;
@@ -38,6 +38,11 @@ const AppSidebar = () => {
         icon: <FontAwesomeIcon icon={["fas", "home"]} />,
         name: translate.nav.home,
         path: "/",
+      },
+      {
+        icon: <FontAwesomeIcon icon={["fas", "calendar-alt"]} />,
+        name: "Calendario",
+        path: "/calendario",
       },
       {
         icon: <FontAwesomeIcon icon={["fas", "users"]} />,

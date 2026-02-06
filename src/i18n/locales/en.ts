@@ -119,6 +119,13 @@ export const en: TranslationKeys = {
     members: {
       title: 'Members',
       searchPlaceholder: 'Search members...',
+      all: 'All',
+      members: 'Members',
+      attendees: 'Attendees',
+      noMembersFound: 'No members registered',
+      noAttendeesFound: 'No attendees',
+      noUsersFound: 'No users registered',
+      noSearchResults: 'No users found with that search term',
     },
   },
 
@@ -188,5 +195,16 @@ export const en: TranslationKeys = {
     grandmother: 'Grandmother',
     grandson: 'Grandson',
     granddaughter: 'Granddaughter',
+  },
+
+  // Calendar
+  calendar: {
+    today: 'Today',
+    more: 'more',
+    months: [
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
+    ],
+    days: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
   },
 };

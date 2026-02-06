@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { User, UserFilters, Pagination } from '../../../types';
+import { User, UserFilters, Pagination } from '@/types';
 
 interface UserState {
   // Estados para lista de usuarios
@@ -200,3 +200,5 @@ export const {
   // Limpiar estado
   clearUserState
 } = userSlice.actions;
+
+export default userSlice.reducer;

@@ -1,10 +1,13 @@
 import { useState, useEffect, ChangeEvent, FormEvent } from "react";
 import ReactDOM from "react-dom";
-import Select from "../../../components/form/Select";
-import DatePicker from "../../../components/form/date-picker";
-import Label from "../../../components/form/Label";
-import Input from "../../../components/form/input/InputField";
-import { countriesES, relationsES, gendersES } from "../../../helpers";
+import Select from "@/core/components/form/Select";
+import DatePicker from "@/core/components/form/date-picker";
+import Label from "@/core/components/form/Label";
+import Input from "@/core/components/form/input/InputField";
+import { countriesES, countriesEN } from "@/i18n/countries";
+import { gendersES, gendersEN } from "@/i18n/genders";
+import { relationsES, relationsEN } from "@/i18n/relations";
+import { useLanguage } from "@/core/context/LanguageContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { FileInput } from "flowbite-react";
 import { 
@@ -12,12 +15,12 @@ import {
   createFieldUpdater, 
   createBirthdateUpdater, 
   createAvatarRestorer 
-} from "../helpers/userFormHelpers";
-import { validateUserForm, prepareUserDataForSave } from "../helpers/userValidations";
-import { formatDate, convertISOToDate } from "../../../helpers/dateUtils";
-import { linkGoogleAccount } from "../../auth/firebase/authQueries";
-import { showSuccessAlert, showErrorAlert, showLoadingAlert, closeAlert } from "../../../helpers/sweetAlertHelper";
-import { User } from "../../../types";
+} from "@/modules/user/helpers/userFormHelpers";
+import { validateUserForm, prepareUserDataForSave } from "@/modules/user/helpers/userValidations";
+import { formatDate, convertISOToDate } from "@/core/helpers/dateUtils";
+import { linkGoogleAccount } from "@/modules/auth/firebase/authQueries";
+import { showSuccessAlert, showErrorAlert, showLoadingAlert, closeAlert } from "@/core/helpers/sweetAlertHelper";
+import { User } from "@/types";
 
 interface UserModalProps {
   open: boolean;
@@ -46,6 +49,12 @@ export default function UserModal({
   user = {}, 
   onSave 
 }: UserModalProps) {
+  const { language } = useLanguage();
+
+  const countries = language === "es" ? countriesES : countriesEN;
+  const genders = language === "es" ? gendersES : gendersEN;
+  const relations = language === "es" ? relationsES : relationsEN;
+
   const isView = mode === "view";
   const isEdit = mode === "edit";
   const isCreate = mode === "create";
@@ -74,7 +83,8 @@ export default function UserModal({
 
   useEffect(() => {
     if (open) {
-      const userHadWebAccess = user.hasWebAccess || false;
+      // En modo create, siempre empezar con hasWebAccess = false
+      const userHadWebAccess = isCreate ? false : (user.hasWebAccess || false);
       const birthdateValue = user.birthdate ? (typeof user.birthdate === 'string' ? user.birthdate : user.birthdate.toISOString()) : null;
       
       setFormData({
@@ -96,7 +106,7 @@ export default function UserModal({
       setHasWebAccess(userHadWebAccess);
       setOriginalHasWebAccess(userHadWebAccess);
     }
-  }, [open, user.id]);
+  }, [open, user.id, isCreate]);
 
   // Bloquear scroll del body cuando el modal está abierto
   useEffect(() => {
@@ -115,36 +125,6 @@ export default function UserModal({
   const onChange = createFieldUpdater(setFormData);
   const onBirthdateChange = createBirthdateUpdater(onChange);
   const onRestoreAvatar = createAvatarRestorer(setFormData, originalAvatar);
-
-  // Handler para vincular Google
-  const handleLinkGoogle = async () => {
-    try {
-      showLoadingAlert('Vinculando cuenta de Google...', 'Por favor, selecciona tu cuenta de Google');
-      
-      const result = await linkGoogleAccount();
-      
-      closeAlert();
-      
-      if (result.ok) {
-        await showSuccessAlert(
-          '¡Google vinculado!',
-          'Ahora puedes iniciar sesión con Google o con tu email/contraseña.'
-        );
-      } else {
-        showErrorAlert(
-          'Error al vincular',
-          result.errorMessage || 'No se pudo vincular tu cuenta de Google'
-        );
-      }
-    } catch (error) {
-      closeAlert();
-      console.error('Error al vincular Google:', error);
-      showErrorAlert(
-        'Error inesperado',
-        'Ocurrió un error al vincular Google. Por favor intenta de nuevo.'
-      );
-    }
-  };
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -268,17 +248,26 @@ export default function UserModal({
             />
           </div>
 
-          {isFamily && (
+          {(isFamily || formData.relation) && (
             <div>
               <Label htmlFor="user-relation">
-                Relación <span className="text-red-500">*</span>
+                Relación {!isView && <span className="text-red-500">*</span>}
               </Label>
-              <Select
-                options={relationsES.map(r => ({ value: r.code, label: r.name }))}
-                placeholder="Selecciona una relación"
-                onChange={(value: string) => onChange("relation", value)}
-                defaultValue={formData.relation || ""}
-              />
+              {isView ? (
+                <Input
+                  id="user-relation"
+                  type="text"
+                  value={relations.find(r => r.code === formData.relation)?.name || ""}
+                  disabled={true}
+                />
+              ) : (
+                <Select
+                  options={relations.map(r => ({ value: r.code, label: r.name }))}
+                  placeholder="Selecciona una relación"
+                  onChange={(value: string) => onChange("relation", value)}
+                  defaultValue={formData.relation || ""}
+                />
+              )}
             </div>
           )}
 
@@ -288,12 +277,12 @@ export default function UserModal({
               <Input
                 id="user-gender"
                 type="text"
-                value={gendersES.find(g => g.code === formData.gender)?.name || ""}
+                value={genders.find(g => g.code === formData.gender)?.name || ""}
                 disabled={true}
               />
             ) : (
               <Select
-                options={gendersES.map(g => ({ value: g.code, label: g.name }))}
+                options={genders.map(g => ({ value: g.code, label: g.name }))}
                 placeholder="Selecciona un género"
                 onChange={(value: string) => onChange("gender", value)}
                 defaultValue={formData.gender || ""}
@@ -340,12 +329,12 @@ export default function UserModal({
               <Input
                 id="user-nationality"
                 type="text"
-                value={countriesES.find(c => c.code === formData.nationality)?.name || ""}
+                value={countries.find(c => c.code === formData.nationality)?.name || ""}
                 disabled={true}
               />
             ) : (
               <Select
-                options={countriesES
+                options={countries
                   .sort((a, b) => a.name.localeCompare(b.name))
                   .map(c => ({ value: c.code, label: c.name }))}
                 placeholder="Selecciona un país"
@@ -421,7 +410,7 @@ export default function UserModal({
           </div>
 
           {/* Sección: Accesos Web */}
-          {(isFamily || isEdit || (isView && hasWebAccess)) && (
+          {(isFamily || isEdit || isCreate || (isView && hasWebAccess)) && (
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-2">
               <FontAwesomeIcon icon={["fas", "globe"]} className="mr-2 text-green-600 dark:text-green-400" />
@@ -447,7 +436,7 @@ export default function UserModal({
               <p className="text-xs text-gray-500 dark:text-gray-400">
                 {isEdit 
                   ? 'Si desactivas esta opción, el usuario no podrá iniciar sesión (debes eliminar manualmente desde Firebase Console > Authentication)'
-                  : 'Si activas esta opción, el familiar podrá iniciar sesión con correo y contraseña'
+                  : 'Si activas esta opción, el usuario podrá iniciar sesión con correo y contraseña'
                 }
               </p>
             </div>

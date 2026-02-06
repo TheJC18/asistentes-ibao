@@ -1,5 +1,5 @@
-import { AppDispatch } from '../../../store';
-import { User, UserFilters, Pagination } from '../../../types';
+import { AppDispatch } from '@/core/store';
+import { User, UserFilters, Pagination } from '@/types';
 import { 
   setLoadingUsers, 
   setUsers, 
@@ -22,7 +22,7 @@ import {
   createUserInFirebase, 
   updateUserInFirebase, 
   deleteUserFromFirebase 
-} from '../firebase/userQueries';
+} from '@/modules/user/firebase/userQueries';
 
 interface LoadUsersParams extends Partial<UserFilters> {
   page?: number;

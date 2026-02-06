@@ -1,23 +1,28 @@
 import { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { UserCard } from '../../../components/common';
-import UserModal from '../../user/components/UserModal';
-import { useUserActions } from '../../user/hooks/useUserActions';
-import { updateFamilyMember } from '../firebase/familyQueries';
+import { UserCard } from '@/core/components/common';
+import UserModal from '@/modules/user/components/UserModal';
+import { useUserActions } from '@/modules/user/hooks/useUserActions';
+import { updateFamilyMember, deleteFamilyMember } from '@/modules/family/firebase/familyQueries';
+import { showDeleteConfirmAlert, showSuccessAlert, showErrorAlert } from '@/core/helpers/sweetAlertHelper';
+import { useTranslation } from '@/core/context/LanguageContext';
 
 interface FamilyMemberCardProps {
   member: any;
   familyId?: string;
   onMemberUpdate?: (updatedMember: any) => void;
+  onMemberDelete?: (memberId: string) => void;
 }
 
 export default function FamilyMemberCard({ 
   member, 
   familyId, 
-  onMemberUpdate 
+  onMemberUpdate,
+  onMemberDelete 
 }: FamilyMemberCardProps) {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const { updateUser } = useUserActions();
+  const translate = useTranslation();
 
   const handleEditClick = () => {
     setIsEditModalOpen(true);
@@ -45,9 +50,34 @@ export default function FamilyMemberCard({
     }
   };
 
-  const handleDeleteClick = () => {
-    // TODO: Implementar eliminación de familiar
-    console.log('Eliminar familiar:', member.id);
+  const handleDeleteClick = async () => {
+    if (!familyId) return;
+    
+    const result = await showDeleteConfirmAlert(
+      translate.pages.family.deleteMember,
+      `¿Estás seguro de eliminar a ${member.name} de tu familia?`
+    );
+    
+    if (result.isConfirmed) {
+      const deleteResult = await deleteFamilyMember(familyId, member.id);
+      
+      if (deleteResult.ok) {
+        await showSuccessAlert(
+          '¡Eliminado!',
+          deleteResult.message || 'Familiar eliminado correctamente'
+        );
+        
+        // Notificar al padre para actualizar la lista
+        if (onMemberDelete) {
+          onMemberDelete(member.id);
+        }
+      } else {
+        await showErrorAlert(
+          'Error',
+          deleteResult.errorMessage || 'No se pudo eliminar el familiar'
+        );
+      }
+    }
   };
 
   return (

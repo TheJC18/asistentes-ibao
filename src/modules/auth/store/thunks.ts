@@ -1,6 +1,6 @@
-import { AppDispatch } from '../../../store';
-import { loginWithEmailPassword, logoutFirebase, registerUserWithEmailPassword, singInWithGoogle } from '../../../firebase/providers';
-import { getRole, getProfileCompleted, updateProfileCompleted, checkOrCreateUser, getUserByUID } from '../firebase/authQueries';
+import { AppDispatch } from '@/core/store';
+import { loginWithEmailPassword, logoutFirebase, registerUserWithEmailPassword, singInWithGoogle } from '@/firebase/providers';
+import { getRole, getProfileCompleted, updateProfileCompleted, checkOrCreateUser, getUserByUID } from '@/modules/auth/firebase/authQueries';
 import { chekingCredentials, login, logout, setRole, setProfileCompleted } from './authSlice';
 
 export const checkingAuthentication = () => {
@@ -35,13 +35,19 @@ export const startGoogleSignIn = () => {
 
             dispatch(login({
                 uid: result.uid!,
-                email: result.email!,
-                displayName: result.displayName!,
-                photoURL: result.photoURL,
+                email: userData.email || result.email!,
+                name: userData.name || userData.displayName || result.displayName!,
+                displayName: userData.displayName || result.displayName!,
+                avatar: userData.avatar || userData.photoURL || result.photoURL,
+                photoURL: userData.photoURL || result.photoURL,
                 birthdate: userData.birthdate || null,
                 nationality: userData.nationality || null,
                 isMember: userData.isMember || false,
-                profileCompleted: userData.profileCompleted || false
+                profileCompleted: userData.profileCompleted || false,
+                phone: userData.phone || null,
+                gender: userData.gender || null,
+                relation: userData.relation || null,
+                hasWebAccess: userData.hasWebAccess ?? null
             }));
 
             dispatch(setRole({ role: userData.role || 'user' }));
@@ -50,7 +56,9 @@ export const startGoogleSignIn = () => {
             dispatch(login({
                 uid: result.uid!,
                 email: result.email!,
+                name: result.displayName!,
                 displayName: result.displayName!,
+                avatar: result.photoURL,
                 photoURL: result.photoURL
             }));
             dispatch(setRole({ role: 'user' }));
@@ -76,7 +84,48 @@ export const startCreatingUserWithEmailPassword = ({ displayName, email, passwor
             return;
         }
 
-        dispatch(login({ uid: uid!, displayName, email, photoURL }));
+        await checkOrCreateUser({
+            uid: uid!,
+            displayName,
+            photoURL,
+            email
+        });
+
+        const userDataResult = await getUserByUID({ uid: uid! });
+
+        if (userDataResult.ok && userDataResult.user) {
+            const userData = userDataResult.user;
+
+            dispatch(login({
+                uid: uid!,
+                email: userData.email || email,
+                name: userData.name || userData.displayName || displayName,
+                displayName: userData.displayName || displayName,
+                avatar: userData.avatar || userData.photoURL || photoURL,
+                photoURL: userData.photoURL || photoURL,
+                birthdate: userData.birthdate || null,
+                nationality: userData.nationality || null,
+                isMember: userData.isMember || false,
+                profileCompleted: userData.profileCompleted || false,
+                phone: userData.phone || null,
+                gender: userData.gender || null,
+                relation: userData.relation || null,
+                hasWebAccess: userData.hasWebAccess ?? null
+            }));
+
+            dispatch(setRole({ role: userData.role || 'user' }));
+        } else {
+            dispatch(login({
+                uid: uid!,
+                email,
+                name: displayName,
+                displayName,
+                avatar: photoURL,
+                photoURL
+            }));
+            dispatch(setRole({ role: 'user' }));
+            dispatch(setProfileCompleted({ profileCompleted: false }));
+        }
     };
 };
 
@@ -112,13 +161,19 @@ export const startLoginWithEmailPassword = ({ email, password }: LoginParams) =>
 
             dispatch(login({
                 uid: uid!,
-                email: email,
-                displayName: displayName!,
-                photoURL: photoURL,
+                email: userData.email || email,
+                name: userData.name || userData.displayName || displayName!,
+                displayName: userData.displayName || displayName!,
+                avatar: userData.avatar || userData.photoURL || photoURL,
+                photoURL: userData.photoURL || photoURL,
                 birthdate: userData.birthdate || null,
                 nationality: userData.nationality || null,
                 isMember: userData.isMember || false,
-                profileCompleted: userData.profileCompleted || false
+                profileCompleted: userData.profileCompleted || false,
+                phone: userData.phone || null,
+                gender: userData.gender || null,
+                relation: userData.relation || null,
+                hasWebAccess: userData.hasWebAccess ?? null
             }));
 
             dispatch(setRole({ role: userData.role || 'user' }));
@@ -127,7 +182,9 @@ export const startLoginWithEmailPassword = ({ email, password }: LoginParams) =>
             dispatch(login({
                 uid: uid!,
                 email: email,
+                name: displayName!,
                 displayName: displayName!,
+                avatar: photoURL,
                 photoURL: photoURL
             }));
 

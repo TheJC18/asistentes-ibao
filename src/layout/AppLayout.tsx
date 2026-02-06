@@ -1,9 +1,9 @@
 import { ReactNode } from 'react';
-import { SidebarProvider, useSidebar } from '../context/SidebarContext';
+import { SidebarProvider, useSidebar } from '@/core/context/SidebarContext';
 import { Outlet } from 'react-router-dom';
-import AppHeader from './AppHeader';
-import Backdrop from './Backdrop';
-import AppSidebar from './AppSidebar';
+import AppHeader from '@/layout/AppHeader';
+import Backdrop from '@/layout/Backdrop';
+import AppSidebar from '@/layout/AppSidebar';
 
 // Configuración de la biblioteca de FontAwesome
 import { library } from '@fortawesome/fontawesome-svg-core';

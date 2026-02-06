@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useTranslation } from '../../../context/LanguageContext';
-import { startUpdateProfileCompleted } from '../../auth/store';
-import UserModal from '../../user/components/UserModal';
-import { updateUserInFirebase } from '../../user/firebase/userQueries';
-import { sendPasswordResetEmailToUser } from '../../auth/firebase/authQueries';
-import { showSuccessAlert, showErrorAlert, showLoadingAlert, closeAlert } from '../../../helpers/sweetAlertHelper';
-import { RootState, AppDispatch } from '../../../store';
+import { useTranslation } from '@/core/context/LanguageContext';
+import { startUpdateProfileCompleted } from '@/modules/auth/store';
+import UserModal from '@/modules/user/components/UserModal';
+import { updateUserInFirebase } from '@/modules/user/firebase/userQueries';
+import { sendPasswordResetEmailToUser } from '@/modules/auth/firebase/authQueries';
+import { showSuccessAlert, showErrorAlert, showLoadingAlert, closeAlert } from '@/core/helpers/sweetAlertHelper';
+import { RootState, AppDispatch } from '@/core/store';
 
 export default function CompleteProfileCard() {
   const dispatch = useDispatch<AppDispatch>();

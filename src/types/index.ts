@@ -9,7 +9,7 @@ export interface User {
   role: 'admin' | 'user' | 'member';
   isMember?: boolean;
   gender?: 'male' | 'female' | 'other' | 'neutral';
-  birthdate?: string | Date;
+  birthdate?: string | Date | null;
   nationality?: string;
   relation?: string;
   familyId?: string;
@@ -17,8 +17,8 @@ export interface User {
   hasWebAccess?: boolean;
   profileCompleted?: boolean;
   status?: 'active' | 'inactive';
-  createdAt?: Date;
-  updatedAt?: Date;
+  createdAt?: string | Date;
+  updatedAt?: string | Date;
 }
 
 export interface AuthState {
