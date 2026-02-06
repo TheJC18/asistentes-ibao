@@ -1,4 +1,5 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useTranslation } from '../../../context/LanguageContext';
 import Badge from '../../../components/ui/badge/Badge';
 import FloatingAddButton from '../../../components/ui/FloatingAddButton';
 import UserModal from '../components/UserModal';
@@ -8,6 +9,8 @@ import { useUserManagement } from '../hooks/useUserManagement';
 import { User } from '../../../types';
 
 export default function UserListPage() {
+  const translate = useTranslation();
+  
   // Hook de gestión de usuarios (contiene toda la lógica)
   const {
     users,
@@ -30,7 +33,7 @@ export default function UserListPage() {
   const columns = [
     {
       key: 'avatar',
-      label: 'Avatar',
+      label: translate.form.avatar,
       className: 'text-start',
       visibleOn: ["xs", "ss", "sm", "md", "lg", "xl"], // Visible desde xs en adelante
       render: (userItem: User) => (
@@ -48,25 +51,25 @@ export default function UserListPage() {
     },
     {
       key: 'displayName',
-      label: 'Nombre',
+      label: translate.form.name,
       className: 'text-start font-semibold text-base md:text-lg text-gray-900 dark:text-gray-100',
       visibleOn: ["base", "2xs", "xs", "ss", "sm", "md", "lg", "xl"], // Siempre visible
-      render: (userItem: User) => userItem.displayName || userItem.name || 'Sin nombre',
+      render: (userItem: User) => userItem.displayName || userItem.name || translate.form.noName,
     },
     {
       key: 'role',
-      label: 'Rol',
+      label: translate.form.role,
       className: 'text-start',
       visibleOn: ["md", "lg", "xl"], // Visible desde ss en adelante
       render: (userItem: User) => (
         <Badge size="sm" color={userItem.role === 'admin' ? 'primary' : 'warning'}>
-          {userItem.role === 'admin' ? 'ADMIN' : 'USUARIO'}
+          {userItem.role === 'admin' ? translate.role.adminBadge : translate.role.userBadge}
         </Badge>
       ),
     },
     {
       key: 'isMember',
-      label: '¿Es miembro?',
+      label: translate.form.isMember,
       className: 'text-start',
       visibleOn: ["sm", "md", "lg", "xl"], // Visible desde sm en adelante
       render: (userItem: User) => (
@@ -77,7 +80,7 @@ export default function UserListPage() {
     },
     { 
       key: 'nationality', 
-      label: 'Nacionalidad',  
+      label: translate.form.nationality,  
       className: 'text-start text-gray-800 dark:text-gray-200', 
       visibleOn: ["md", "lg", "xl"],
       render: (userItem: User) => {
@@ -96,14 +99,14 @@ export default function UserListPage() {
     },
     { 
       key: 'email', 
-      label: 'Correo', 
+      label: translate.form.email, 
       className: 'text-start text-gray-800 dark:text-gray-200', 
       visibleOn: ["lg", "xl"],
       render: (userItem: User) => userItem.email || <span className="text-gray-400 dark:text-gray-500">-</span>
     },
     { 
       key: 'birthdate', 
-      label: 'Nacimiento', 
+      label: translate.form.birth, 
       className: 'text-start text-gray-800 dark:text-gray-200', 
       visibleOn: ["lg", "xl"],
       render: (userItem: User) => {
@@ -129,7 +132,7 @@ export default function UserListPage() {
     <div className="flex flex-row gap-1 items-center justify-center">
       <button 
         className="p-1 h-7 w-7 text-xs rounded-full bg-blue-500/80 hover:bg-blue-700 text-white transition" 
-        title="Ver detalles" 
+        title={translate.common.viewDetails} 
         onClick={() => handleView(userItem)}
         disabled={isDeleting}
       >
@@ -137,7 +140,7 @@ export default function UserListPage() {
       </button>
       <button 
         className="p-1 h-7 w-7 text-xs rounded-full bg-green-500/80 hover:bg-green-700 text-white transition" 
-        title="Editar usuario" 
+        title={translate.common.editUser} 
         onClick={() => handleEdit(userItem)}
         disabled={isDeleting}
       >
@@ -149,7 +152,7 @@ export default function UserListPage() {
             ? 'bg-gray-400 cursor-not-allowed' 
             : 'bg-red-500/80 hover:bg-red-700'
         } text-white`}
-        title="Eliminar usuario" 
+        title={translate.common.deleteUser} 
         onClick={() => handleDelete(userItem)}
         disabled={isDeleting}
       >
@@ -165,8 +168,8 @@ export default function UserListPage() {
   return (
     <>
       <EntityList<User>
-        title="Gestión de usuarios"
-        description="Usuarios registrados en la aplicación"
+        title={translate.pages.users.title}
+        description={translate.pages.users.description}
         data={users}
         columns={columns}
         renderActions={renderActions}
@@ -174,7 +177,7 @@ export default function UserListPage() {
         isLoading={isLoading}
         error={error}
         onRetry={handleRetry}
-        noDataMessage="No hay usuarios registrados"
+        noDataMessage={translate.pages.users.noUsers}
       />
 
       <FloatingAddButton onClick={handleCreate} />

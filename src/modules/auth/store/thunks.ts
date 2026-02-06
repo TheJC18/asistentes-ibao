@@ -46,7 +46,13 @@ export const startGoogleSignIn = () => {
 
             dispatch(setRole({ role: userData.role || 'user' }));
         } else {
-            dispatch(login(result));
+            // Si no se pudo obtener los datos de Firestore, usar los datos básicos
+            dispatch(login({
+                uid: result.uid!,
+                email: result.email!,
+                displayName: result.displayName!,
+                photoURL: result.photoURL
+            }));
             dispatch(setRole({ role: 'user' }));
             dispatch(setProfileCompleted({ profileCompleted: false }));
         }
@@ -70,7 +76,7 @@ export const startCreatingUserWithEmailPassword = ({ displayName, email, passwor
             return;
         }
 
-        dispatch(login({ ok, uid: uid!, displayName, email, photoURL }));
+        dispatch(login({ uid: uid!, displayName, email, photoURL }));
     };
 };
 
@@ -134,7 +140,7 @@ export const startLoginWithEmailPassword = ({ email, password }: LoginParams) =>
 export const startLogOut = () => {
     return async (dispatch: AppDispatch) => {
         await logoutFirebase();
-        dispatch(logout());
+        dispatch(logout(undefined));
     };
 };
 

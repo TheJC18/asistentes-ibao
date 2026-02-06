@@ -68,14 +68,14 @@ export const authSlice = createSlice({
             state.isMember = payload.isMember || false;
         },
 
-        logout: (state, action?: PayloadAction<LogoutPayload | undefined>) => {
+        logout: (state, action: PayloadAction<LogoutPayload | undefined>) => {
             state.status = 'not-authenticated';
             state.uid = null;
             state.email = null;
             state.birthdate = null;
             state.displayName = null;
             state.photoURL = null;
-            state.errorMessage = action?.payload?.errorMessage || null;
+            state.errorMessage = action.payload?.errorMessage || null;
             state.role = null;
             state.profileCompleted = null;
             state.nationality = null;

@@ -1,18 +1,13 @@
 import { useState, useMemo, ReactNode } from 'react';
 import TableDefault from './TableDefault';
 import Pagination from './Pagination';
+import { ColumnConfig } from '../../../types';
 
 interface EntityListProps<T> {
   title: ReactNode;
   description?: string;
   data?: T[];
-  columns?: Array<{
-    key: string;
-    label: string;
-    className?: string;
-    visibleOn?: string[];
-    render?: (item: T) => ReactNode;
-  }>;
+  columns?: ColumnConfig<T>[];
   renderActions?: (item: T) => ReactNode;
   filterFunction?: (item: T, search: string) => boolean;
   perPageOptions?: number[];
@@ -125,7 +120,7 @@ export default function EntityList<T extends { id?: string | number }>({
                       perPage={perPage}
                       setPerPage={setPerPage}
                       perPageLabel="Por página:"
-                      options={perPageOptions}
+                      perPageOptions={perPageOptions}
                     />
                   </div>
                 </>

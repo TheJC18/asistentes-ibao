@@ -99,6 +99,14 @@ export interface FirebaseResponse<T = any> {
   warning?: string;
 }
 
+export interface ColumnConfig<T> {
+  key: keyof T | string;
+  label: string;
+  render?: (item: T) => React.ReactNode;
+  className?: string;
+  visibleOn?: string[] | Array<"base" | "2xs" | "xs" | "ss" | "sm" | "md" | "lg" | "xl">;
+}
+
 export interface FormValidation {
   [key: string]: string | null;
 }

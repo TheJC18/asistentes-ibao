@@ -149,6 +149,37 @@ export const addUserToFamily = async (
 };
 
 /**
+ * Actualizar datos de un miembro de la familia (incluyendo relación)
+ */
+export const updateFamilyMember = async (
+    familyId: string,
+    userId: string,
+    memberData: Partial<MemberData>
+): Promise<AddUserToFamilyResult> => {
+    try {
+        const memberRef = doc(FirebaseDB, `families/${familyId}/members`, userId);
+        
+        const updateData = {
+            ...memberData,
+            updatedAt: serverTimestamp()
+        };
+        
+        await updateDoc(memberRef, updateData);
+        
+        return {
+            ok: true,
+            message: 'Miembro de la familia actualizado correctamente'
+        };
+    } catch (error: any) {
+        console.error('Error al actualizar miembro de familia:', error);
+        return {
+            ok: false,
+            errorMessage: error.message
+        };
+    }
+};
+
+/**
  * Remover un usuario de una familia
  */
 export const removeUserFromFamily = async (familyId: string, userId: string): Promise<RemoveUserFromFamilyResult> => {

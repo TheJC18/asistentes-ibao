@@ -5,6 +5,7 @@ import { Provider } from 'react-redux';
 
 import { store } from './store';
 import { ThemeProvider } from './context/ThemeContext';
+import { LanguageProvider } from './context/LanguageContext';
 
 import './index.css';
 import { AppTheme } from './theme/AppTheme';
@@ -15,9 +16,11 @@ createRoot(document.getElementById('root')!).render(
     <Provider store={store}>
       <BrowserRouter>
         <ThemeProvider>
-          <AppTheme>
-            <AppRouter />
-          </AppTheme> 
+          <LanguageProvider>
+            <AppTheme>
+              <AppRouter />
+            </AppTheme>
+          </LanguageProvider>
         </ThemeProvider>
       </BrowserRouter>
     </Provider>

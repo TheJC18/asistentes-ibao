@@ -18,13 +18,13 @@ if (!firebaseConfig.apiKey || firebaseConfig.apiKey === 'your_api_key_here') {
   throw new Error('Firebase API Key no configurada. Por favor, configura el archivo .env con tus credenciales de Firebase.');
 }
 
-export const FirebaseApp: FirebaseApp = initializeApp(firebaseConfig);
-export const FirebaseAuth: Auth = getAuth(FirebaseApp);
-export const FirebaseDB: Firestore = getFirestore(FirebaseApp);
+export const firebaseApp: FirebaseApp = initializeApp(firebaseConfig);
+export const FirebaseAuth: Auth = getAuth(firebaseApp);
+export const FirebaseDB: Firestore = getFirestore(firebaseApp);
 
 // App secundaria para crear usuarios sin cerrar sesión del admin
-export const SecondaryFirebaseApp: FirebaseApp = initializeApp(firebaseConfig, "Secondary");
-export const SecondaryFirebaseAuth: Auth = getAuth(SecondaryFirebaseApp);
+export const secondaryFirebaseApp: FirebaseApp = initializeApp(firebaseConfig, "Secondary");
+export const SecondaryFirebaseAuth: Auth = getAuth(secondaryFirebaseApp);
 
 /* Para usar Google Sign-In en producción, necesitas 
    añadir el dominio de tu app (Authentication/Configuracion/Dominios) */

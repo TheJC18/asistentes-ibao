@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useTranslation } from '../../context/LanguageContext';
 import { DropdownItem } from '../ui/dropdown/DropdownItem';
 import { Dropdown } from '../ui/dropdown/Dropdown';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -22,6 +23,7 @@ const UserDropdown = ({ displayName, email, photoURL, role }: UserDropdownProps)
   const [isOpen, setIsOpen] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
+  const translate = useTranslation();
   
   // Obtener datos completos del usuario desde el store
   const { uid, birthdate, nationality, isMember } = useSelector((state: RootState) => state.auth);
@@ -49,21 +51,21 @@ const UserDropdown = ({ displayName, email, photoURL, role }: UserDropdownProps)
       const result = await updateUserInFirebase(uid || '', data);
       
       if (result.ok) {
-        showToast('success', 'Perfil actualizado correctamente');
+        showToast('success', translate.common.profileUpdated);
         setShowEditModal(false);
         // Recargar la página para actualizar los datos en el header
         window.location.reload();
       } else {
         showErrorAlert(
-          'Error al guardar',
-          result.errorMessage || 'No se pudo actualizar el perfil'
+          translate.pages.home.errorSaving,
+          result.errorMessage || translate.common.errorUpdatingProfile
         );
       }
     } catch (error) {
       console.error('Error al guardar perfil:', error);
       showErrorAlert(
-        'Error al guardar',
-        'Ocurrió un error al actualizar el perfil'
+        translate.pages.home.errorSaving,
+        translate.common.unexpectedErrorProfile
       );
     }
   }
@@ -74,20 +76,20 @@ const UserDropdown = ({ displayName, email, photoURL, role }: UserDropdownProps)
       
       if (result.ok) {
         showSuccessAlert(
-          'Email enviado',
-          `Se ha enviado un email de restablecimiento a ${email}`
+          translate.common.emailSent,
+          translate.common.emailSentMessage.replace('{email}', email)
         );
       } else {
         showErrorAlert(
           'Error',
-          result.errorMessage || 'No se pudo enviar el email'
+          result.errorMessage || translate.common.errorSendingEmail
         );
       }
     } catch (error) {
       console.error('Error al enviar email:', error);
       showErrorAlert(
         'Error',
-        'Ocurrió un error al enviar el email de restablecimiento'
+        translate.common.unexpectedEmailError
       );
     }
   }
@@ -101,7 +103,7 @@ const UserDropdown = ({ displayName, email, photoURL, role }: UserDropdownProps)
         <span className="mr-3 overflow-hidden rounded-full h-11 w-11 border">
           <img src={photoURL || "/user_default.png"} alt="User" />
         </span>
-        <span className="block mr-1 font-medium text-theme-sm">{displayName || "Usuario"}</span>
+        <span className="block mr-1 font-medium text-theme-sm">{displayName || translate.common.user}</span>
         <FontAwesomeIcon
           icon={["fas", "chevron-down"]}
           className={`transition-transform duration-200 ${
@@ -118,11 +120,11 @@ const UserDropdown = ({ displayName, email, photoURL, role }: UserDropdownProps)
         <div>
           <span className="font-medium text-gray-700 text-theme-sm dark:text-gray-400 flex items-center gap-2">
             <FontAwesomeIcon icon={["fas", role === "admin" ? "crown" : "user"]} />
-            {displayName || "Usuario"}
+            {displayName || translate.common.user}
           </span>
           <span className="mt-0.5 text-theme-xs text-gray-500 dark:text-gray-400 flex items-center gap-2">
             <FontAwesomeIcon icon={["fas", "at"]} />
-            {email || "Sin email"}
+            {email || translate.common.noEmail}
           </span>
         </div>
 
@@ -133,7 +135,7 @@ const UserDropdown = ({ displayName, email, photoURL, role }: UserDropdownProps)
               className="flex items-center gap-3 px-3 py-2 font-medium text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300 w-full text-left"
             >
               <FontAwesomeIcon icon={["fas", "user"]} className="text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-300" />
-              Editar mi perfil
+              {translate.common.editProfile}
             </button>
           </li>
           <li>
@@ -144,7 +146,7 @@ const UserDropdown = ({ displayName, email, photoURL, role }: UserDropdownProps)
               className="flex items-center gap-3 px-3 py-2 font-medium text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
             >
               <FontAwesomeIcon icon={["fas", "circle-question"]} className="text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-300" />
-              Soporte
+              {translate.common.support}
             </DropdownItem>
           </li>
         </ul>
@@ -154,7 +156,7 @@ const UserDropdown = ({ displayName, email, photoURL, role }: UserDropdownProps)
           className="flex items-center gap-3 px-3 py-2 mt-3 font-medium text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300 w-full"
         >
           <FontAwesomeIcon icon={["fas", "right-from-bracket"]} className="text-gray-500 group-hover:text-gray-700 dark:group-hover:text-gray-300" />
-          Cerrar sesión
+          {translate.auth.logout}
         </button>
       </Dropdown>
       

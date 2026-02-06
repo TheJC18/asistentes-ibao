@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { FaEye, FaEyeSlash, FaInfoCircle } from 'react-icons/fa';
 
 import { useForm } from '../../hooks/useForm';
+import { useTranslation } from '../../context/LanguageContext';
 import Label from '../form/Label';
 import Input from '../form/input/InputField';
 import Button from '../ui/button/Button';
@@ -26,24 +27,24 @@ const formData: RegisterFormData = {
   confirmPassword: '' 
 };
 
-// Validaciones del formulario
-const formValidations: FormValidationRules<RegisterFormData> = {
-  email: [ (value) => value.includes('@'), 'El correo debe tener una @' ],
-  password: [ (value) => value.length >= 6, 'La contraseña debe tener al menos 6 caracteres' ],
-  displayName: [ (value) => value.length >= 1, 'El nombre es obligatorio' ],
-  confirmPassword: [ 
-    (value, formState) => value === formState?.password, 
-    'Las contraseñas deben coincidir' 
-  ]
-};
-
 export default function RegisterForm() {
   const dispatch = useDispatch<AppDispatch>();
   const { status, errorMessage } = useSelector((state: RootState) => state.auth);
+  const translate = useTranslation();
   const isCheckingAuthentication = useMemo(() => status === 'checking', [status]);
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const formValidations: FormValidationRules<RegisterFormData> = {
+    email: [ (value) => value.includes('@'), translate.messages.validation.emailInvalid ],
+    password: [ (value) => value.length >= 6, translate.messages.validation.passwordLength ],
+    displayName: [ (value) => value.length >= 1, translate.messages.validation.nameRequired ],
+    confirmPassword: [ 
+      (value, formState) => value === formState?.password, 
+      translate.messages.validation.passwordsMustMatch
+    ]
+  };
 
   const {
     formState,
@@ -74,10 +75,10 @@ export default function RegisterForm() {
               <img src="/logo.webp" alt="Logo" className="w-full h-full object-contain"/>
             </div>
             <h1 className="mb-2 font-semibold text-gray-800 text-title-sm dark:text-white/90 sm:text-title-md">
-              Crear cuenta
+              {translate.auth.signUp}
             </h1>
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              Regístrate con tus datos
+              {translate.auth.registerWithData}
             </p>
           </div>
           <div>
@@ -85,7 +86,7 @@ export default function RegisterForm() {
               <div className="space-y-6">
                 <div>
                   <Label>
-                    Nombre completo <span className="text-error-500">*</span>{' '}
+                    {translate.auth.fullName} <span className="text-error-500">*</span>{' '}
                   </Label>
                   <Input
                     name="displayName"
@@ -93,7 +94,7 @@ export default function RegisterForm() {
                     value={displayName}
                     onChange={onInputChange}
                     required
-                    placeholder="Nombre completo"
+                    placeholder={translate.auth.fullNamePlaceholder}
                     disabled={isCheckingAuthentication}
                   />
                   {formSubmitted && displayNameValid && (
@@ -102,7 +103,7 @@ export default function RegisterForm() {
                 </div>
                 <div>
                   <Label>
-                    Correo <span className="text-error-500">*</span>{' '}
+                    {translate.form.email} <span className="text-error-500">*</span>{' '}
                   </Label>
                   <Input
                     name="email"
@@ -110,7 +111,7 @@ export default function RegisterForm() {
                     value={email}
                     onChange={onInputChange}
                     required
-                    placeholder="Correo electrónico"
+                    placeholder={translate.auth.emailPlaceholder}
                     disabled={isCheckingAuthentication}
                   />
                   {formSubmitted && emailValid && (
@@ -119,7 +120,7 @@ export default function RegisterForm() {
                 </div>
                 <div>
                   <Label>
-                    Contraseña <span className="text-error-500">*</span>{' '}
+                    {translate.form.password} <span className="text-error-500">*</span>{' '}
                   </Label>
                   <div className="relative">
                     <Input
@@ -128,7 +129,7 @@ export default function RegisterForm() {
                       value={password}
                       onChange={onInputChange}
                       required
-                      placeholder="Contraseña"
+                      placeholder={translate.auth.passwordPlaceholder}
                       disabled={isCheckingAuthentication}
                     />
                     <span
@@ -144,7 +145,7 @@ export default function RegisterForm() {
                 </div>
                 <div>
                   <Label>
-                    Confirmar Contraseña <span className="text-error-500">*</span>{' '}
+                    {translate.form.confirmPassword} <span className="text-error-500">*</span>{' '}
                   </Label>
                   <div className="relative">
                     <Input
@@ -153,7 +154,7 @@ export default function RegisterForm() {
                       value={confirmPassword}
                       onChange={onInputChange}
                       required
-                      placeholder="Contraseña"
+                      placeholder={translate.auth.passwordPlaceholder}
                       disabled={isCheckingAuthentication}
                     />
                     <span
@@ -180,7 +181,7 @@ export default function RegisterForm() {
                     type="submit"
                     disabled={isCheckingAuthentication}
                   >
-                    Crear cuenta
+                    {translate.auth.signUp}
                   </Button>
                 </div>
                 <div className="flex items-center justify-end">
@@ -188,7 +189,7 @@ export default function RegisterForm() {
                     to="/auth/iniciar-sesion"
                     className="text-sm text-brand-500 hover:text-brand-600 dark:text-brand-400"
                   >
-                    Inicia sesión aquí
+                    {translate.auth.signInHere}
                   </RouterLink>
                 </div>
               </div>

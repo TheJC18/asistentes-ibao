@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { useSidebar } from '../context/SidebarContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ThemeToggleButton } from '../components/common/ThemeToggleButton';
+import { LanguageToggleButton } from '../components/common/LanguageToggleButton';
 import UserDropdown from '../components/header/UserDropdown';
 import { RootState } from '../store';
 
@@ -72,6 +73,7 @@ const AppHeader = () => {
         </div>
 
         <div className="flex items-center gap-3">
+          <LanguageToggleButton />
           <ThemeToggleButton />
           <UserDropdown 
             uid={uid || ''} 

@@ -1,6 +1,7 @@
 import { useCallback, useState, useRef, useEffect, ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useTranslation } from '../context/LanguageContext';
 import { useSidebar } from "../context/SidebarContext";
 import { useSelector } from "react-redux";
 import { RootState } from "../store";
@@ -24,42 +25,38 @@ interface Sections {
   [key: string]: NavItem[];
 }
 
-// Secciones dinámicas del sidebar
-const sections: Sections = {
-  menu: [
-    {
-      icon: <FontAwesomeIcon icon={["fas", "home"]} />,
-      name: "Inicio",
-      path: "/",
-    },
-    {
-      icon: <FontAwesomeIcon icon={["fas", "users"]} />,
-      name: "Mi Familia",
-      path: "/familia",
-    },
-    {
-      icon: <FontAwesomeIcon icon={["fas", "user-check"]} />,
-      name: "Miembros",
-      path: "/miembros",
-    },
-    {
-      icon: <FontAwesomeIcon icon={["fas", "address-book"]} />,
-      name: "Usuarios",
-      path: "/usuarios",
-      roles: ['admin'],
-    },
-  ],
-};
-
-interface OpenSubmenu {
-  section: string;
-  index: number;
-}
-
 const AppSidebar = () => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
   const location = useLocation();
   const { role } = useSelector((state: RootState) => state.auth);
+  const translate = useTranslation();
+
+  // Secciones dinámicas del sidebar (ahora dentro del componente para tener acceso a translate)
+  const sections: Sections = {
+    menu: [
+      {
+        icon: <FontAwesomeIcon icon={["fas", "home"]} />,
+        name: translate.nav.home,
+        path: "/",
+      },
+      {
+        icon: <FontAwesomeIcon icon={["fas", "users"]} />,
+        name: translate.nav.family,
+        path: "/familia",
+      },
+      {
+        icon: <FontAwesomeIcon icon={["fas", "user-check"]} />,
+        name: translate.nav.members,
+        path: "/miembros",
+      },
+      {
+        icon: <FontAwesomeIcon icon={["fas", "address-book"]} />,
+        name: translate.nav.users,
+        path: "/usuarios",
+        roles: ['admin'],
+      },
+    ],
+  };
 
   const [openSubmenu, setOpenSubmenu] = useState<OpenSubmenu | null>(null);
   const [subMenuHeight, setSubMenuHeight] = useState<{ [key: string]: number }>({});

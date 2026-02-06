@@ -7,6 +7,7 @@ import { useUserActions } from "../../user/hooks/useUserActions";
 import { createFamily, getFamilyMembers, getUserFamilies } from "../firebase/familyQueries";
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../store';
+import { useTranslation } from '../../../context/LanguageContext';
 
 interface FamilyData {
   id: string;
@@ -18,7 +19,14 @@ interface FamilyData {
 interface MemberData {
   id: string;
   name: string;
+  email: string;
+  avatar: string;
+  birthdate: string;
+  age: number | string;
+  phone: string;
+  type: string;
   relation?: string;
+  gender?: string;
   [key: string]: any;
 }
 
@@ -30,6 +38,7 @@ export default function FamilyListPage() {
   const { isOpen, openModal, closeModal } = useModal();
   const { createUser, sendPasswordReset } = useUserActions();
   const { uid: currentUserId } = useSelector((state: RootState) => state.auth);
+  const translate = useTranslation(); // Hook para traducciones
 
   // Inicializar familia al cargar
   useEffect(() => {
@@ -161,7 +170,7 @@ export default function FamilyListPage() {
 
   if (loading) {
     return <div className="flex justify-center items-center min-h-[80vh]">
-      <div className="text-xl">Cargando familia...</div>
+      <div className="text-xl">{translate.common.loading}</div>
     </div>;
   }
 
@@ -170,24 +179,31 @@ export default function FamilyListPage() {
       <div className="p-4 md:p-6">
         <h2 className="text-4xl font-extrabold mb-8 text-black dark:text-white text-center drop-shadow">
           <FontAwesomeIcon icon={["fas", "users"]} className="text-blue-700 px-3" />
-          Mi Familia
+          {translate.pages.family.title}
         </h2>
         <input
           className="mb-10 w-full rounded-xl border border-gray-300 px-5 py-4 text-lg focus:ring-2 focus:ring-blue-400 bg-white dark:bg-gray-800 dark:text-white/90 dark:border-gray-600 shadow-sm"
-          placeholder="Buscar miembro, relación..."
+          placeholder={translate.pages.family.searchPlaceholder}
           value={search}
           onChange={e => setSearch(e.target.value)}
         />
         <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 3xl:grid-cols-5 gap-6 md:gap-8 lg:gap-10">
           {filteredMembers.map(member => (
-            <FamilyMemberCard key={member.id} member={member} />
+            <FamilyMemberCard 
+              key={member.id} 
+              member={member} 
+              familyId={familyId || undefined}
+              onMemberUpdate={(updatedMember) => {
+                setMembers(members.map(m => m.id === updatedMember.id ? updatedMember : m));
+              }}
+            />
           ))}
         </div>
       </div>
       {/* Botón flotante para agregar */}
       <button
         className="fixed bottom-15 right-2 z-5 bg-blue-400 hover:bg-blue-700 text-white rounded-full w-20 h-20 flex items-center justify-center shadow-2xl transition-all text-4xl dark:border-gray-900 hover:scale-110 hover:rotate-6 opacity-60 hover:opacity-100"
-        title="Agregar miembro de la familia"
+        title={translate.pages.family.addMember}
         onClick={openModal}
       >
         <FontAwesomeIcon icon={["fas", "plus"]} />

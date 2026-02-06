@@ -45,6 +45,9 @@ export default function DatePicker({
   placeholder,
   inputClassName = "",
   hideRightIcon = false,
+  disabled = false,
+  required = false,
+  name,
 }: {
   id: string;
   onChange?: (date: Date[]) => void;
@@ -53,6 +56,9 @@ export default function DatePicker({
   placeholder?: string;
   inputClassName?: string;
   hideRightIcon?: boolean;
+  disabled?: boolean;
+  required?: boolean;
+  name?: string;
 }) {
   const [value, setValue] = useState<Date | null>(null);
   const [showCalendar, setShowCalendar] = useState(false);

@@ -1,12 +1,5 @@
 import { useEffect, useState, ReactNode } from "react";
-
-interface ColumnConfig<T> {
-  key: keyof T;
-  label: string;
-  render?: (item: T) => ReactNode;
-  className?: string;
-  visibleOn?: Array<"base" | "2xs" | "xs"  | "ss" | "sm" | "md" | "lg" | "xl">; 
-}
+import { ColumnConfig } from '../../../types';
 
 interface TableDefaultProps<T> {
   data: T[];

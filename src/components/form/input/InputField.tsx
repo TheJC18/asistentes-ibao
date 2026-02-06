@@ -13,10 +13,12 @@ interface InputProps {
   max?: string;
   step?: number;
   disabled?: boolean;
+  required?: boolean;
   success?: boolean;
   error?: boolean;
   hint?: string;
-  autoComplete?: "on" | "off"; // <-- aquí
+  autoComplete?: string;
+  readOnly?: boolean;
 }
 
 const Input: FC<InputProps> = ({
@@ -31,10 +33,12 @@ const Input: FC<InputProps> = ({
   max,
   step,
   disabled = false,
+  required = false,
   success = false,
   error = false,
   hint,
-  autoComplete = "off", // <-- valor por defecto si deseas
+  autoComplete = "off",
+  readOnly = false,
 }) => {
   let inputClasses = ` h-11 w-full rounded-lg border appearance-none px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-hidden focus:ring-3  dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 ${className}`;
 
@@ -61,8 +65,10 @@ const Input: FC<InputProps> = ({
         max={max}
         step={step}
         disabled={disabled}
+        required={required}
+        readOnly={readOnly}
         className={inputClasses}
-        autoComplete={autoComplete} // <-- aquí
+        autoComplete={autoComplete}
       />
 
       {hint && (

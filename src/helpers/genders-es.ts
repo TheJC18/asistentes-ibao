@@ -3,7 +3,6 @@ import { Gender } from '../types';
 export const gendersES: Gender[] = [
   { code: 'male', name: 'Masculino' },
   { code: 'female', name: 'Femenino' },
-  { code: 'other', name: 'Otro' }
 ];
 
 export const getGenderName = (genderCode?: string): string => {

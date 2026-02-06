@@ -1,10 +1,12 @@
 import { useSelector } from 'react-redux';
+import { useTranslation } from '../../../context/LanguageContext';
 import Calendar from '../../../components/ui/calendar/Calendar';
 import CompleteProfileCard from '../components/CompleteProfileCard';
 import { RootState } from '../../../store';
 
 export default function Home() {
   const { profileCompleted } = useSelector((state: RootState) => state.auth);
+  const translate = useTranslation();
 
   const handleDateClick = (date: Date) => {
     console.log('Fecha clickeada:', date);
@@ -26,7 +28,7 @@ export default function Home() {
   return (
     <div className="p-6">
       <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">
-        Inicio
+        {translate.pages.home.title}
       </h1>
       
       <Calendar 

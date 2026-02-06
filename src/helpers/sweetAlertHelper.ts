@@ -98,7 +98,7 @@ export const showLoadingAlert = (title: string = 'Procesando...', text?: string)
   });
 };
 
-export const showToast = (title: string, icon: 'success' | 'error' | 'warning' | 'info' = 'success'): void => {
+export const showToast = (icon: 'success' | 'error' | 'warning' | 'info', title: string): void => {
   Swal.fire({
     toast: true,
     position: 'top-end',
@@ -122,5 +122,5 @@ export const showCustomAlert = (config: SweetAlertOptions): Promise<SweetAlertRe
   return Swal.fire({
     ...baseConfig,
     ...config
-  });
+  } as SweetAlertOptions);
 };

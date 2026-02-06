@@ -75,14 +75,15 @@ export default function UserModal({
   useEffect(() => {
     if (open) {
       const userHadWebAccess = user.hasWebAccess || false;
+      const birthdateValue = user.birthdate ? (typeof user.birthdate === 'string' ? user.birthdate : user.birthdate.toISOString()) : null;
       
       setFormData({
-        name: user.name || user.displayName || "",
+        name: user.name || "",
         email: user.email || "",
         role: user.role || "",
         isMember: user.isMember || false,
         nationality: user.nationality || "",
-        birthdate: user.birthdate || "",
+        birthdate: birthdateValue,
         avatar: user.avatar || user.photoURL || "/user_default.png",
         gender: user.gender || "",
         relation: (user as any).relation || "",
@@ -188,7 +189,7 @@ export default function UserModal({
 
   const modalContent = (
     <div
-      className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm overflow-y-auto p-4"
+      className="fixed inset-0 z-[9999] flex items-start justify-center bg-black/60 backdrop-blur-sm overflow-y-auto p-4"
       style={{ display: open ? "flex" : "none" }}
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
@@ -310,7 +311,7 @@ export default function UserModal({
                 <input
                   className="w-full rounded-lg border pl-10 pr-3 py-2 text-base dark:bg-gray-800 dark:text-white border-gray-300 dark:border-gray-700"
                   type="text"
-                  value={formatDate(formData.birthdate) || ""}
+                  value={formData.birthdate ? new Date(formData.birthdate).toLocaleDateString('es-ES', { year: 'numeric', month: '2-digit', day: '2-digit' }) : ""}
                   disabled
                 />
               </div>

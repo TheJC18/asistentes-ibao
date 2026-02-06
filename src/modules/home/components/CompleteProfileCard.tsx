@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useTranslation } from '../../../context/LanguageContext';
 import { startUpdateProfileCompleted } from '../../auth/store';
 import UserModal from '../../user/components/UserModal';
 import { updateUserInFirebase } from '../../user/firebase/userQueries';
@@ -11,6 +12,7 @@ import { RootState, AppDispatch } from '../../../store';
 export default function CompleteProfileCard() {
   const dispatch = useDispatch<AppDispatch>();
   const { uid, displayName, email, photoURL, profileCompleted } = useSelector((state: RootState) => state.auth);
+  const translate = useTranslation();
   const [showModal, setShowModal] = useState(false);
 
   // Si el perfil ya está completado o aún no se ha verificado (null), no mostrar nada
@@ -25,7 +27,7 @@ export default function CompleteProfileCard() {
   const handleSaveProfile = async (userData: any) => {
     try {
       // Mostrar loading
-      showLoadingAlert('Guardando perfil...', 'Por favor espera un momento');
+      showLoadingAlert(translate.pages.home.savingProfile, translate.pages.home.pleaseWait);
 
       // Guardar los datos del usuario en Firestore
       const result = await updateUserInFirebase(uid || '', userData);
@@ -37,8 +39,8 @@ export default function CompleteProfileCard() {
         // Cerrar loading y mostrar éxito
         closeAlert();
         await showSuccessAlert(
-          '¡Perfil completado!',
-          'Tu perfil ha sido actualizado correctamente. Ahora puedes acceder a todas las funciones de la plataforma.'
+          translate.pages.home.profileCompleted,
+          translate.pages.home.profileCompletedMessage
         );
         
         // Cerrar el modal
@@ -46,16 +48,16 @@ export default function CompleteProfileCard() {
       } else {
         closeAlert();
         showErrorAlert(
-          'Error al guardar',
-          result.errorMessage || 'No se pudo actualizar tu perfil. Por favor intenta de nuevo.'
+          translate.pages.home.errorSaving,
+          result.errorMessage || translate.pages.home.errorSavingMessage
         );
       }
     } catch (error) {
       closeAlert();
       console.error('Error al guardar el perfil:', error);
       showErrorAlert(
-        'Error inesperado',
-        'Ocurrió un error al guardar tu perfil. Por favor intenta de nuevo.'
+        translate.pages.home.unexpectedError,
+        translate.pages.home.unexpectedErrorMessage
       );
     }
   };
@@ -108,30 +110,30 @@ export default function CompleteProfileCard() {
                 </div>
                 <div>
                   <h3 className="text-xl font-bold text-white">
-                    ¡Bienvenido, {displayName}!
+                    {translate.pages.home.welcomeUser.replace('{name}', displayName || '')}
                   </h3>
                   <p className="text-sm text-blue-100">
-                    Completa tu perfil para acceder a todas las funciones
+                    {translate.pages.home.completeProfile}
                   </p>
                 </div>
               </div>
 
               <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 mb-4">
                 <p className="text-white text-sm mb-3">
-                  Para comenzar a usar la plataforma, necesitamos que completes tu información personal:
+                  {translate.pages.home.completeProfileMessage}
                 </p>
                 <ul className="space-y-2 text-sm text-white/90">
                   <li className="flex items-center gap-2">
                     <FontAwesomeIcon icon={["fas", "check-circle"]} className="text-green-300" />
-                    Fecha de nacimiento
+                    {translate.pages.home.completeProfileItems.birthdate}
                   </li>
                   <li className="flex items-center gap-2">
                     <FontAwesomeIcon icon={["fas", "check-circle"]} className="text-green-300" />
-                    Nacionalidad
+                    {translate.pages.home.completeProfileItems.nationality}
                   </li>
                   <li className="flex items-center gap-2">
                     <FontAwesomeIcon icon={["fas", "check-circle"]} className="text-green-300" />
-                    Foto de perfil
+                    {translate.pages.home.completeProfileItems.photo}
                   </li>
                 </ul>
               </div>
@@ -141,7 +143,7 @@ export default function CompleteProfileCard() {
                 className="px-6 py-3 bg-white text-blue-600 rounded-lg font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200 flex items-center gap-2"
               >
                 <FontAwesomeIcon icon={["fas", "edit"]} />
-                Completar mi perfil
+                {translate.pages.home.completeProfileTitle}
               </button>
             </div>
 

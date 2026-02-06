@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { FaEye, FaEyeSlash, FaInfoCircle, FaGoogle, FaSignInAlt } from 'react-icons/fa';
 import { Spinner } from 'flowbite-react';
 import { useForm } from '../../hooks/useForm';
+import { useTranslation } from '../../context/LanguageContext';
 import Label from '../../components/form/Label';
 import Input from '../../components/form/input/InputField';
 import Button from '../../components/ui/button/Button';
@@ -21,6 +22,7 @@ const formData: SignInFormData = { email: '', password: '' };
 export default function SignInForm() {
   const dispatch = useDispatch<AppDispatch>();
   const { status, errorMessage } = useSelector((state: RootState) => state.auth);
+  const translate = useTranslation();
 
   // Usa el formData definido fuera del componente
   const { formState, onInputChange } = useForm(formData);
@@ -52,10 +54,10 @@ export default function SignInForm() {
               <img src="/logo.webp" alt="Logo" className="w-full h-full object-contain"/>
             </div>
             <h1 className="mb-2 font-semibold text-gray-800 text-title-sm dark:text-white/90 sm:text-title-md">
-              Iniciar sesión
+              {translate.auth.login}
             </h1>
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              Ingresa con tus credenciales!
+              {translate.auth.enterCredentials}
             </p>
           </div>
           <div>
@@ -63,7 +65,7 @@ export default function SignInForm() {
               <div className="space-y-6">
                 <div>
                   <Label>
-                    Correo <span className="text-error-500">*</span>{' '}
+                    {translate.form.email} <span className="text-error-500">*</span>{' '}
                   </Label>
                   <Input
                     name="email"
@@ -71,13 +73,13 @@ export default function SignInForm() {
                     value={email}
                     onChange={onInputChange}
                     required
-                    placeholder="Correo electrónico"
+                    placeholder={translate.auth.emailPlaceholder}
                     disabled={isCheckingAuthentication}
                   />
                 </div>
                 <div>
                   <Label>
-                    Contraseña <span className="text-error-500">*</span>{' '}
+                    {translate.form.password} <span className="text-error-500">*</span>{' '}
                   </Label>
                   <div className="relative">
                     <Input
@@ -86,7 +88,7 @@ export default function SignInForm() {
                       value={password}
                       onChange={onInputChange}
                       required
-                      placeholder="Contraseña"
+                      placeholder={translate.auth.passwordPlaceholder}
                       disabled={isCheckingAuthentication}
                     />
                     <span
@@ -108,7 +110,7 @@ export default function SignInForm() {
                     to="/auth/registro"
                     className="text-sm text-brand-500 hover:text-brand-600 dark:text-brand-400"
                   >
-                    Crear nueva cuenta
+                    {translate.auth.createNewAccount}
                   </RouterLink>
                 </div>
                 <div className="flex gap-x-4">
@@ -120,7 +122,7 @@ export default function SignInForm() {
                     disabled={isCheckingAuthentication}
                     startIcon={<FaSignInAlt />}
                   >
-                    Ingresar
+                    {translate.auth.signIn}
                   </Button>
 
                   <Button
@@ -131,7 +133,7 @@ export default function SignInForm() {
                     disabled={isCheckingAuthentication}
                     startIcon={<FaGoogle />}
                   >
-                    Google
+                    {translate.auth.google}
                   </Button>
 
                 </div>
