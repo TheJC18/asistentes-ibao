@@ -43,7 +43,7 @@ export function UserCard({
   const userAvatar = user.avatar || user.photoURL || "/user_default.png";
   const countries = language === "es" ? countriesES : countriesEN;
   const dateLocale = language === "es" ? "es-ES" : "en-US";
-  const yearsLabel = language === "es" ? "años" : "years";
+  const yearsLabel = translate.userCard?.age || (language === "es" ? "años" : "years");
 
   const relationLabel = user.relation
     ? getRelationLabelByLocale(language, user.relation, user.gender || "neutral")
@@ -84,12 +84,12 @@ export function UserCard({
 
   return (
     <>
-      <div className="rounded-2xl border border-gray-200 bg-white dark:bg-gray-800 dark:border-gray-700 p-6 flex flex-col items-center gap-4 hover:shadow-lg transition-all duration-300 min-h-[400px] w-full group">
+      <div className="rounded-2xl border border-border bg-card p-6 flex flex-col items-center gap-4 hover:shadow-lg transition-all duration-300 min-h-[400px] w-full group">
         
         {/* Avatar centrado y destacado */}
         <div className="relative">
           <div 
-            className="w-32 h-32 rounded-full overflow-hidden border-4 border-gray-300 dark:border-gray-600 shadow-md cursor-pointer hover:shadow-lg hover:border-gray-400 transition-all"
+            className="w-32 h-32 rounded-full overflow-hidden border-4 border-border shadow-md cursor-pointer hover:shadow-lg hover:border-primary transition-all"
             onClick={() => setIsAvatarExpanded(true)}
           >
             <img 
@@ -112,7 +112,7 @@ export function UserCard({
 
           {/* Badge de membresía en la esquina del avatar */}
           {user.isMember !== undefined && (
-            <div className={`absolute -bottom-2 -right-2 w-10 h-10 rounded-full flex items-center justify-center border-4 border-white dark:border-gray-900 shadow-lg ${
+            <div className={`absolute -bottom-2 -right-2 w-10 h-10 rounded-full flex items-center justify-center border-4 border-card shadow-lg ${
               user.isMember
                 ? 'bg-green-500'
                 : 'bg-gray-400'
@@ -127,7 +127,7 @@ export function UserCard({
 
         {/* Nombre centrado */}
         <div className="text-center w-full">
-          <h3 className="text-xl font-bold text-gray-900 dark:text-white line-clamp-2 break-words">
+          <h3 className="text-xl font-bold text-text-primary line-clamp-2 break-words">
             {userName}
           </h3>
         </div>
@@ -135,17 +135,17 @@ export function UserCard({
         {/* Relación centrada y en negrita */}
         {showRelation && relationLabel && (
           <div className="text-center">
-            <p className="text-sm font-extrabold text-blue-600 dark:text-blue-400 uppercase tracking-wide">
+            <p className="text-sm font-extrabold text-primary uppercase tracking-wide">
               {relationLabel}
             </p>
           </div>
         )}
 
         {/* Divider sutil */}
-        <div className="w-12 h-0.5 bg-gray-300 dark:bg-gray-600 rounded-full"></div>
+        <div className="w-12 h-0.5 bg-border rounded-full"></div>
 
         {/* Información en formato minimalista */}
-        <div className="w-full space-y-3 text-sm text-gray-700 dark:text-gray-300">
+        <div className="w-full space-y-3 text-sm text-text-primary">
           
           {/* Nacionalidad con bandera - Solo si existe */}
           {showNationality && user.nationality && (
@@ -181,7 +181,7 @@ export function UserCard({
               <span>
                 {formattedBirthdate}
                 {userAge && (
-                  <strong className="text-gray-600 dark:text-gray-400">
+                  <strong className="text-text-secondary">
                     {" "}({userAge} {yearsLabel})
                   </strong>
                 )}
@@ -214,13 +214,13 @@ export function UserCard({
             <div className="flex items-start gap-3">
               <FontAwesomeIcon icon={["fas", "globe"]} className="text-blue-500 mt-1 flex-shrink-0" />
               <span className="flex items-center gap-2">
-                {translate.form.hasWebAccess}:
+                {translate.userCard?.webAccess || translate.form?.hasWebAccess || 'Acceso web'}:
                 <span className={`font-semibold ${
                   user.hasWebAccess
-                    ? 'text-green-600 dark:text-green-400'
-                    : 'text-red-600 dark:text-red-400'
+                    ? 'text-success'
+                    : 'text-error'
                 }`}>
-                  {user.hasWebAccess ? translate.common.yes : translate.common.no}
+                  {user.hasWebAccess ? (translate.common?.yes || 'Sí') : (translate.common?.no || 'No')}
                 </span>
               </span>
             </div>
@@ -243,14 +243,14 @@ export function UserCard({
               <FontAwesomeIcon icon={["fas", "times"]} className="text-2xl" />
             </button>
 
-            <div className="bg-white dark:bg-gray-900 rounded-2xl p-4 shadow-2xl">
+            <div className="bg-card rounded-2xl p-4 shadow-2xl">
               <img
                 src={userAvatar}
                 alt={userName}
                 className="w-full h-auto max-h-[80vh] object-contain rounded-xl"
                 onClick={(e) => e.stopPropagation()}
               />
-              <p className="text-center mt-4 text-lg font-semibold text-gray-900 dark:text-white">
+              <p className="text-center mt-4 text-lg font-semibold text-text-primary">
                 {userName}
               </p>
             </div>

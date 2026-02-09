@@ -7,7 +7,7 @@ import Input from "@/core/components/form/input/InputField";
 import { countriesES, countriesEN } from "@/i18n/countries";
 import { gendersES, gendersEN } from "@/i18n/genders";
 import { relationsES, relationsEN } from "@/i18n/relations";
-import { useLanguage } from "@/core/context/LanguageContext";
+import { useLanguage, useTranslation } from "@/core/context/LanguageContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { FileInput } from "flowbite-react";
 import { 
@@ -40,7 +40,9 @@ interface UserFormData {
   isMember: boolean;
   gender: string;
   relation: string;
+  phone: string;
 }
+
 
 export default function UserModal({ 
   open, 
@@ -50,6 +52,7 @@ export default function UserModal({
   onSave 
 }: UserModalProps) {
   const { language } = useLanguage();
+  const translate = useTranslation();
 
   const countries = language === "es" ? countriesES : countriesEN;
   const genders = language === "es" ? gendersES : gendersEN;
@@ -70,6 +73,7 @@ export default function UserModal({
     isMember: false,
     gender: "",
     relation: "",
+    phone: "",
   });
 
   const [hasWebAccess, setHasWebAccess] = useState(false);
@@ -97,7 +101,20 @@ export default function UserModal({
         avatar: user.avatar || user.photoURL || "/user_default.png",
         gender: user.gender || "",
         relation: (user as any).relation || "",
+        phone: user.phone || "",
       });
+      <div>
+        <Label htmlFor="user-phone">Teléfono</Label>
+        <Input
+          id="user-phone"
+          type="tel"
+          value={formData.phone || ""}
+          disabled={isView}
+          onChange={(e: ChangeEvent<HTMLInputElement>) => onChange("phone", e.target.value)}
+          autoComplete="on"
+          placeholder="Ingresa el teléfono"
+        />
+      </div>
       setOriginalAvatar(user.avatar || user.photoURL || "/user_default.png");
       setFileInputValue("");
       setPassword("");
@@ -160,12 +177,12 @@ export default function UserModal({
 
   const titleIcon = isView ? ["fas", "eye"] : isEdit ? ["fas", "edit"] : isFamily ? ["fas", "user-friends"] : ["fas", "user-plus"];
   const titleText = isView
-    ? "Información del usuario"
+    ? translate.pages?.users?.viewUser || translate.common.viewDetails 
     : isEdit
-    ? "Editar usuario"
+    ? translate.pages?.users?.editUser || translate.common.editUser
     : isFamily
-    ? "Agregar familiar"
-    : "Crear usuario";
+    ? translate.pages?.family?.addFamiliar 
+    : translate.pages?.users?.addUser || translate.common.create;
 
   const modalContent = (
     <div
@@ -176,12 +193,12 @@ export default function UserModal({
       }}
     >
       <div
-        className="relative w-full max-w-md bg-white dark:bg-gray-900 rounded-2xl shadow-2xl dark:shadow-black/50 border border-gray-200 dark:border-gray-700 my-8"
+        className="relative w-full max-w-md bg-card rounded-2xl shadow-2xl border border-border my-8"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
         <button
-          className="absolute top-4 right-4 z-10 p-2 rounded-lg text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+          className="absolute top-4 right-4 z-10 p-2 rounded-lg text-text-tertiary hover:text-text-primary hover:bg-surface-hover transition-colors"
           onClick={onClose}
           aria-label="Close"
         >
@@ -189,10 +206,10 @@ export default function UserModal({
         </button>
 
         {/* Header */}
-        <div className="px-6 sm:px-8 pt-6 pb-4 border-b border-gray-200 dark:border-gray-700">
+        <div className="px-6 sm:px-8 pt-6 pb-4 border-b border-border">
           <div className="flex items-center justify-center gap-3">
-            <FontAwesomeIcon icon={titleIcon as any} className="text-blue-600 dark:text-blue-400 text-2xl" />
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{titleText}</h2>
+            <FontAwesomeIcon icon={titleIcon as any} className="text-secondary text-2xl" />
+            <h2 className="text-2xl font-bold text-text-primary">{titleText}</h2>
           </div>
         </div>
 
@@ -202,29 +219,29 @@ export default function UserModal({
           
           {/* Sección: Datos Personales */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-2">
-              <FontAwesomeIcon icon={["fas", "user"]} className="mr-2 text-blue-600 dark:text-blue-400" />
-              Datos Personales
+            <h3 className="text-lg font-semibold text-text-primary border-b border-border pb-2">
+              <FontAwesomeIcon icon={["fas", "user"]} className="mr-2 text-secondary" />
+              {translate.formSections?.personalData}
             </h3>
             
           <div>
             <img
               src={formData.avatar}
-              alt="Imagen del usuario"
-              className="text-center w-32 h-32 mx-auto mb-2 rounded-full border-2 border-blue-500 object-cover shadow"
+              alt={translate.form?.avatar}
+              className="text-center w-32 h-32 mx-auto mb-2 rounded-full border-2 border-primary object-cover shadow"
             />
             {!isView && (
               <>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
-                  Imagen de perfil
+                <label className="block text-sm font-medium text-text-secondary mb-1">
+                  {translate.form?.avatar}
                 </label>
                 <div className="flex flex-col sm:flex-row sm:items-center gap-2 relative group w-full">
                   <FileInput value={fileInputValue} onChange={onFileChange} className="custom-class flex-1" />
                   <div className="flex sm:block w-full sm:w-auto">
                     <button
                       type="button"
-                      className="flex items-center justify-center rounded-full p-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-blue-100 dark:hover:bg-blue-800 transition focus:outline-none focus:ring-2 focus:ring-blue-400 w-full sm:w-auto"
-                      title="Restaurar imagen original"
+                      className="flex items-center justify-center rounded-full p-2 bg-surface text-text-secondary hover:bg-secondary hover:text-text-on-primary transition focus:outline-none focus:ring-2 focus:ring-secondary w-full sm:w-auto"
+                      title={""}
                       onClick={onRestoreAvatar}
                     >
                       <FontAwesomeIcon icon={["fas", "arrow-rotate-left"]} className="w-4 h-4" />
@@ -236,7 +253,7 @@ export default function UserModal({
           </div>
 
           <div>
-            <Label htmlFor="user-name">Nombre</Label>
+            <Label htmlFor="user-name">{translate.form?.name}</Label>
             <Input
               id="user-name"
               type="text"
@@ -244,14 +261,27 @@ export default function UserModal({
               disabled={isView}
               onChange={(e: ChangeEvent<HTMLInputElement>) => onChange("name", e.target.value)}
               autoComplete="on"
-              placeholder="Ingresa el nombre"
+              placeholder={translate.form?.namePlaceholder ?? ""}
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="user-phone">{translate.form?.phone}</Label>
+            <Input
+              id="user-phone"
+              type="tel"
+              value={formData.phone || ""}
+              disabled={isView}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => onChange("phone", e.target.value)}
+              autoComplete="on"
+              placeholder={translate.form?.phonePlaceholder ?? ""}
             />
           </div>
 
           {(isFamily || formData.relation) && (
             <div>
               <Label htmlFor="user-relation">
-                Relación {!isView && <span className="text-red-500">*</span>}
+                {translate.form?.relation} {!isView && <span className="text-error">*</span>}
               </Label>
               {isView ? (
                 <Input
@@ -263,7 +293,7 @@ export default function UserModal({
               ) : (
                 <Select
                   options={relations.map(r => ({ value: r.code, label: r.name }))}
-                  placeholder="Selecciona una relación"
+                  placeholder={translate.form?.relationPlaceholder ?? ""}
                   onChange={(value: string) => onChange("relation", value)}
                   defaultValue={formData.relation || ""}
                 />
@@ -272,7 +302,7 @@ export default function UserModal({
           )}
 
           <div>
-            <Label htmlFor="user-gender">Género</Label>
+            <Label htmlFor="user-gender">{translate.form?.gender}</Label>
             {isView ? (
               <Input
                 id="user-gender"
@@ -283,7 +313,7 @@ export default function UserModal({
             ) : (
               <Select
                 options={genders.map(g => ({ value: g.code, label: g.name }))}
-                placeholder="Selecciona un género"
+                placeholder={translate.form?.genderPlaceholder ?? ""}
                 onChange={(value: string) => onChange("gender", value)}
                 defaultValue={formData.gender || ""}
               />
@@ -291,14 +321,14 @@ export default function UserModal({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Fecha de nacimiento</label>
+            <label className="block text-sm font-medium text-text-secondary mb-1">{translate.form?.birthdate}</label>
             {isView ? (
               <div className="relative flex items-center">
-                <span className="absolute left-3 text-gray-500 dark:text-gray-400 pointer-events-none">
+                <span className="absolute left-3 text-text-tertiary pointer-events-none">
                   <FontAwesomeIcon icon={["fas", "calendar-alt"]} />
                 </span>
                 <input
-                  className="w-full rounded-lg border pl-10 pr-3 py-2 text-base dark:bg-gray-800 dark:text-white border-gray-300 dark:border-gray-700"
+                  className="w-full rounded-lg border pl-10 pr-3 py-2 text-base bg-background text-text-primary border-border"
                   type="text"
                   value={formData.birthdate ? new Date(formData.birthdate).toLocaleDateString('es-ES', { year: 'numeric', month: '2-digit', day: '2-digit' }) : ""}
                   disabled
@@ -306,14 +336,14 @@ export default function UserModal({
               </div>
             ) : (
               <div className="relative flex items-center">
-                <span className="absolute left-3 text-gray-500 dark:text-gray-400 z-10">
+                <span className="absolute left-3 text-text-tertiary z-10">
                   <FontAwesomeIcon icon={["fas", "calendar-alt"]} />
                 </span>
                 <DatePicker
                   key={`birthdate-${user.id || 'new'}-${formData.birthdate || 'empty'}`}
                   id="user-birthdate"
                   label=""
-                  placeholder="Selecciona la fecha"
+                  placeholder={translate.form?.birthdatePlaceholder ?? ""}
                   inputClassName="pl-10 pr-3"
                   hideRightIcon
                   defaultDate={convertISOToDate(formData.birthdate || null)}
@@ -324,7 +354,7 @@ export default function UserModal({
           </div>
 
           <div>
-            <Label htmlFor="user-nationality">Nacionalidad</Label>
+            <Label htmlFor="user-nationality">{translate.form?.nationality}</Label>
             {isView ? (
               <Input
                 id="user-nationality"
@@ -335,9 +365,9 @@ export default function UserModal({
             ) : (
               <Select
                 options={countries
-                  .sort((a, b) => a.name.localeCompare(b.name))
-                  .map(c => ({ value: c.code, label: c.name }))}
-                placeholder="Selecciona un país"
+                  .sort((countryA, countryB) => countryA.name.localeCompare(countryB.name))
+                  .map(country => ({ value: country.code, label: country.name }))}
+                placeholder={translate.form?.nationalityPlaceholder ?? ""}
                 onChange={(value: string) => onChange("nationality", value)}
                 defaultValue={formData.nationality || ""}
               />
@@ -347,28 +377,28 @@ export default function UserModal({
 
           {/* Sección: Datos de la Iglesia */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-2">
-              <FontAwesomeIcon icon={["fas", "church"]} className="mr-2 text-purple-600 dark:text-purple-400" />
-              Datos de la Iglesia
+            <h3 className="text-lg font-semibold text-text-primary border-b border-border pb-2">
+              <FontAwesomeIcon icon={["fas", "church"]} className="mr-2 text-secondary" />
+              {translate.formSections?.churchData}
             </h3>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-3">
-              ¿Forma parte de la membresía?
+            <label className="block text-sm font-medium text-text-secondary mb-3">
+              {translate.form?.isMember}
             </label>
             
             {isView ? (
               <div className="flex items-center gap-2">
                 <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium ${
                   formData.isMember 
-                    ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' 
-                    : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400'
+                    ? 'bg-success-light text-success' 
+                    : 'bg-surface text-text-tertiary'
                 }`}>
                   <FontAwesomeIcon 
                     icon={["fas", formData.isMember ? "check-circle" : "times-circle"]} 
                     className="text-lg"
                   />
-                  <span>{formData.isMember ? 'Sí, es miembro' : 'No es miembro'}</span>
+                  <span>{formData.isMember ? translate.formLabels?.memberYes : translate.formLabels?.memberNo}</span>
                 </div>
               </div>
             ) : (
@@ -378,15 +408,15 @@ export default function UserModal({
                   onClick={() => onChange("isMember", true)}
                   className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 transition-all ${
                     formData.isMember
-                      ? 'border-green-500 bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400 dark:border-green-500'
-                      : 'border-gray-300 bg-white text-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-700 hover:border-green-300'
+                      ? 'border-success bg-success-light text-success'
+                      : 'border-border bg-card text-text-secondary hover:border-success'
                   }`}
                 >
                   <FontAwesomeIcon 
                     icon={["fas", "check-circle"]} 
-                    className={`text-xl ${formData.isMember ? 'text-green-500' : 'text-gray-400'}`}
+                    className={`text-xl ${formData.isMember ? 'text-success' : 'text-text-disabled'}`}
                   />
-                  <span className="font-medium">Soy miembro</span>
+                  <span className="font-medium">{translate.formLabels?.memberYes}</span>
                 </button>
                 
                 <button
@@ -394,15 +424,15 @@ export default function UserModal({
                   onClick={() => onChange("isMember", false)}
                   className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 transition-all ${
                     !formData.isMember
-                      ? 'border-red-500 bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-400 dark:border-red-500'
-                      : 'border-gray-300 bg-white text-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-700 hover:border-red-300'
+                      ? 'border-error bg-error-light text-error'
+                      : 'border-border bg-card text-text-secondary hover:border-error'
                   }`}
                 >
                   <FontAwesomeIcon 
                     icon={["fas", "times-circle"]} 
-                    className={`text-xl ${!formData.isMember ? 'text-red-500' : 'text-gray-400'}`}
+                    className={`text-xl ${!formData.isMember ? 'text-error' : 'text-text-disabled'}`}
                   />
-                  <span className="font-medium">No soy miembro</span>
+                  <span className="font-medium">{translate.formLabels?.memberNo}</span>
                 </button>
               </div>
             )}
@@ -412,16 +442,16 @@ export default function UserModal({
           {/* Sección: Accesos Web */}
           {(isFamily || isEdit || isCreate || (isView && hasWebAccess)) && (
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-2">
-              <FontAwesomeIcon icon={["fas", "globe"]} className="mr-2 text-green-600 dark:text-green-400" />
-              Accesos Web
+            <h3 className="text-lg font-semibold text-text-primary border-b border-border pb-2">
+              <FontAwesomeIcon icon={["fas", "globe"]} className="mr-2 text-success" />
+              {translate.form?.hasWebAccess}
             </h3>
 
             {!isView && (
-            <div className="border border-gray-300 dark:border-gray-600 rounded-lg p-4 bg-gray-50 dark:bg-gray-800/50">
+            <div className="border border-border rounded-lg p-4 bg-surface">
               <div className="flex items-center justify-between mb-2">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
-                  {isEdit ? '¿Tiene acceso a la aplicación web?' : '¿Dar acceso a la aplicación web?'}
+                <label className="block text-sm font-medium text-text-secondary">
+                  {isEdit ? (translate.form?.hasWebAccessEdit || '¿Tiene acceso a la aplicación web?') : (translate.form?.hasWebAccessCreate)}
                 </label>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input
@@ -430,13 +460,13 @@ export default function UserModal({
                     onChange={(e) => setHasWebAccess(e.target.checked)}
                     className="sr-only peer"
                   />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                  <div className="w-11 h-6 bg-surface peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-light rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-background after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-background after:border-border after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-secondary"></div>
                 </label>
               </div>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
+              <p className="text-xs text-text-tertiary">
                 {isEdit 
-                  ? 'Si desactivas esta opción, el usuario no podrá iniciar sesión (debes eliminar manualmente desde Firebase Console > Authentication)'
-                  : 'Si activas esta opción, el usuario podrá iniciar sesión con correo y contraseña'
+                  ? translate.form?.webAccessEditHelp
+                  : translate.form?.webAccessCreateHelp
                 }
               </p>
             </div>
@@ -446,7 +476,7 @@ export default function UserModal({
               <>
                 <div>
                   <Label htmlFor="user-email">
-                    Correo {!isView && <span className="text-red-500">*</span>}
+                    {translate.form?.email} {!isView && <span className="text-error">*</span>}
                   </Label>
                   <Input
                     id="user-email"
@@ -455,16 +485,16 @@ export default function UserModal({
                     disabled={isView || (isEdit && originalHasWebAccess)}
                     onChange={(e: ChangeEvent<HTMLInputElement>) => onChange("email", e.target.value)}
                     autoComplete="on"
-                    placeholder="Ingresa el correo electrónico"
+                    placeholder={""}
                   />
                   {isEdit && originalHasWebAccess && (
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      El correo no se puede cambiar después de crear el usuario
+                    <p className="text-xs text-text-tertiary mt-1">
+                      {translate.form?.emailNoChange}
                     </p>
                   )}
                   {isEdit && !originalHasWebAccess && (
-                    <p className="text-xs text-blue-500 dark:text-blue-400 mt-1">
-                      Ingresa un correo para dar acceso web a este usuario
+                    <p className="text-xs text-info mt-1">
+                      {translate.form?.emailForWebAccess}
                     </p>
                   )}
                 </div>
@@ -474,7 +504,7 @@ export default function UserModal({
                   <>
                     <div>
                       <Label htmlFor="user-password">
-                        Contraseña <span className="text-red-500">*</span>
+                        {translate.form?.password} <span className="text-error">*</span>
                       </Label>
                       <Input
                         id="user-password"
@@ -484,14 +514,14 @@ export default function UserModal({
                           setPassword(e.target.value);
                           setErrors([]);
                         }}
-                        placeholder="Ingresa la contraseña"
+                        placeholder={""}
                         autoComplete="on"
                       />
                     </div>
 
                     <div>
                       <Label htmlFor="user-confirm-password">
-                        Verificar contraseña <span className="text-red-500">*</span>
+                        {translate.form?.confirmPassword} <span className="text-error">*</span>
                       </Label>
                       <Input
                         id="user-confirm-password"
@@ -501,7 +531,7 @@ export default function UserModal({
                           setConfirmPassword(e.target.value);
                           setErrors([]);
                         }}
-                        placeholder="Confirma la contraseña"
+                        placeholder={""}
                         autoComplete="on"
                       />
                     </div>
@@ -512,7 +542,7 @@ export default function UserModal({
                 {isEdit && (
                   <>
                     <div>
-                      <Label htmlFor="user-new-password">Nueva contraseña</Label>
+                      <Label htmlFor="user-new-password">{translate.form?.newPassword}</Label>
                       <Input
                         id="user-new-password"
                         type="password"
@@ -521,14 +551,14 @@ export default function UserModal({
                           setPassword(e.target.value);
                           setErrors([]);
                         }}
-                        placeholder="Dejar vacío para no cambiar"
+                        placeholder={translate.form?.newPasswordPlaceholder}
                         autoComplete="on"
-                        hint="Deja vacío si no deseas cambiar la contraseña"
+                        hint={translate.form?.newPasswordHint}
                       />
                     </div>
 
                     <div>
-                      <Label htmlFor="user-confirm-new-password">Verificar nueva contraseña</Label>
+                      <Label htmlFor="user-confirm-new-password">{translate.form?.confirmNewPassword}</Label>
                       <Input
                         id="user-confirm-new-password"
                         type="password"
@@ -537,7 +567,7 @@ export default function UserModal({
                           setConfirmPassword(e.target.value);
                           setErrors([]);
                         }}
-                        placeholder="Dejar vacío para no cambiar"
+                        placeholder={translate.form?.confirmNewPasswordPlaceholder}
                         autoComplete="on"
                       />
                     </div>
@@ -550,10 +580,10 @@ export default function UserModal({
           )}
 
           {errors.length > 0 && (
-            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded-lg">
+            <div className="bg-error-light border border-error text-error px-4 py-3 rounded-lg">
               <div className="flex items-center gap-2 mb-2 font-semibold">
                 <FontAwesomeIcon icon={["fas", "exclamation-circle"]} />
-                <span>Por favor, corrige los siguientes errores:</span>
+                <span>{translate.messages?.error?.generic}</span>
               </div>
               <ul className="space-y-1 ml-1">
                 {errors.map((error, index) => (
@@ -566,9 +596,9 @@ export default function UserModal({
           {!isView && (
             <button
               type="submit"
-              className="w-full mt-6 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-medium shadow-sm hover:shadow transition-all"
+              className="w-full mt-6 py-2.5 rounded-lg bg-secondary hover:bg-secondary-hover text-text-on-primary font-medium shadow-sm hover:shadow transition-all"
             >
-              {isEdit ? "Guardar cambios" : isFamily ? "Agregar familiar" : "Crear usuario"}
+              {isEdit ? (translate.common?.save) : isFamily ? (translate.pages?.family?.addFamiliar) : (translate.pages?.users?.addUser)}
             </button>
           )}
         </form>
@@ -577,5 +607,6 @@ export default function UserModal({
     </div>
   );
 
-  return ReactDOM.createPortal(modalContent, document.body);
+  const modalRoot = document.getElementById('modal-root');
+  return ReactDOM.createPortal(modalContent, modalRoot);
 }

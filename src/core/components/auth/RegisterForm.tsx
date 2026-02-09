@@ -19,6 +19,8 @@ interface RegisterFormData {
   confirmPassword: string;
 }
 
+type FormValues = RegisterFormData;
+
 // Datos iniciales del formulario
 const formData: RegisterFormData = { 
   displayName: '', 
@@ -46,24 +48,47 @@ export default function RegisterForm() {
     ]
   };
 
-  const {
-    formState,
-    formValidation,
-    onInputChange,
-    isFormValid,
-  } = useForm(formData, formValidations);
+  // Función de validación adaptada al nuevo hook
+  const validate = (values: FormValues) => {
+    const errors: { [key: string]: string } = {};
+    
+    // Validar displayName
+    if (!values.displayName || values.displayName.length < 1) {
+      errors.displayName = translate.messages.validation.nameRequired;
+    }
+    
+    // Validar email
+    if (!values.email || !values.email.includes('@')) {
+      errors.email = translate.messages.validation.emailInvalid;
+    }
+    
+    // Validar password
+    if (!values.password || values.password.length < 6) {
+      errors.password = translate.messages.validation.passwordLength;
+    }
+    
+    // Validar confirmPassword
+    if (values.password !== values.confirmPassword) {
+      errors.confirmPassword = translate.messages.validation.passwordsMustMatch;
+    }
+    
+    return errors;
+  };
 
-  const { displayName, email, password, confirmPassword } = formState;
-  const displayNameValid = formValidation.displayName;
-  const emailValid = formValidation.email;
-  const passwordValid = formValidation.password;
-  const confirmPasswordValid = formValidation.confirmPassword;
+  const {
+    values,
+    errors,
+    handleChange,
+  } = useForm(formData, undefined, validate);
+
+  const { displayName, email, password, confirmPassword } = values;
+  const isFormValid = Object.keys(errors).length === 0;
 
   const onSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setFormSubmitted(true);
     if (!isFormValid) return;
-    dispatch(startCreatingUserWithEmailPassword(formState));
+    dispatch(startCreatingUserWithEmailPassword(values));
   };
 
   return (
@@ -74,10 +99,10 @@ export default function RegisterForm() {
             <div className="w-32 h-32 mx-auto mb-10 flex items-center justify-center">
               <img src="/logo.webp" alt="Logo" className="w-full h-full object-contain"/>
             </div>
-            <h1 className="mb-2 font-semibold text-gray-800 text-title-sm dark:text-white/90 sm:text-title-md">
+            <h1 className="mb-2 font-semibold text-text-primary text-title-sm sm:text-title-md">
               {translate.auth.signUp}
             </h1>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <p className="text-sm text-text-secondary">
               {translate.auth.registerWithData}
             </p>
           </div>
@@ -92,13 +117,13 @@ export default function RegisterForm() {
                     name="displayName"
                     type="text"
                     value={displayName}
-                    onChange={onInputChange}
+                    onChange={handleChange}
                     required
                     placeholder={translate.auth.fullNamePlaceholder}
                     disabled={isCheckingAuthentication}
                   />
-                  {formSubmitted && displayNameValid && (
-                    <div className="text-error-500 text-xs mt-1">{displayNameValid}</div>
+                  {formSubmitted && errors.displayName && (
+                    <div className="text-error-500 text-xs mt-1">{errors.displayName}</div>
                   )}
                 </div>
                 <div>
@@ -109,13 +134,13 @@ export default function RegisterForm() {
                     name="email"
                     type="email"
                     value={email}
-                    onChange={onInputChange}
+                    onChange={handleChange}
                     required
                     placeholder={translate.auth.emailPlaceholder}
                     disabled={isCheckingAuthentication}
                   />
-                  {formSubmitted && emailValid && (
-                    <div className="text-error-500 text-xs mt-1">{emailValid}</div>
+                  {formSubmitted && errors.email && (
+                    <div className="text-error-500 text-xs mt-1">{errors.email}</div>
                   )}
                 </div>
                 <div>
@@ -127,7 +152,7 @@ export default function RegisterForm() {
                       name="password"
                       type={showPassword ? 'text' : 'password'}
                       value={password}
-                      onChange={onInputChange}
+                      onChange={handleChange}
                       required
                       placeholder={translate.auth.passwordPlaceholder}
                       disabled={isCheckingAuthentication}
@@ -139,8 +164,8 @@ export default function RegisterForm() {
                       {showPassword ? <FaEyeSlash /> : <FaEye />}
                     </span>
                   </div>
-                  {formSubmitted && passwordValid && (
-                    <div className="text-error-500 text-xs mt-1">{passwordValid}</div>
+                  {formSubmitted && errors.password && (
+                    <div className="text-error-500 text-xs mt-1">{errors.password}</div>
                   )}
                 </div>
                 <div>
@@ -152,7 +177,7 @@ export default function RegisterForm() {
                       name="confirmPassword"
                       type={showConfirmPassword ? 'text' : 'password'}
                       value={confirmPassword}
-                      onChange={onInputChange}
+                      onChange={handleChange}
                       required
                       placeholder={translate.auth.passwordPlaceholder}
                       disabled={isCheckingAuthentication}
@@ -164,8 +189,8 @@ export default function RegisterForm() {
                       {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
                     </span>
                   </div>
-                  {formSubmitted && confirmPasswordValid && (
-                    <div className="text-error-500 text-xs mt-1">{confirmPasswordValid}</div>
+                  {formSubmitted && errors.confirmPassword && (
+                    <div className="text-error-500 text-xs mt-1">{errors.confirmPassword}</div>
                   )}
                 </div>
                 {errorMessage && (
@@ -187,7 +212,7 @@ export default function RegisterForm() {
                 <div className="flex items-center justify-end">
                   <RouterLink
                     to="/auth/iniciar-sesion"
-                    className="text-sm text-brand-500 hover:text-brand-600 dark:text-brand-400"
+                    className="text-sm text-primary hover:text-primary-hover"
                   >
                     {translate.auth.signInHere}
                   </RouterLink>

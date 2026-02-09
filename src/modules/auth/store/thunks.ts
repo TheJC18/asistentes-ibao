@@ -1,6 +1,7 @@
 import { AppDispatch } from '@/core/store';
 import { loginWithEmailPassword, logoutFirebase, registerUserWithEmailPassword, singInWithGoogle } from '@/firebase/providers';
 import { getRole, getProfileCompleted, updateProfileCompleted, checkOrCreateUser, getUserByUID } from '@/modules/auth/firebase/authQueries';
+import { ROLES } from '@/core/constants/roles';
 import { chekingCredentials, login, logout, setRole, setProfileCompleted } from './authSlice';
 
 export const checkingAuthentication = () => {
@@ -50,7 +51,7 @@ export const startGoogleSignIn = () => {
                 hasWebAccess: userData.hasWebAccess ?? null
             }));
 
-            dispatch(setRole({ role: userData.role || 'user' }));
+            dispatch(setRole({ role: userData.role || ROLES.USER }));
         } else {
             // Si no se pudo obtener los datos de Firestore, usar los datos básicos
             dispatch(login({
@@ -61,7 +62,7 @@ export const startGoogleSignIn = () => {
                 avatar: result.photoURL,
                 photoURL: result.photoURL
             }));
-            dispatch(setRole({ role: 'user' }));
+            dispatch(setRole({ role: ROLES.USER }));
             dispatch(setProfileCompleted({ profileCompleted: false }));
         }
     };
@@ -113,7 +114,7 @@ export const startCreatingUserWithEmailPassword = ({ displayName, email, passwor
                 hasWebAccess: userData.hasWebAccess ?? null
             }));
 
-            dispatch(setRole({ role: userData.role || 'user' }));
+            dispatch(setRole({ role: userData.role || ROLES.USER }));
         } else {
             dispatch(login({
                 uid: uid!,
@@ -123,7 +124,7 @@ export const startCreatingUserWithEmailPassword = ({ displayName, email, passwor
                 avatar: photoURL,
                 photoURL
             }));
-            dispatch(setRole({ role: 'user' }));
+            dispatch(setRole({ role: ROLES.USER }));
             dispatch(setProfileCompleted({ profileCompleted: false }));
         }
     };
@@ -176,7 +177,7 @@ export const startLoginWithEmailPassword = ({ email, password }: LoginParams) =>
                 hasWebAccess: userData.hasWebAccess ?? null
             }));
 
-            dispatch(setRole({ role: userData.role || 'user' }));
+            dispatch(setRole({ role: userData.role || ROLES.USER }));
         } else {
             // Si no se pudo obtener los datos de Firestore, usar los datos básicos
             dispatch(login({
@@ -188,7 +189,7 @@ export const startLoginWithEmailPassword = ({ email, password }: LoginParams) =>
                 photoURL: photoURL
             }));
 
-            dispatch(setRole({ role: 'user' }));
+            dispatch(setRole({ role: ROLES.USER }));
             dispatch(setProfileCompleted({ profileCompleted: false }));
         }
     };
@@ -210,12 +211,12 @@ export const startGetRole = ({ uid }: GetRoleParams) => {
         try {
             const { ok, role } = await getRole({ uid });
             if (!ok) {
-                dispatch(setRole({ role: 'user' }));
+                dispatch(setRole({ role: ROLES.USER }));
             } else {
-                dispatch(setRole({ role: role || 'user' }));
+                dispatch(setRole({ role: role || ROLES.USER }));
             }
         } catch {
-            dispatch(setRole({ role: 'user' }));
+            dispatch(setRole({ role: ROLES.USER }));
         }
     };
 };

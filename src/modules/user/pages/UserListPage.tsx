@@ -6,6 +6,7 @@ import UserModal from '@/modules/user/components/UserModal';
 import EntityList from '@/core/components/ui/table/EntityList';
 import { getCountryNameByCode } from '@/modules/user/helpers/userUtils';
 import { useUserManagement } from '@/modules/user/hooks/useUserManagement';
+import { getRoleBadgeColor, getRoleBadgeTranslationKey } from '@/core/constants/roles';
 import { User } from '@/types';
 
 export default function UserListPage() {
@@ -38,7 +39,7 @@ export default function UserListPage() {
       visibleOn: ["xs", "ss", "sm", "md", "lg", "xl"], // Visible desde xs en adelante
       render: (userItem: User) => (
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 overflow-hidden rounded-full border-2 border-blue-400 shadow">
+          <div className="w-10 h-10 overflow-hidden rounded-full border-2 border-secondary shadow">
             <img 
               width={40} 
               height={40} 
@@ -52,7 +53,7 @@ export default function UserListPage() {
     {
       key: 'displayName',
       label: translate.form.name,
-      className: 'text-start font-semibold text-base md:text-lg text-gray-900 dark:text-gray-100',
+      className: 'text-start font-semibold text-base md:text-lg text-text-primary',
       visibleOn: ["base", "2xs", "xs", "ss", "sm", "md", "lg", "xl"], // Siempre visible
       render: (userItem: User) => userItem.displayName || userItem.name || translate.form.noName,
     },
@@ -61,11 +62,18 @@ export default function UserListPage() {
       label: translate.form.role,
       className: 'text-start',
       visibleOn: ["md", "lg", "xl"], // Visible desde ss en adelante
-      render: (userItem: User) => (
-        <Badge size="sm" color={userItem.role === 'admin' ? 'primary' : 'warning'}>
-          {userItem.role === 'admin' ? translate.role.adminBadge : translate.role.userBadge}
-        </Badge>
-      ),
+      render: (userItem: User) => {
+        const badgeColor = getRoleBadgeColor(userItem.role);
+        const translationKey = getRoleBadgeTranslationKey(userItem.role);
+        const [section, key] = translationKey.split('.');
+        const badgeText = translate[section as keyof typeof translate]?.[key as any] || userItem.role.toUpperCase();
+        
+        return (
+          <Badge size="sm" color={badgeColor}>
+            {badgeText}
+          </Badge>
+        );
+      },
     },
     {
       key: 'isMember',
@@ -73,7 +81,7 @@ export default function UserListPage() {
       className: 'text-start',
       visibleOn: ["sm", "md", "lg", "xl"], // Visible desde sm en adelante
       render: (userItem: User) => (
-        <Badge size="xl" color={userItem.isMember === true ? 'success' : 'error'} variant="solid">
+        <Badge size="md" color={userItem.isMember === true ? 'success' : 'error'} variant="solid">
           {userItem.isMember === true ? <FontAwesomeIcon icon={["fas", "check"]} /> : <FontAwesomeIcon icon={["fas", "times"]} />}
         </Badge>
       ),
@@ -81,11 +89,11 @@ export default function UserListPage() {
     { 
       key: 'nationality', 
       label: translate.form.nationality,  
-      className: 'text-start text-gray-800 dark:text-gray-200', 
+      className: 'text-start text-text-primary', 
       visibleOn: ["md", "lg", "xl"],
       render: (userItem: User) => {
         const nationality = userItem.nationality;
-        if (!nationality) return <span className="text-gray-400 dark:text-gray-500">-</span>;
+        if (!nationality) return <span className="text-text-disabled">-</span>;
         
         // Si tiene 2 caracteres, asumimos que es un código
         if (nationality.length === 2) {
@@ -100,22 +108,22 @@ export default function UserListPage() {
     { 
       key: 'email', 
       label: translate.form.email, 
-      className: 'text-start text-gray-800 dark:text-gray-200', 
+      className: 'text-start text-text-primary', 
       visibleOn: ["lg", "xl"],
-      render: (userItem: User) => userItem.email || <span className="text-gray-400 dark:text-gray-500">-</span>
+      render: (userItem: User) => userItem.email || <span className="text-text-disabled">-</span>
     },
     { 
       key: 'birthdate', 
       label: translate.form.birth, 
-      className: 'text-start text-gray-800 dark:text-gray-200', 
+      className: 'text-start text-text-primary', 
       visibleOn: ["lg", "xl"],
       render: (userItem: User) => {
-        if (!userItem.birthdate) return <span className="text-gray-400 dark:text-gray-500">-</span>;
+        if (!userItem.birthdate) return <span className="text-text-disabled">-</span>;
         try {
           const date = new Date(userItem.birthdate);
           return date.toLocaleDateString('es-ES', { year: 'numeric', month: '2-digit', day: '2-digit' });
         } catch {
-          return <span className="text-gray-400 dark:text-gray-500">-</span>;
+          return <span className="text-text-disabled">-</span>;
         }
       }
     },
@@ -131,7 +139,7 @@ export default function UserListPage() {
   const renderActions = (userItem: User) => (
     <div className="flex flex-row gap-1 items-center justify-center">
       <button 
-        className="p-1 h-7 w-7 text-xs rounded-full bg-blue-500/80 hover:bg-blue-700 text-white transition" 
+        className="p-1 h-7 w-7 text-xs rounded-full bg-info hover:bg-info/80 text-text-on-primary transition" 
         title={translate.common.viewDetails} 
         onClick={() => handleView(userItem)}
         disabled={isDeleting}
@@ -139,7 +147,7 @@ export default function UserListPage() {
         <FontAwesomeIcon icon={["fas", "eye"]} />
       </button>
       <button 
-        className="p-1 h-7 w-7 text-xs rounded-full bg-green-500/80 hover:bg-green-700 text-white transition" 
+        className="p-1 h-7 w-7 text-xs rounded-full bg-success hover:bg-success/80 text-text-on-primary transition" 
         title={translate.common.editUser} 
         onClick={() => handleEdit(userItem)}
         disabled={isDeleting}
@@ -149,9 +157,9 @@ export default function UserListPage() {
       <button 
         className={`p-1 h-7 w-7 text-xs rounded-full transition ${
           isDeleting 
-            ? 'bg-gray-400 cursor-not-allowed' 
-            : 'bg-red-500/80 hover:bg-red-700'
-        } text-white`}
+            ? 'bg-surface text-text-disabled cursor-not-allowed' 
+            : 'bg-error hover:bg-error/80 text-text-on-primary'
+        }`}
         title={translate.common.deleteUser} 
         onClick={() => handleDelete(userItem)}
         disabled={isDeleting}
@@ -170,8 +178,8 @@ export default function UserListPage() {
       <EntityList<User>
         title={
           <div className="flex items-center gap-3">
-            <FontAwesomeIcon icon={["fas", "address-book"]} className="text-purple-600 dark:text-purple-400 text-3xl" />
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white">{translate.pages.users.title}</h2>
+            <FontAwesomeIcon icon={["fas", "address-book"]} className="text-primary text-3xl" />
+            <h2 className="text-3xl font-bold text-text-primary">{translate.pages.users.title}</h2>
           </div>
         }
         description={translate.pages.users.description}
@@ -190,8 +198,8 @@ export default function UserListPage() {
           {
             icon: ["fas", "plus"],
             onClick: handleCreate,
-            title: "Crear usuario",
-            tooltip: "Nuevo usuario",
+            title: translate.pages.users.addUser,
+            tooltip: translate.pages.users.addUser,
             color: "blue"
           }
         ]}

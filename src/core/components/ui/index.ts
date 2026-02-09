@@ -27,3 +27,6 @@ export * from "./modal/index";
 export { Pagination } from "./table/Pagination";
 export { TableDefault } from "./table/TableDefault";
 export { EntityList } from "./table/EntityList";
+
+// Theme Demo
+export { ThemeDemo } from "./ThemeDemo";

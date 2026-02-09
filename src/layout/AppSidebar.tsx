@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useTranslation } from '@/core/context/LanguageContext';
 import { useSidebar } from "@/core/context/SidebarContext";
 import { useSelector } from "react-redux";
+import { ROLES } from "@/core/constants/roles";
 import { RootState } from "@/core/store";
 
 interface SubItem {
@@ -26,7 +27,7 @@ interface Sections {
 }
 
 const AppSidebar = () => {
-  const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
+  const { isExpanded, isMobileOpen, isHovered, setIsHovered, toggleMobileSidebar } = useSidebar();
   const location = useLocation();
   const { role } = useSelector((state: RootState) => state.auth);
   const translate = useTranslation();
@@ -41,7 +42,7 @@ const AppSidebar = () => {
       },
       {
         icon: <FontAwesomeIcon icon={["fas", "calendar-alt"]} />,
-        name: "Calendario",
+        name: translate.nav.calendar,
         path: "/calendario",
       },
       {
@@ -58,7 +59,7 @@ const AppSidebar = () => {
         icon: <FontAwesomeIcon icon={["fas", "address-book"]} />,
         name: translate.nav.users,
         path: "/usuarios",
-        roles: ['admin'],
+        roles: [ROLES.ADMIN],
       },
     ],
   };
@@ -133,7 +134,7 @@ const AppSidebar = () => {
 
   const renderSectionTitle = (sectionName: string, isExpanded: boolean, isHovered: boolean, isMobileOpen: boolean) => (
     <h2
-      className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${
+      className={`mb-4 text-xs uppercase flex leading-[20px] text-text-tertiary ${
         !isExpanded && !isHovered ? "lg:justify-center" : "justify-start"
       }`}
     >
@@ -229,6 +230,7 @@ const AppSidebar = () => {
                   <li key={subItem.name}>
                     <Link
                       to={subItem.path}
+                      onClick={() => isMobileOpen && toggleMobileSidebar()}
                       className={`menu-dropdown-item ${
                         isActive(subItem.path)
                           ? "menu-dropdown-item-active"
@@ -273,7 +275,7 @@ const AppSidebar = () => {
 
   return (
     <div
-      className="flex flex-col h-full px-5 bg-white dark:bg-gray-900 text-gray-900 transition-all duration-300 ease-in-out overflow-y-auto"
+      className="flex flex-col h-full px-5 bg-card text-text-primary transition-all duration-300 ease-in-out overflow-y-auto"
       onMouseEnter={() => !isExpanded && !isMobileOpen && setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >

@@ -12,6 +12,7 @@ import {
 } from 'firebase/firestore';
 import { FirebaseDB } from '@/firebase/config';
 import { User, Family, FamilyMember } from '@/types';
+import { ROLES } from '@/core/constants/roles';
 
 // === INTERFACES ===
 
@@ -88,7 +89,7 @@ export const createFamily = async (familyData: CreateFamilyData, creatorUserId: 
         // Agregar al creador como miembro de la familia
         await addUserToFamily(familyId, creatorUserId, {
             relation: 'Titular',
-            role: 'admin',
+            role: ROLES.ADMIN,
             addedBy: creatorUserId,
         });
         
@@ -445,10 +446,7 @@ export const deleteFamilyMember = async (familyId: string, userId: string): Prom
 /**
  * Buscar usuarios disponibles para agregar a la familia
  */
-export const searchUsersToAddToFamily = async (
-    familyId: string,
-    searchTerm: string = ''
-): Promise<{ ok: boolean; users: any[]; errorMessage?: string }> => {
+export const searchUsersToAddToFamily = async (familyId: string, searchTerm: string = ''): Promise<{ ok: boolean; users: any[]; errorMessage?: string }> => {
     try {
         // 1. Obtener todos los usuarios
         const usersRef = collection(FirebaseDB, 'users');
@@ -460,13 +458,12 @@ export const searchUsersToAddToFamily = async (
         const currentMemberIds = membersSnapshot.docs.map(doc => doc.id);
         
         // 3. Filtrar usuarios que no están en la familia
-        let availableUsers = usersSnapshot.docs
+        let availableUsers: User[] = usersSnapshot.docs
             .filter(doc => !currentMemberIds.includes(doc.id))
             .map(doc => ({
                 id: doc.id,
-                ...doc.data()
+                ...(doc.data() as Omit<User, 'id'>)
             }));
-        
         // 4. Aplicar búsqueda si hay término
         if (searchTerm.trim()) {
             const term = searchTerm.toLowerCase();
@@ -478,9 +475,9 @@ export const searchUsersToAddToFamily = async (
         }
         
         // 5. Ordenar por nombre
-        availableUsers.sort((a, b) => {
-            const nameA = (a.name || '').toLowerCase();
-            const nameB = (b.name || '').toLowerCase();
+        availableUsers.sort((userA, userB) => {
+            const nameA = (userA.name || '').toLowerCase();
+            const nameB = (userB.name || '').toLowerCase();
             return nameA.localeCompare(nameB);
         });
         

@@ -51,13 +51,13 @@ export default function Modal({
       }}
     >
       <div
-        className={`relative w-full ${maxWidthClasses[maxWidth]} bg-white dark:bg-gray-900 rounded-2xl shadow-2xl dark:shadow-black/50 border border-gray-200 dark:border-gray-700 my-8 max-h-[calc(100vh-4rem)] flex flex-col`}
+        className={`relative w-full ${maxWidthClasses[maxWidth]} bg-card rounded-2xl shadow-2xl border border-border my-8 max-h-[calc(100vh-4rem)] flex flex-col`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
         {showCloseButton && (
           <button
-            className="absolute top-4 right-4 z-10 p-2 rounded-lg text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            className="absolute top-4 right-4 z-10 p-2 rounded-lg text-text-tertiary hover:text-text-primary hover:bg-surface-hover transition-colors"
             onClick={onClose}
             aria-label="Cerrar"
           >
@@ -67,15 +67,15 @@ export default function Modal({
 
         {/* Header */}
         {title && (
-          <div className="px-6 sm:px-8 pt-6 pb-4 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
+          <div className="px-6 sm:px-8 pt-6 pb-4 border-b border-border flex-shrink-0">
             <div className="flex items-center justify-center gap-3">
               {titleIcon && (
                 <FontAwesomeIcon
                   icon={titleIcon}
-                  className="text-blue-600 dark:text-blue-400 text-2xl"
+                  className="text-secondary text-2xl"
                 />
               )}
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+              <h2 className="text-2xl font-bold text-text-primary">
                 {title}
               </h2>
             </div>
@@ -90,5 +90,6 @@ export default function Modal({
     </div>
   );
 
-  return ReactDOM.createPortal(modalContent, document.body);
+  const modalRoot = document.getElementById('modal-root');
+  return ReactDOM.createPortal(modalContent, modalRoot);
 }

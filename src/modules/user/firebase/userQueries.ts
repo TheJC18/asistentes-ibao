@@ -161,6 +161,7 @@ export const getUsersFromFirebase = async (params: GetUsersParams = {}): Promise
                 displayName: data.displayName || data.name || '',
                 email: data.email || '',
                 nationality: data.nationality || '',
+                phone: data.phone || '',
                 isMember: data.isMember || false,
                 avatar: data.avatar || data.photoURL || '/user_default.png',
                 photoURL: data.photoURL || data.avatar || '/user_default.png',
@@ -175,10 +176,10 @@ export const getUsersFromFirebase = async (params: GetUsersParams = {}): Promise
         });
         
         // Ordenar por fecha de creación en el cliente (más recientes primero)
-        users.sort((a, b) => {
-            if (!a.createdAt) return 1;
-            if (!b.createdAt) return -1;
-            return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        users.sort((userA, userB) => {
+            if (!userA.createdAt) return 1;
+            if (!userB.createdAt) return -1;
+            return new Date(userB.createdAt).getTime() - new Date(userA.createdAt).getTime();
         });
         
         // Aplicar filtro de búsqueda en el lado del cliente

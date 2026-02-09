@@ -14,12 +14,12 @@ interface FloatingActionButtonsProps {
 }
 
 const colorClasses = {
-  blue: 'bg-blue-500 hover:bg-blue-600',
-  green: 'bg-green-500 hover:bg-green-600',
-  red: 'bg-red-500 hover:bg-red-600',
-  purple: 'bg-purple-500 hover:bg-purple-600',
-  pink: 'bg-pink-500 hover:bg-pink-600',
-  yellow: 'bg-yellow-500 hover:bg-yellow-600',
+  blue: 'bg-info hover:bg-info/80',
+  green: 'bg-success hover:bg-success/80',
+  red: 'bg-error hover:bg-error/80',
+  purple: 'bg-secondary hover:bg-secondary-hover',
+  pink: 'bg-secondary hover:bg-secondary-hover',
+  yellow: 'bg-warning hover:bg-warning/80',
 };
 
 export default function FloatingActionButtons({ buttons }: FloatingActionButtonsProps) {
@@ -30,13 +30,13 @@ export default function FloatingActionButtons({ buttons }: FloatingActionButtons
       {buttons.map((button, index) => (
         <button
           key={index}
-          className={`${colorClasses[button.color || 'blue']} text-white rounded-full w-16 h-16 flex items-center justify-center shadow-2xl transition-all hover:scale-110 group`}
+          className={`${colorClasses[button.color || 'blue']} text-text-on-primary rounded-full w-16 h-16 flex items-center justify-center shadow-2xl transition-all hover:scale-110 group`}
           title={button.title}
           onClick={button.onClick}
         >
           <FontAwesomeIcon icon={button.icon} className="text-2xl" />
           {button.tooltip && (
-            <span className="absolute right-20 bg-gray-900 text-white px-3 py-2 rounded-lg text-sm whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+            <span className="absolute right-20 bg-overlay text-text-on-primary px-3 py-2 rounded-lg text-sm whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
               {button.tooltip}
             </span>
           )}

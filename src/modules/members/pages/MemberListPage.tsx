@@ -40,13 +40,13 @@ export default function MemberListPage() {
 	const nonMembersCount = members.filter(m => !m.isMember).length;
 	
 	return (
-		<div className="relative min-h-[80vh] dark:from-gray-900 dark:via-gray-950 dark:to-gray-900">
+		<div className="relative min-h-[80vh]">
 			<div className="p-4 md:p-6">
 				{/* Header con icono centrado - mismo estilo que otras páginas */}
 				<div className="flex flex-col items-center mb-6">
 					<div className="flex items-center gap-3 mb-4">
-						<FontAwesomeIcon icon={["fas", "user-check"]} className="text-green-600 dark:text-green-400 text-3xl" />
-						<h2 className="text-3xl font-bold text-gray-900 dark:text-white">{translate.nav.members}</h2>
+						<FontAwesomeIcon icon={["fas", "user-check"]} className="text-primary text-3xl" />
+						<h2 className="text-3xl font-bold text-text-primary">{translate.nav.members}</h2>
 					</div>
 				</div>
 				
@@ -56,7 +56,7 @@ export default function MemberListPage() {
 						type="text"
 						value={searchTerm}
 						onChange={handleSearchChange}
-						className="w-full rounded-xl border px-5 py-4 text-lg focus:ring-2 focus:ring-brand-400 dark:bg-gray-900 dark:text-white/90 dark:border-gray-700 shadow-sm"
+						className="w-full rounded-xl border border-border px-5 py-4 text-lg focus:ring-2 focus:ring-primary bg-background text-text-primary shadow-sm"
 						placeholder={translate.pages.members.searchPlaceholder}
 					/>
 				</div>
@@ -67,8 +67,8 @@ export default function MemberListPage() {
 						onClick={() => handleFilterChange('all')}
 						className={`px-6 py-3 rounded-lg font-semibold transition-all ${
 							filter === 'all'
-								? 'bg-brand-600 text-white shadow-lg scale-105'
-								: 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
+								? 'bg-primary text-text-on-primary shadow-lg scale-105'
+								: 'bg-card text-text-primary border border-border hover:bg-surface'
 						}`}
 					>
 						<FontAwesomeIcon icon={["fas", "users"]} className="mr-2" />
@@ -79,8 +79,8 @@ export default function MemberListPage() {
 						onClick={() => handleFilterChange('members')}
 						className={`px-6 py-3 rounded-lg font-semibold transition-all ${
 							filter === 'members'
-								? 'bg-green-600 text-white shadow-lg scale-105'
-								: 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
+								? 'bg-success text-text-on-primary shadow-lg scale-105'
+								: 'bg-card text-text-primary border border-border hover:bg-surface'
 						}`}
 					>
 						<FontAwesomeIcon icon={["fas", "user-check"]} className="mr-2" />
@@ -91,8 +91,8 @@ export default function MemberListPage() {
 						onClick={() => handleFilterChange('non-members')}
 						className={`px-6 py-3 rounded-lg font-semibold transition-all ${
 							filter === 'non-members'
-								? 'bg-orange-600 text-white shadow-lg scale-105'
-								: 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
+								? 'bg-warning text-text-on-primary shadow-lg scale-105'
+								: 'bg-card text-text-primary border border-border hover:bg-surface'
 						}`}
 					>
 						<FontAwesomeIcon icon={["fas", "user-xmark"]} className="mr-2" />
@@ -103,52 +103,50 @@ export default function MemberListPage() {
 				{/* Estado de carga */}
 				{isLoading && (
 					<div className="flex justify-center items-center py-12">
-						<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-600"></div>
+						<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
 					</div>
 				)}
 				
 				{/* Error */}
 				{error && (
-					<div className="bg-red-100 dark:bg-red-900/30 border border-red-400 dark:border-red-700 text-red-700 dark:text-red-400 px-4 py-3 rounded-lg mb-6">
+					<div className="bg-error/10 border border-error text-error px-4 py-3 rounded-lg mb-6">
 						<FontAwesomeIcon icon={["fas", "exclamation-triangle"]} className="mr-2" />
 						{error}
 					</div>
 				)}
 				
 				{/* Lista de miembros */}
-				{!isLoading && !error && (
-					<>
-						{filteredMembers.length === 0 ? (
-							<div className="text-center py-12">
-								<FontAwesomeIcon 
-									icon={["fas", "users-slash"]} 
-									className="text-6xl text-gray-400 dark:text-gray-600 mb-4" 
-								/>
-								<p className="text-xl text-gray-600 dark:text-gray-400">
-									{searchTerm 
-										? translate.pages.members.noSearchResults
-										: filter === 'members'
-										? translate.pages.members.noMembersFound
-										: filter === 'non-members'
-										? translate.pages.members.noAttendeesFound
-										: translate.pages.members.noUsersFound
-									}
-								</p>
-							</div>
-						) : (
-							<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-								{filteredMembers.map((member) => (
-									<UserCard 
-										key={member.id}
-										user={member}
-										showRelation={false}
-										showPhone={true}
-										showNationality={true}
-									/>
-								))}
-							</div>
-						)}
-					</>
+				{!isLoading && !error && filteredMembers.length === 0 && (
+					<div className="text-center py-12">
+						<FontAwesomeIcon 
+							icon={["fas", "users-slash"]} 
+							className="text-6xl text-text-disabled mb-4" 
+						/>
+						<p className="text-xl text-text-secondary">
+							{searchTerm 
+								? translate.pages.members.noSearchResults
+								: filter === 'members'
+								? translate.pages.members.noMembersFound
+								: filter === 'non-members'
+								? translate.pages.members.noAttendeesFound
+								: translate.pages.members.noUsersFound
+							}
+						</p>
+					</div>
+				)}
+				
+				{!isLoading && !error && filteredMembers.length > 0 && (
+					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+						{filteredMembers.map((member) => (
+							<UserCard 
+								key={member.id}
+								user={member}
+								showRelation={false}
+								showPhone={true}
+								showNationality={true}
+							/>
+						))}
+					</div>
 				)}
 			</div>
 		</div>

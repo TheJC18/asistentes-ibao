@@ -4,14 +4,12 @@ import { Link } from 'react-router-dom';
 
 import { useSidebar } from '@/core/context/SidebarContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { ThemeToggleButton } from '@/core/components/common/ThemeToggleButton';
-import { LanguageToggleButton } from '@/core/components/common/LanguageToggleButton';
 import UserDropdown from '@/core/components/header/UserDropdown';
 import { RootState } from '@/core/store';
 
 const AppHeader = () => {
   const [isApplicationMenuOpen, setApplicationMenuOpen] = useState(false);
-  const { isMobileOpen, toggleSidebar, toggleMobileSidebar } = useSidebar();
+  const { isMobileOpen, isExpanded, toggleSidebar, toggleMobileSidebar } = useSidebar();
   const { uid, displayName, email, photoURL, role } = useSelector((state: RootState) => state.auth);
 
   // Cierra el menú del header si se abre el sidebar móvil
@@ -56,11 +54,11 @@ const AppHeader = () => {
   }, []);
 
   return (
-    <header className="sticky top-0 w-full bg-white border-b border-gray-200 dark:border-gray-800 dark:bg-gray-900 z-20">
+    <header className="sticky top-0 w-full bg-card border-b border-border z-20">
       <div className="flex items-center justify-between px-4 py-3 lg:px-6 lg:py-4">
         <div className="flex items-center gap-3">
           <button
-            className="flex items-center justify-center w-10 h-10 text-gray-500 rounded-lg hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 lg:border lg:border-gray-200 dark:lg:border-gray-800"
+            className="flex items-center justify-center w-10 h-10 text-text-secondary rounded-lg hover:bg-surface-hover lg:border lg:border-border"
             onClick={handleToggle}
             aria-label="Toggle Sidebar"
           >
@@ -73,8 +71,6 @@ const AppHeader = () => {
         </div>
 
         <div className="flex items-center gap-3">
-          <LanguageToggleButton />
-          <ThemeToggleButton />
           <UserDropdown 
             uid={uid || ''} 
             displayName={displayName || ''} 

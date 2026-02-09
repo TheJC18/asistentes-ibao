@@ -14,6 +14,7 @@ import {
     User
 } from 'firebase/auth';
 import { FirebaseDB, FirebaseAuth, SecondaryFirebaseAuth } from '@/firebase/config';
+import { ROLES } from '@/core/constants/roles';
 
 interface CheckOrCreateUserParams {
     uid: string;
@@ -125,20 +126,20 @@ export const getRole = async({ uid }: GetRoleParams): Promise<GetRoleResult> => 
             return {
                 ok: false,
                 error: userResult.error || 'No se pudo obtener el usuario.',
-                role: 'user'
+                role: ROLES.USER
             };
         }
 
         return {
             ok: userResult.ok,
-            role: userResult.data.role || 'user',
+            role: userResult.data.role || ROLES.USER,
         };
     } catch (error: any) {
         console.error('Error en getRole:', error);
         return {
             ok: false,
             error: error.message || 'Error desconocido',
-            role: 'user'
+            role: ROLES.USER
         };
     }
 };

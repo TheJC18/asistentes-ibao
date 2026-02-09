@@ -200,15 +200,15 @@ export default function DatePicker({
           onClick={() => handleDateSelect(day)}
           className={`
             p-2 text-center rounded-lg text-sm font-medium transition-all duration-200
-            hover:bg-blue-50 dark:hover:bg-blue-900/40
-            focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400
+            hover:bg-primary-light
+            focus:outline-none focus:ring-2 focus:ring-primary/50
             ${isSelected(day) 
-              ? 'bg-gradient-to-r from-blue-600 to-blue-400 text-white font-bold shadow-lg' 
+              ? 'bg-primary text-on-primary font-bold shadow-lg' 
               : isToday(day)
-              ? 'border-2 border-blue-600 dark:border-blue-400 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-semibold'
+              ? 'border-2 border-primary bg-primary-light text-primary font-semibold'
               : isWeekend
-              ? 'text-red-500 dark:text-red-400'
-              : 'text-gray-900 dark:text-gray-100'
+              ? 'text-error'
+              : 'text-text-primary'
             }
           `}
         >
@@ -232,13 +232,13 @@ export default function DatePicker({
           onClick={() => handleMonthSelect(index)}
           className={`
             p-3 text-center rounded-lg text-sm font-medium transition-all duration-200
-            hover:bg-blue-50 dark:hover:bg-blue-900/40
-            focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400
+            hover:bg-primary-light
+            focus:outline-none focus:ring-2 focus:ring-primary/50
             ${isSelected 
-              ? 'bg-gradient-to-r from-blue-600 to-blue-400 text-white font-bold shadow-lg' 
+              ? 'bg-primary text-on-primary font-bold shadow-lg' 
               : isCurrentMonth
-              ? 'border-2 border-blue-600 dark:border-blue-400 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-semibold'
-              : 'text-gray-900 dark:text-gray-100'
+              ? 'border-2 border-primary bg-primary-light text-primary font-semibold'
+              : 'text-text-primary'
             }
           `}
         >
@@ -264,13 +264,13 @@ export default function DatePicker({
           onClick={() => handleYearSelect(year)}
           className={`
             p-3 text-center rounded-lg text-sm font-medium transition-all duration-200
-            hover:bg-blue-50 dark:hover:bg-blue-900/40
-            focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400
+            hover:bg-primary-light
+            focus:outline-none focus:ring-2 focus:ring-primary/50
             ${isSelected 
-              ? 'bg-gradient-to-r from-blue-600 to-blue-400 text-white font-bold shadow-lg' 
+              ? 'bg-primary text-on-primary font-bold shadow-lg' 
               : isCurrentYear
-              ? 'border-2 border-blue-600 dark:border-blue-400 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-semibold'
-              : 'text-gray-900 dark:text-gray-100'
+              ? 'border-2 border-primary bg-primary-light text-primary font-semibold'
+              : 'text-text-primary'
             }
           `}
         >
@@ -293,11 +293,11 @@ export default function DatePicker({
           placeholder={placeholder}
           readOnly
           onClick={() => setShowCalendar((prev) => !prev)}
-          className={`h-11 w-full rounded-lg border appearance-none px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-hidden focus:ring-3 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 bg-transparent text-gray-800 border-gray-300 focus:border-brand-300 focus:ring-brand-500/20 dark:border-gray-700 dark:focus:border-brand-800 cursor-pointer ${inputClassName}`}
+          className={`h-11 w-full rounded-lg border appearance-none px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-text-disabled focus:outline-hidden focus:ring-3 bg-background text-text-primary border-border focus:border-primary focus:ring-primary/20 cursor-pointer ${inputClassName}`}
           autoComplete="bday"
         />
         {!hideRightIcon && (
-          <span className="absolute text-gray-500 -translate-y-1/2 pointer-events-none right-3 top-1/2 dark:text-gray-400">
+          <span className="absolute text-text-secondary -translate-y-1/2 pointer-events-none right-3 top-1/2">
             <FontAwesomeIcon icon={["fas", "calendar-alt"]} className="size-6" />
           </span>
         )}
@@ -305,14 +305,14 @@ export default function DatePicker({
         {showCalendar && (
           <div
             ref={calendarRef}
-            className="absolute z-[9999] mt-2 left-0 w-full bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 p-4"
+            className="absolute z-[9999] mt-2 left-0 w-full bg-card rounded-2xl shadow-2xl border border-border p-4"
           >
             {/* Header - Navegación */}
             <div className="flex items-center justify-between mb-4">
               <button
                 type="button"
                 onClick={goToPrevious}
-                className="p-2 rounded-lg text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/50 transition-colors"
+                className="p-2 rounded-lg text-primary hover:bg-primary-light transition-colors"
               >
                 <FontAwesomeIcon icon={["fas", "chevron-left"]} className="w-4 h-4" />
               </button>
@@ -320,7 +320,7 @@ export default function DatePicker({
               <button
                 type="button"
                 onClick={toggleViewMode}
-                className="text-base font-bold text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 transition-colors px-2 py-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+                className="text-base font-bold text-text-primary hover:text-primary transition-colors px-2 py-1 rounded-lg hover:bg-surface"
               >
                 {viewMode === 'days' && `${monthNames[currentMonth]} ${currentYear}`}
                 {viewMode === 'months' && currentYear}
@@ -330,7 +330,7 @@ export default function DatePicker({
               <button
                 type="button"
                 onClick={goToNext}
-                className="p-2 rounded-lg text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/50 transition-colors"
+                className="p-2 rounded-lg text-primary hover:bg-primary-light transition-colors"
               >
                 <FontAwesomeIcon icon={["fas", "chevron-right"]} className="w-4 h-4" />
               </button>
@@ -344,7 +344,7 @@ export default function DatePicker({
                   {dayNames.map((day) => (
                     <div
                       key={day}
-                      className="text-center text-xs font-semibold text-gray-600 dark:text-gray-400 p-2"
+                      className="text-center text-xs font-semibold text-text-secondary p-2"
                     >
                       {day}
                     </div>

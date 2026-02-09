@@ -109,7 +109,7 @@ export default function CompleteProfileCard() {
                   />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-white">
+                  <h3 className="text-xl font-bold text-white truncate max-w-[250px] sm:max-w-full">
                     {translate.pages.home.welcomeUser.replace('{name}', displayName || '')}
                   </h3>
                   <p className="text-sm text-blue-100">

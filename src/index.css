@@ -146,6 +146,81 @@
   --z-index-9999: 9999;
   --z-index-99999: 99999;
   --z-index-999999: 999999;
+  
+  /* Colores Semánticos - Light Theme */
+  --color-primary: var(--color-brand-500);
+  --color-primary-hover: var(--color-brand-600);
+  --color-primary-light: var(--color-brand-50);
+  --color-secondary: var(--color-blue-light-500);
+  --color-secondary-hover: var(--color-blue-light-600);
+  
+  /* Backgrounds */
+  --color-background: var(--color-white);
+  --color-surface: var(--color-gray-50);
+  --color-surface-hover: var(--color-gray-100);
+  --color-card: var(--color-white);
+  --color-overlay: rgba(16, 24, 40, 0.4);
+  
+  /* Borders */
+  --color-border: var(--color-gray-200);
+  --color-border-hover: var(--color-gray-300);
+  --color-divider: var(--color-gray-200);
+  
+  /* Text Colors */
+  --color-text-primary: var(--color-gray-900);
+  --color-text-secondary: var(--color-gray-600);
+  --color-text-tertiary: var(--color-gray-500);
+  --color-text-disabled: var(--color-gray-400);
+  --color-text-on-primary: var(--color-white);
+  
+  /* Status Colors */
+  --color-success: var(--color-success-500);
+  --color-success-light: var(--color-success-50);
+  --color-error: var(--color-error-500);
+  --color-error-light: var(--color-error-50);
+  --color-warning: var(--color-warning-500);
+  --color-warning-light: var(--color-warning-50);
+  --color-info: var(--color-blue-light-500);
+  --color-info-light: var(--color-blue-light-50);
+}
+
+/* Dark Theme Overrides */
+.dark {
+  /* Colores Semánticos - Dark Theme */
+  --color-primary: var(--color-brand-400);
+  --color-primary-hover: var(--color-brand-500);
+  --color-primary-light: rgba(70, 95, 255, 0.12);
+  --color-secondary: var(--color-blue-light-400);
+  --color-secondary-hover: var(--color-blue-light-500);
+  
+  /* Backgrounds */
+  --color-background: var(--color-gray-950);
+  --color-surface: var(--color-gray-900);
+  --color-surface-hover: var(--color-gray-800);
+  --color-card: var(--color-gray-dark);
+  --color-overlay: rgba(0, 0, 0, 0.6);
+  
+  /* Borders */
+  --color-border: var(--color-gray-800);
+  --color-border-hover: var(--color-gray-700);
+  --color-divider: var(--color-gray-800);
+  
+  /* Text Colors */
+  --color-text-primary: var(--color-gray-50);
+  --color-text-secondary: var(--color-gray-300);
+  --color-text-tertiary: var(--color-gray-400);
+  --color-text-disabled: var(--color-gray-600);
+  --color-text-on-primary: var(--color-white);
+  
+  /* Status Colors */
+  --color-success: var(--color-success-400);
+  --color-success-light: rgba(6, 152, 85, 0.12);
+  --color-error: var(--color-error-400);
+  --color-error-light: rgba(217, 45, 32, 0.12);
+  --color-warning: var(--color-warning-400);
+  --color-warning-light: rgba(247, 144, 9, 0.12);
+  --color-info: var(--color-blue-light-400);
+  --color-info-light: rgba(11, 165, 236, 0.12);
 }
 
 @layer base {
@@ -161,7 +236,7 @@
     cursor: pointer;
   }
   body {
-    @apply relative font-normal font-outfit z-1 bg-gray-50;
+    @apply relative font-normal font-outfit z-1 bg-surface text-text-primary;
   }
 }
 

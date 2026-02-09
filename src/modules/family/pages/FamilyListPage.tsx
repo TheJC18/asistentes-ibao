@@ -10,6 +10,7 @@ import { createFamily, getFamilyMembers, getUserFamilies } from "@/modules/famil
 import { useSelector } from 'react-redux';
 import { RootState } from '@/core/store';
 import { useTranslation } from '@/core/context/LanguageContext';
+import { ROLES } from '@/core/constants/roles';
 
 interface FamilyData {
   id: string;
@@ -126,7 +127,7 @@ export default function FamilyListPage() {
           // Agregar al creador a MI familia con la relación inversa
           await addUserToFamily(myFamilyId, whoAddedMe, {
             relation: inverseRelation,
-            role: 'member',
+            role: ROLES.MEMBER,
             addedBy: currentUserId || ''
           });
         }
@@ -193,14 +194,14 @@ export default function FamilyListPage() {
         {/* Header con icono centrado - mismo estilo que otras páginas */}
         <div className="flex flex-col items-center mb-6">
           <div className="flex items-center gap-3 mb-4">
-            <FontAwesomeIcon icon={["fas", "users"]} className="text-blue-600 dark:text-blue-400 text-3xl" />
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white">{translate.pages.family.title}</h2>
+            <FontAwesomeIcon icon={["fas", "users"]} className="text-primary text-3xl" />
+            <h2 className="text-3xl font-bold text-text-primary">{translate.pages.family.title}</h2>
           </div>
         </div>
         
         {/* Buscador */}
         <input
-          className="mb-10 w-full rounded-xl border border-gray-300 px-5 py-4 text-lg focus:ring-2 focus:ring-brand-400 bg-white dark:bg-gray-800 dark:text-white/90 dark:border-gray-600 shadow-sm"
+          className="mb-10 w-full rounded-xl border border-border px-5 py-4 text-lg focus:ring-2 focus:ring-primary bg-background text-text-primary shadow-sm"
           placeholder={translate.pages.family.searchPlaceholder}
           value={search}
           onChange={e => setSearch(e.target.value)}
@@ -226,15 +227,15 @@ export default function FamilyListPage() {
           {
             icon: ["fas", "user-plus"],
             onClick: openAddModal,
-            title: "Agregar usuario existente",
-            tooltip: "Agregar existente",
+            title: translate.pages.family.addFamiliar,
+            tooltip: translate.pages.family.addFamiliar,
             color: "green"
           },
           {
             icon: ["fas", "plus"],
             onClick: openCreateModal,
             title: translate.pages.family.addMember,
-            tooltip: "Crear nuevo",
+            tooltip: translate.pages.family.addMember,
             color: "blue"
           }
         ]}

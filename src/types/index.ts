@@ -1,16 +1,20 @@
 // Types globales del proyecto
+import { RoleType } from '@/core/constants/roles';
+
 export interface User {
   id: string;
   uid?: string;
   name: string;
+  displayName?: string;
   email?: string;
   photoURL?: string;
   avatar?: string;
-  role: 'admin' | 'user' | 'member';
+  role: RoleType;
   isMember?: boolean;
   gender?: 'male' | 'female' | 'other' | 'neutral';
   birthdate?: string | Date | null;
   nationality?: string;
+  phone?: string;
   relation?: string;
   familyId?: string;
   createdBy?: string;
@@ -27,7 +31,7 @@ export interface AuthState {
   email: string | null;
   displayName: string | null;
   photoURL: string | null;
-  role: 'admin' | 'user' | 'member' | null;
+  role: RoleType | null;
   profileCompleted: boolean;
   errorMessage: string | null;
 }

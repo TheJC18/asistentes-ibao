@@ -73,7 +73,7 @@ export const registerUserWithEmailPassword = async ({
       photoURL: photoURL || ''
     };
   } catch (error: any) {
-    const errorMessage = error.message || 'Error al crear usuario';
+    const errorMessage = error.message || 'auth.errorCreatingUser';
     return {
       ok: false,
       errorMessage
@@ -103,16 +103,16 @@ export const loginWithEmailPassword = async ({
     };
   } catch (error: any) {
     const errorCode = error.code;
-    let errorMessage = 'Error al iniciar sesión';
+    let errorMessage = 'auth.errorLogin';
 
     if (errorCode === 'auth/user-not-found' || errorCode === 'auth/wrong-password') {
-      errorMessage = 'Credenciales incorrectas';
+      errorMessage = 'auth.invalidCredentials';
     } else if (errorCode === 'auth/too-many-requests') {
-      errorMessage = 'Demasiados intentos. Intenta más tarde';
+      errorMessage = 'auth.tooManyRequests';
     } else if (errorCode === 'auth/user-disabled') {
-      errorMessage = 'Usuario deshabilitado';
+      errorMessage = 'auth.userDisabled';
     } else if (errorCode === 'auth/invalid-credential') {
-      errorMessage = 'Credenciales inválidas';
+      errorMessage = 'auth.invalidCredential';
     }
 
     return {

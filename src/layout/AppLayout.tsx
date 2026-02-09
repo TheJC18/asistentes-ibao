@@ -26,10 +26,10 @@ const AppLayoutContent = ({ children }: AppLayoutContentProps) => {
   const sidebarWidth = isExpanded || isHovered ? SIDEBAR_WIDTH_EXPANDED : SIDEBAR_WIDTH_COLLAPSED;
 
   return (
-    <div className="relative min-h-screen bg-gray-100 dark:bg-gray-900">
+    <div className="relative min-h-screen bg-surface">
       {/* Sidebar Desktop - Columna fija a la izquierda */}
       <aside
-        className="hidden lg:block fixed top-0 left-0 h-screen overflow-y-auto bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 z-30 transition-all duration-300"
+        className="hidden lg:block fixed top-0 left-0 h-screen overflow-y-auto bg-card border-r border-border z-30 transition-all duration-300"
         style={{ width: sidebarWidth }}
       >
         <AppSidebar />
@@ -39,7 +39,7 @@ const AppLayoutContent = ({ children }: AppLayoutContentProps) => {
       {isMobileOpen && (
         <>
           <Backdrop />
-          <aside className="fixed top-0 left-0 h-screen w-[290px] bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 z-50 overflow-y-auto lg:hidden">
+          <aside className="fixed top-0 left-0 h-screen w-[290px] bg-card border-r border-border z-50 overflow-y-auto lg:hidden">
             <AppSidebar />
           </aside>
         </>

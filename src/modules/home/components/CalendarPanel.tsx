@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from '@/core/context/LanguageContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Calendar, { UserBirthday } from '@/core/components/ui/calendar/Calendar';
 
@@ -29,6 +30,7 @@ export default function CalendarPanel({
   onEventClick
 }: CalendarPanelProps) {
   const [activeFilter, setActiveFilter] = useState<ViewFilter>('all');
+  const translate = useTranslation();
 
   // Filtrar datos según vista activa
   const getFilteredBirthdays = (): UserBirthday[] => {
@@ -47,16 +49,16 @@ export default function CalendarPanel({
 
   if (loading) {
     return (
-      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 p-6">
+      <div className="bg-card rounded-2xl shadow-lg border border-border p-6">
         <div className="flex justify-center items-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 dark:border-blue-400"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 p-6">
+    <div>
       {/* Filtros */}
       <div className="flex items-center justify-center mb-6 flex-wrap gap-4">
 
@@ -66,36 +68,36 @@ export default function CalendarPanel({
             onClick={() => setActiveFilter('all')}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
               activeFilter === 'all'
-                ? 'bg-blue-600 text-white'
-                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                ? 'bg-info text-text-on-primary'
+                : 'bg-surface text-text-primary hover:bg-surface-hover'
             }`}
           >
             <FontAwesomeIcon icon={["fas", "calendar-check"]} className="mr-2" />
-            Todo ({totalItems})
+            {translate.pages?.members?.all} ({totalItems})
           </button>
 
           <button
             onClick={() => setActiveFilter('birthdays')}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
               activeFilter === 'birthdays'
-                ? 'bg-pink-600 text-white'
-                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                ? 'bg-secondary text-text-on-primary'
+                : 'bg-surface text-text-primary hover:bg-surface-hover'
             }`}
           >
             <FontAwesomeIcon icon={["fas", "cake-candles"]} className="mr-2" />
-            Cumpleaños ({birthdayCount})
+            {translate.calendar?.birthdays || translate.pages?.members?.attendees} ({birthdayCount})
           </button>
 
           <button
             onClick={() => setActiveFilter('events')}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
               activeFilter === 'events'
-                ? 'bg-green-600 text-white'
-                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                ? 'bg-success text-text-on-primary'
+                : 'bg-surface text-text-primary hover:bg-surface-hover'
             }`}
           >
             <FontAwesomeIcon icon={["fas", "calendar-days"]} className="mr-2" />
-            Eventos ({eventCount})
+            {translate.calendar?.events} ({eventCount})
           </button>
         </div>
       </div>

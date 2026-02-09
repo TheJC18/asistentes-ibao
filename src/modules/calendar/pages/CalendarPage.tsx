@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from '@/core/context/LanguageContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { UserBirthday } from '@/core/components/ui/calendar/Calendar';
 import CalendarPanel, { CustomEvent } from '@/modules/home/components/CalendarPanel';
 import { getAllUsersBirthdays } from '@/modules/user/firebase/userQueries';
 
 export default function CalendarPage() {
+  const translate = useTranslation();
   const [birthdays, setBirthdays] = useState<UserBirthday[]>([]);
   const [customEvents, setCustomEvents] = useState<CustomEvent[]>([]);
   const [loading, setLoading] = useState(true);
@@ -47,8 +49,8 @@ export default function CalendarPage() {
       {/* Header */}
       <div className="flex flex-col items-center mb-6">
         <div className="flex items-center gap-3 mb-4">
-          <FontAwesomeIcon icon={["fas", "calendar-alt"]} className="text-blue-600 dark:text-blue-400 text-3xl" />
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Calendario</h1>
+          <FontAwesomeIcon icon={["fas", "calendar-alt"]} className="text-primary text-3xl" />
+          <h1 className="text-3xl font-bold text-text-primary">{translate.pages?.calendar?.title}</h1>
         </div>
       </div>
 

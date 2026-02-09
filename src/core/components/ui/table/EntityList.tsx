@@ -2,6 +2,7 @@ import { useState, useMemo, ReactNode } from 'react';
 import TableDefault from './TableDefault';
 import Pagination from './Pagination';
 import { ColumnConfig } from '@/types';
+import { useTranslation } from '@/core/context/LanguageContext';
 
 interface EntityListProps<T> {
   title: ReactNode;
@@ -31,15 +32,22 @@ export default function EntityList<T extends { id?: string | number }>({
   filterFunction,
   perPageOptions = [5, 10, 15, 25],
   defaultPerPage = 10,
-  searchPlaceholder = "Buscar...",
   onSearchChange,
   FloatingButton,
   ModalComponent,
   isLoading = false,
   error = null,
   onRetry,
-  noDataMessage = "No hay datos para mostrar"
+  searchPlaceholder,
+  noDataMessage,
 }: EntityListProps<T>) {
+  // Importación directa y nombre descriptivo para la traducción
+  // (debe ir al inicio del archivo, pero aquí se muestra para el diff)
+  const translation = useTranslation();
+  const i18nSearchPlaceholder = translation.table?.searchPlaceholder ?? '';
+  const i18nNoDataMessage = translation.table?.noDataMessage ?? '';
+  const searchInputPlaceholder = searchPlaceholder ?? i18nSearchPlaceholder;
+  const emptyDataMessage = noDataMessage ?? i18nNoDataMessage;
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(defaultPerPage);
@@ -57,27 +65,27 @@ export default function EntityList<T extends { id?: string | number }>({
 
   return (
     <>
-      <div className="min-h-[80vh] dark:from-gray-900 dark:via-gray-950 dark:to-gray-900">
+      <div className="min-h-[80vh]">
         <div className="p-4 md:p-6">
           {/* Header */}
           <div className="flex flex-col items-center mb-6">
             {typeof title === 'string' ? (
-              <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">{title}</h2>
+              <h2 className="text-3xl font-bold text-text-primary mb-2">{title}</h2>
             ) : (
               title
             )}
             {description && (
-              <p className="text-gray-500 dark:text-gray-400 text-center">{description}</p>
+              <p className="text-text-secondary text-center">{description}</p>
             )}
           </div>
 
           {error && (
-            <div className="mb-6 p-4 bg-red-100 dark:bg-red-900/30 border border-red-400 dark:border-red-700 rounded-lg">
-              <p className="text-red-700 dark:text-red-300 text-center">{error}</p>
+            <div className="mb-6 p-4 bg-error-light border border-error rounded-lg">
+              <p className="text-error text-center">{error}</p>
               {onRetry && (
                 <button
                   onClick={onRetry}
-                  className="mt-2 mx-auto block px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded"
+                  className="mt-2 mx-auto block px-4 py-2 bg-error hover:bg-error/80 text-text-on-primary rounded"
                 >
                   Reintentar
                 </button>
@@ -87,13 +95,13 @@ export default function EntityList<T extends { id?: string | number }>({
 
           {isLoading ? (
             <div className="flex justify-center items-center py-20">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-secondary"></div>
             </div>
           ) : (
             <>
               <input
-                className="mb-10 w-full rounded-xl border px-5 py-4 text-lg focus:ring-2 focus:ring-blue-400 dark:bg-gray-900 dark:text-white/90 dark:border-gray-700 shadow-sm"
-                placeholder={searchPlaceholder}
+                className="mb-10 w-full rounded-xl border border-border px-5 py-4 text-lg focus:ring-2 focus:ring-primary bg-background text-text-primary shadow-sm"
+                placeholder={searchInputPlaceholder}
                 value={search}
                 autoComplete="false"
                 onChange={(e) => {
@@ -103,8 +111,8 @@ export default function EntityList<T extends { id?: string | number }>({
               />
 
               {filteredData.length === 0 ? (
-                <div className="text-center py-20 text-gray-500 dark:text-gray-400">
-                  {noDataMessage}
+                <div className="text-center py-20 text-text-secondary">
+                  {emptyDataMessage}
                 </div>
               ) : (
                 <>
@@ -115,7 +123,6 @@ export default function EntityList<T extends { id?: string | number }>({
                       actions={renderActions}
                     />
                   </div>
-
                   <div className="flex flex-col sm:flex-row justify-between items-center mt-8 gap-4">
                     <Pagination
                       page={page}
@@ -124,7 +131,7 @@ export default function EntityList<T extends { id?: string | number }>({
                       onNext={handleNext}
                       perPage={perPage}
                       setPerPage={setPerPage}
-                      perPageLabel="Por página:"
+                      perPageLabel={translation.table?.perPageLabel ?? ''}
                       perPageOptions={perPageOptions}
                     />
                   </div>

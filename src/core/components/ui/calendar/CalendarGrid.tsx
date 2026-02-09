@@ -73,6 +73,11 @@ export default function CalendarGrid({ currentDate, events = [], onDateClick, on
            date.getFullYear() === today.getFullYear();
   };
 
+  const isWeekend = (date: Date): boolean => {
+    const day = date.getDay();
+    return day === 0 || day === 6; // Sunday or Saturday
+  };
+
   const getEventsForDate = (date: Date): CalendarEvent[] => {
     if (!events || events.length === 0) return [];
     
@@ -98,13 +103,13 @@ export default function CalendarGrid({ currentDate, events = [], onDateClick, on
   };
 
   return (
-    <div className="border border-gray-200 dark:border-gray-600 rounded-lg overflow-hidden">
+    <div className="border border-border rounded-lg overflow-hidden">
       {/* Header de días */}
-      <div className="grid grid-cols-7 bg-gray-50 dark:bg-gray-900/50">
+      <div className="grid grid-cols-7 bg-surface">
         {translate.calendar.days.map((day) => (
           <div
             key={day}
-            className="py-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-200 border-b border-gray-200 dark:border-gray-600"
+            className="py-3 text-center text-sm font-semibold text-text-primary border-b border-border"
           >
             {day}
           </div>
@@ -120,19 +125,21 @@ export default function CalendarGrid({ currentDate, events = [], onDateClick, on
           return (
             <div
               key={index}
-              className={`min-h-[120px] border-b border-r border-gray-200 dark:border-gray-600 p-2 ${
-                !isCurrentMonth ? 'bg-gray-50 dark:bg-gray-900/30' : 'bg-white dark:bg-gray-800'
-              } ${(index + 1) % 7 === 0 ? 'border-r-0' : ''} hover:bg-gray-50 dark:hover:bg-gray-700 transition cursor-pointer`}
+              className={`min-h-[120px] border-b border-r border-border p-2 ${
+                !isCurrentMonth ? 'bg-surface' : 'bg-card'
+              } ${(index + 1) % 7 === 0 ? 'border-r-0' : ''} hover:bg-surface transition cursor-pointer`}
               onClick={() => handleDateClick(date)}
             >
               <div className="flex justify-between items-start mb-1">
                 <span
                   className={`text-sm font-medium ${
                     !isCurrentMonth
-                      ? 'text-gray-400 dark:text-gray-500'
+                      ? 'text-text-disabled'
                       : isTodayDate
-                      ? 'bg-brand-500 text-white w-7 h-7 rounded-full flex items-center justify-center'
-                      : 'text-gray-700 dark:text-gray-200'
+                      ? 'bg-primary text-text-on-primary w-7 h-7 rounded-full flex items-center justify-center'
+                      : isWeekend(date)
+                      ? 'text-error'
+                      : 'text-text-primary'
                   }`}
                 >
                   {date.getDate()}
@@ -147,14 +154,14 @@ export default function CalendarGrid({ currentDate, events = [], onDateClick, on
                     onClick={(e) => handleEventClick(event, e)}
                     className={`text-xs px-2 py-1 rounded truncate cursor-pointer hover:opacity-80 transition ${
                       event.type === 'birthday'
-                        ? 'bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-400'
+                        ? 'bg-secondary-light text-secondary'
                         : event.color === 'blue'
-                        ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
+                        ? 'bg-info-light text-info'
                         : event.color === 'green'
-                        ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                        ? 'bg-success-light text-success'
                         : event.color === 'red'
-                        ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
-                        : 'bg-brand-100 text-brand-700 dark:bg-brand-900/30 dark:text-brand-400'
+                        ? 'bg-error-light text-error'
+                        : 'bg-primary-light text-primary'
                     }`}
                   >
                     {event.allDay ? '' : new Date(event.date).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }) + ' '}
@@ -162,7 +169,7 @@ export default function CalendarGrid({ currentDate, events = [], onDateClick, on
                   </div>
                 ))}
                 {dayEvents.length > 3 && (
-                  <div className="text-xs text-gray-500 dark:text-gray-400 px-2">
+                  <div className="text-xs text-text-secondary px-2">
                     +{dayEvents.length - 3} {translate.calendar.more}
                   </div>
                 )}

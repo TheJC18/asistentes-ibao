@@ -3,6 +3,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import { useAppDispatch, useAppSelector } from "./index";
 import { FirebaseAuth } from "@/firebase/config";
 import { checkOrCreateUser, getUserByUID } from "@/modules/auth/firebase/authQueries";
+import { ROLES } from "@/core/constants/roles";
 import {
   chekingCredentials,
   login,
@@ -50,7 +51,7 @@ export const useCheckAuth = () => {
             })
           );
 
-          dispatch(setRole({ role: userData.role || "user" }));
+          dispatch(setRole({ role: userData.role || ROLES.USER }));
         } else {
           dispatch(
             login({
@@ -61,7 +62,7 @@ export const useCheckAuth = () => {
             })
           );
 
-          dispatch(setRole({ role: "user" }));
+          dispatch(setRole({ role: ROLES.USER }));
           dispatch(setProfileCompleted({ profileCompleted: false }));
         }
       } catch (error) {

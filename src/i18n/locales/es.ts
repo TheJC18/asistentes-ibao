@@ -1,13 +1,55 @@
 export const es = {
-  // Navegación y menú
+  about: {
+    title: 'Acerca de la plataforma',
+    description: 'Plataforma diseñada para facilitar la gestión de grupos familiares y usuarios. Herramientas completas para administrar información de miembros y mantener registros organizados.',
+    mainFeatures: 'Características principales',
+    features: [
+      'Gestión completa de perfiles de usuario',
+      'Organización de familias con relaciones definidas',
+      'Calendario integrado de cumpleaños',
+      'Filtrado avanzado de miembros',
+      'Seguridad y privacidad',
+      'Autenticación segura con Firebase',
+      'Control de acceso basado en roles',
+      'Datos protegidos y encriptados',
+      'Cumplimiento de estándares de privacidad',
+    ],
+  },
+  formSections: {
+    personalData: 'Datos Personales',
+    churchData: 'Datos de la Iglesia',
+    webAccess: 'Web access',
+  },
+  formLabels: {
+    avatar: 'Avatar',
+    selectFile: 'Seleccionar archivo',
+    noFile: 'Ningún archivo seleccionado',
+    name: 'Nombre',
+    namePlaceholder: 'Ingresa el nombre',
+    phone: 'Teléfono',
+    phonePlaceholder: 'Ingresa el teléfono',
+    relation: 'Relación',
+    relationPlaceholder: 'Selecciona una relación',
+    gender: 'Género',
+    genderPlaceholder: 'Selecciona un género',
+    birthdate: 'Fecha de nacimiento',
+    birthdatePlaceholder: 'Selecciona la fecha',
+    nationality: 'Nacionalidad',
+    nationalityPlaceholder: 'Selecciona un país',
+    isMember: '¿Es miembro?',
+    memberYes: 'Soy miembro',
+    memberNo: 'No soy miembro',
+    webAccess: 'Web access',
+    webAccessQuestion: '¿Dar acceso a la aplicación web?',
+    webAccessHelp: 'Si activas esta opción, el usuario podrá iniciar sesión con correo y contraseña',
+  },
   nav: {
     home: 'Inicio',
     users: 'Usuarios',
     family: 'Mi Familia',
     members: 'Miembros',
+    calendar: 'Calendario',
   },
-
-  // Común
   common: {
     save: 'Guardar',
     cancel: 'Cancelar',
@@ -37,10 +79,30 @@ export const es = {
     viewDetails: 'Ver detalles',
     editUser: 'Editar usuario',
     deleteUser: 'Eliminar usuario',
+    settings: 'Configuración',
+    language: 'Idioma',
+    theme: 'Tema',
   },
-
-  // Formularios
   form: {
+    namePlaceholder: 'Ingresa el nombre',
+    phonePlaceholder: 'Ingresa el teléfono',
+    relationPlaceholder: 'Selecciona una relación',
+    genderPlaceholder: 'Selecciona un género',
+    birthdatePlaceholder: 'Selecciona la fecha',
+    nationalityPlaceholder: 'Selecciona un país',
+    passwordPlaceholder: 'Ingresa la contraseña',
+    confirmPasswordPlaceholder: 'Confirma la contraseña',
+    hasWebAccessEdit: '¿Tiene acceso a la aplicación web?',
+    hasWebAccessCreate: '¿Dar acceso a la aplicación web?',
+    webAccessEditHelp: 'Si desactivas esta opción, el usuario no podrá iniciar sesión (debes eliminar manualmente desde Firebase Console > Authentication)',
+    webAccessCreateHelp: 'Si activas esta opción, el usuario podrá iniciar sesión con correo y contraseña',
+    emailNoChange: 'El correo no se puede cambiar después de crear el usuario',
+    emailForWebAccess: 'Ingresa un correo para dar acceso web a este usuario',
+    newPassword: 'Nueva contraseña',
+    newPasswordPlaceholder: 'Dejar vacío para no cambiar',
+    newPasswordHint: 'Deja vacío si no deseas cambiar la contraseña',
+    confirmNewPassword: 'Verificar nueva contraseña',
+    confirmNewPasswordPlaceholder: 'Dejar vacío para no cambiar',
     name: 'Nombre',
     email: 'Correo electrónico',
     phone: 'Teléfono',
@@ -52,28 +114,35 @@ export const es = {
     role: 'Rol',
     relation: 'Relación',
     isMember: '¿Es miembro?',
-    hasWebAccess: 'Acceso web',    avatar: 'Avatar',
+    hasWebAccess: 'Acceso web',
+    avatar: 'Avatar',
     actions: 'Acciones',
     noName: 'Sin nombre',
-    birth: 'Nacimiento',  },
-
-  // Géneros
+    birth: 'Nacimiento',
+  },
   gender: {
     male: 'Masculino',
     female: 'Femenino',
     other: 'Otro',
   },
-
-  // Roles
   role: {
     admin: 'Administrador',
     user: 'Usuario',
+    member: 'Miembro',
     adminBadge: 'ADMIN',
     userBadge: 'USUARIO',
+    memberBadge: 'MIEMBRO',
   },
-
-  // Páginas
   pages: {
+    users: {
+      title: 'Gestión de usuarios',
+      description: 'Usuarios registrados en la aplicación',
+      addUser: 'Agregar usuario',
+      editUser: 'Editar usuario',
+      deleteUser: '¿Eliminar usuario?',
+      noUsers: 'No hay usuarios registrados',
+      viewUser: 'Ver usuario',
+    },
     home: {
       title: 'Inicio',
       welcome: 'Bienvenido',
@@ -87,21 +156,13 @@ export const es = {
         photo: 'Foto de perfil',
       },
       profileCompleted: '¡Perfil completado!',
-      profileCompletedMessage: 'Tu perfil ha sido actualizado correctamente. Ahora puedes acceder a todas las funciones de la plataforma.',
+      profileCompletedMessage:'Tu perfil ha sido actualizado correctamente. Ahora puedes acceder a todas las funciones de la plataforma.',
       savingProfile: 'Guardando perfil...',
       pleaseWait: 'Por favor espera un momento',
       errorSaving: 'Error al guardar',
       errorSavingMessage: 'No se pudo actualizar tu perfil. Por favor intenta de nuevo.',
       unexpectedError: 'Error inesperado',
       unexpectedErrorMessage: 'Ocurrió un error al guardar tu perfil. Por favor intenta de nuevo.',
-    },
-    users: {
-      title: 'Gestión de usuarios',
-      description: 'Usuarios registrados en la aplicación',
-      addUser: 'Agregar usuario',
-      editUser: 'Editar usuario',
-      deleteUser: '¿Eliminar usuario?',
-      noUsers: 'No hay usuarios registrados',
     },
     family: {
       title: 'Mi Familia',
@@ -111,6 +172,7 @@ export const es = {
       deleteMember: 'Eliminar de mi familia',
       noMembers: 'No hay miembros en tu familia',
       searchPlaceholder: 'Buscar miembro, relación...',
+      noUsersFound: 'No hay usuarios disponibles',
     },
     members: {
       title: 'Miembros',
@@ -123,9 +185,10 @@ export const es = {
       noUsersFound: 'No hay usuarios registrados',
       noSearchResults: 'No se encontraron usuarios con ese término de búsqueda',
     },
+    calendar: {
+      title: 'Calendario',
+    },
   },
-
-  // Autenticación
   auth: {
     login: 'Iniciar sesión',
     logout: 'Cerrar sesión',
@@ -147,20 +210,23 @@ export const es = {
     passwordPlaceholder: 'Contraseña',
     fullNamePlaceholder: 'Nombre completo',
   },
-
-  // Mensajes
   messages: {
     success: {
       saved: 'Guardado correctamente',
       deleted: 'Eliminado correctamente',
+      deletedFamilyMember: 'Familiar eliminado de tu familia',
       updated: 'Actualizado correctamente',
       created: 'Creado correctamente',
+      added: 'Agregado',
+      addedToFamily: 'ha sido agregado a tu familia',
     },
     error: {
       generic: 'Ocurrió un error',
       notFound: 'No encontrado',
       unauthorized: 'No autorizado',
       required: 'Este campo es requerido',
+      deleteFamilyMemberFailed: 'No se pudo eliminar el familiar de la familia',
+      addUserFailed: 'No se pudo agregar el usuario a la familia',
     },
     validation: {
       emailInvalid: 'El correo debe tener una @',
@@ -169,15 +235,11 @@ export const es = {
       passwordsMustMatch: 'Las contraseñas deben coincidir',
     },
   },
-
-  // UserCard
   userCard: {
     webAccess: 'Acceso web',
     member: 'Miembro',
     age: 'años',
   },
-
-  // Relaciones familiares
   relations: {
     titular: 'Titular',
     spouse: 'Esposa',
@@ -192,14 +254,33 @@ export const es = {
     grandson: 'Nieto',
     granddaughter: 'Nieta',
   },
-
-  // Calendario
+  table: {
+    perPageLabel: 'Por página',
+    pageLabel: 'Página',
+    ofLabel: 'de',
+    prevLabel: 'Anterior',
+    nextLabel: 'Siguiente',
+    searchPlaceholder: 'Buscar...', 
+    noDataMessage: 'No hay datos para mostrar',
+  },
   calendar: {
     today: 'Hoy',
     more: 'más',
+    birthdays: 'Cumpleaños',
+    events: 'Eventos',
     months: [
-      'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-      'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+      'Enero',
+      'Febrero',
+      'Marzo',
+      'Abril',
+      'Mayo',
+      'Junio',
+      'Julio',
+      'Agosto',
+      'Septiembre',
+      'Octubre',
+      'Noviembre',
+      'Diciembre',
     ],
     days: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
   },

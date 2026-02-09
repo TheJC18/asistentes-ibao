@@ -5,6 +5,7 @@ import { FamilyRoutes } from '@/modules/family/routes/FamilyRoutes';
 import { UsersRoutes } from '@/modules/user/routes/UsersRoutes';
 import { MemberRoutes } from '@/modules/members/routes/MemberRoutes';
 import { CalendarRoutes } from '@/modules/calendar/routes/CalendarRoutes';
+import { ROLES } from '@/core/constants/roles';
 import { ProtectedRoute } from './ProtectedRoute';
 import { RoleProtectedRoute } from './RoleProtectedRoute';
 
@@ -49,7 +50,7 @@ export const BaseRoutes = () => {
           path="/usuarios/*" 
           element={
             <ProtectedRoute>
-              <RoleProtectedRoute allowedRoles={['admin']}>
+              <RoleProtectedRoute allowedRoles={[ROLES.ADMIN]}>
                 <UsersRoutes />
               </RoleProtectedRoute>
             </ProtectedRoute>

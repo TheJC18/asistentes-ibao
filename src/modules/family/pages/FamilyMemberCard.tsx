@@ -63,8 +63,8 @@ export default function FamilyMemberCard({
       
       if (deleteResult.ok) {
         await showSuccessAlert(
-          '¡Eliminado!',
-          deleteResult.message || 'Familiar eliminado correctamente'
+          translate.messages?.success?.deleted || 'Eliminado',
+          deleteResult.message || translate.messages?.success?.deletedFamilyMember
         );
         
         // Notificar al padre para actualizar la lista
@@ -73,8 +73,8 @@ export default function FamilyMemberCard({
         }
       } else {
         await showErrorAlert(
-          'Error',
-          deleteResult.errorMessage || 'No se pudo eliminar el familiar'
+          translate.messages?.error?.generic,
+          deleteResult.errorMessage || translate.messages?.error?.deleteFamilyMemberFailed
         );
       }
     }
@@ -93,9 +93,9 @@ export default function FamilyMemberCard({
         {/* Botón de editar (izquierda superior) */}
         <button
           onClick={handleEditClick}
-          className="absolute top-4 left-4 z-10 p-2 rounded-lg bg-green-500/90 hover:bg-green-600 text-white transition shadow-lg hover:shadow-xl opacity-0 group-hover:opacity-100"
-          title="Editar familiar"
-          aria-label="Editar información del familiar"
+          className="absolute top-4 left-4 z-10 p-2 rounded-lg bg-success hover:bg-success/80 text-text-on-primary transition shadow-lg hover:shadow-xl opacity-0 group-hover:opacity-100"
+          title={translate.pages.family.editMember}
+          aria-label={translate.pages.family.editMember}
         >
           <FontAwesomeIcon icon={["fas", "edit"]} className="text-lg" />
         </button>
@@ -103,9 +103,9 @@ export default function FamilyMemberCard({
         {/* Botón de eliminar (derecha superior) */}
         <button
           onClick={handleDeleteClick}
-          className="absolute top-4 right-4 z-10 p-2 rounded-lg bg-red-500/90 hover:bg-red-600 text-white transition shadow-lg hover:shadow-xl opacity-0 group-hover:opacity-100"
-          title="Eliminar de mi familia"
-          aria-label="Eliminar familiar de mi familia"
+          className="absolute top-4 right-4 z-10 p-2 rounded-lg bg-error hover:bg-error/80 text-text-on-primary transition shadow-lg hover:shadow-xl opacity-0 group-hover:opacity-100"
+          title={translate.pages.family.deleteMember}
+          aria-label={translate.pages.family.deleteMember}
         >
           <FontAwesomeIcon icon={["fas", "trash"]} className="text-lg" />
         </button>

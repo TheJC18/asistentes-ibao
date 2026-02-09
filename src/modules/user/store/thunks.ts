@@ -53,10 +53,10 @@ export const startLoadingUsers = (filters: LoadUsersParams = {}, pagination: Par
           }
         }));
       } else {
-        dispatch(setUsersError(result.errorMessage || 'Error al cargar usuarios'));
+        dispatch(setUsersError(result.errorMessage || 'users.errorLoadingUsers'));
       }
     } catch (error: any) {
-      dispatch(setUsersError('Error al cargar usuarios: ' + error.message));
+      dispatch(setUsersError('users.errorLoadingUsers' + ': ' + error.message));
     }
   };
 };
@@ -72,10 +72,10 @@ export const startLoadingUserById = (userId: string) => {
       if (result.ok && result.user) {
         dispatch(setCurrentUser(result.user));
       } else {
-        dispatch(setUserError(result.errorMessage || 'Error al cargar usuario'));
+        dispatch(setUserError(result.errorMessage || 'users.errorLoadingUser'));
       }
     } catch (error: any) {
-      dispatch(setUserError('Error al cargar usuario: ' + error.message));
+      dispatch(setUserError('users.errorLoadingUser' + ': ' + error.message));
     }
   };
 };

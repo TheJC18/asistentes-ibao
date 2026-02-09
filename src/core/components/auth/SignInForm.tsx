@@ -25,8 +25,8 @@ export default function SignInForm() {
   const translate = useTranslation();
 
   // Usa el formData definido fuera del componente
-  const { formState, onInputChange } = useForm(formData);
-  const { email, password } = formState;
+  const { values, handleChange } = useForm(formData);
+  const { email, password } = values;
   const isCheckingAuthentication = useMemo(() => status === 'checking', [status]);
   const [showPassword, setShowPassword] = useState(false);
 
@@ -53,10 +53,10 @@ export default function SignInForm() {
             <div className="w-32 h-32 mx-auto mb-10 flex items-center justify-center">
               <img src="/logo.webp" alt="Logo" className="w-full h-full object-contain"/>
             </div>
-            <h1 className="mb-2 font-semibold text-gray-800 text-title-sm dark:text-white/90 sm:text-title-md">
+            <h1 className="mb-2 font-semibold text-text-primary text-title-sm sm:text-title-md">
               {translate.auth.login}
             </h1>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <p className="text-sm text-text-secondary">
               {translate.auth.enterCredentials}
             </p>
           </div>
@@ -71,7 +71,7 @@ export default function SignInForm() {
                     name="email"
                     type="email"
                     value={email}
-                    onChange={onInputChange}
+                    onChange={handleChange}
                     required
                     placeholder={translate.auth.emailPlaceholder}
                     disabled={isCheckingAuthentication}
@@ -86,7 +86,7 @@ export default function SignInForm() {
                       name="password"
                       type={showPassword ? 'text' : 'password'}
                       value={password}
-                      onChange={onInputChange}
+                      onChange={handleChange}
                       required
                       placeholder={translate.auth.passwordPlaceholder}
                       disabled={isCheckingAuthentication}
@@ -108,7 +108,7 @@ export default function SignInForm() {
                 <div className="flex items-center justify-between">
                   <RouterLink
                     to="/auth/registro"
-                    className="text-sm text-brand-500 hover:text-brand-600 dark:text-brand-400"
+                    className="text-sm text-primary hover:text-primary-hover"
                   >
                     {translate.auth.createNewAccount}
                   </RouterLink>

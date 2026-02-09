@@ -5,7 +5,6 @@ export { RegisterForm } from "./auth/RegisterForm";
 // Common Components
 export { UserCard } from "./common/UserCard";
 export { ThemeToggleButton } from "./common/ThemeToggleButton";
-export { LanguageToggleButton } from "./common/LanguageToggleButton";
 export * from "./common/index";
 
 // Form Components

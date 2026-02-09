@@ -1,15 +1,55 @@
-import { TranslationKeys } from './es';
-
-export const en: TranslationKeys = {
-  // Navigation and menu
+  export const en = {
+    about: {
+      title: 'About the platform',
+      description: 'Platform designed to facilitate the management of family groups and users. Complete tools to manage member information and keep records organized.',
+      mainFeatures: 'Main features',
+      features: [
+        'Comprehensive user profile management',
+        'Organization of families with defined relationships',
+        'Integrated birthday calendar',
+        'Advanced member filtering',
+        'Security and privacy',
+        'Secure authentication with Firebase',
+        'Role-based access control',
+        'Protected and encrypted data',
+        'Compliance with privacy standards',
+      ],
+    },
+  formSections: {
+    personalData: 'Personal Data',
+    churchData: 'Church Data',
+    webAccess: 'Web access',
+  },
+  formLabels: {
+    avatar: 'Avatar',
+    selectFile: 'Select file',
+    noFile: 'No file selected',
+    name: 'Name',
+    namePlaceholder: 'Enter name',
+    phone: 'Phone',
+    phonePlaceholder: 'Enter phone',
+    relation: 'Relation',
+    relationPlaceholder: 'Select a relation',
+    gender: 'Gender',
+    genderPlaceholder: 'Select a gender',
+    birthdate: 'Birthdate',
+    birthdatePlaceholder: 'Select date',
+    nationality: 'Nationality',
+    nationalityPlaceholder: 'Select a country',
+    isMember: 'Is member?',
+    memberYes: 'I am a member',
+    memberNo: 'I am not a member',
+    webAccess: 'Web access',
+    webAccessQuestion: 'Give access to web app?',
+    webAccessHelp: 'If enabled, the user can log in with email and password',
+  },
   nav: {
     home: 'Home',
     users: 'Users',
     family: 'My Family',
     members: 'Members',
+    calendar: 'Calendar',
   },
-
-  // Common
   common: {
     save: 'Save',
     cancel: 'Cancel',
@@ -39,10 +79,30 @@ export const en: TranslationKeys = {
     viewDetails: 'View details',
     editUser: 'Edit user',
     deleteUser: 'Delete user',
+    settings: 'Settings',
+    language: 'Language',
+    theme: 'Theme',
   },
-
-  // Forms
   form: {
+    namePlaceholder: 'Enter name',
+    phonePlaceholder: 'Enter phone',
+    relationPlaceholder: 'Select a relation',
+    genderPlaceholder: 'Select a gender',
+    birthdatePlaceholder: 'Select date',
+    nationalityPlaceholder: 'Select a country',
+    passwordPlaceholder: 'Enter password',
+    confirmPasswordPlaceholder: 'Confirm password',
+    hasWebAccessEdit: 'Has web app access?',
+    hasWebAccessCreate: 'Give web app access?',
+    webAccessEditHelp: 'If you disable this, the user will not be able to log in (you must remove manually from Firebase Console > Authentication)',
+    webAccessCreateHelp: 'If you enable this, the user will be able to log in with email and password',
+    emailNoChange: 'Email cannot be changed after user creation',
+    emailForWebAccess: 'Enter an email to give web access to this user',
+    newPassword: 'New password',
+    newPasswordPlaceholder: 'Leave empty to not change',
+    newPasswordHint: 'Leave empty if you do not want to change the password',
+    confirmNewPassword: 'Confirm new password',
+    confirmNewPasswordPlaceholder: 'Leave empty to not change',
     name: 'Name',
     email: 'Email',
     phone: 'Phone',
@@ -60,24 +120,29 @@ export const en: TranslationKeys = {
     noName: 'No name',
     birth: 'Birth',
   },
-
-  // Genders
   gender: {
     male: 'Male',
     female: 'Female',
     other: 'Other',
   },
-
-  // Roles
   role: {
     admin: 'Admin',
     user: 'User',
+    member: 'Member',
     adminBadge: 'ADMIN',
     userBadge: 'USER',
+    memberBadge: 'MEMBER',
   },
-
-  // Pages
   pages: {
+    users: {
+      title: 'User Management',
+      description: 'Registered users in the application',
+      addUser: 'Add user',
+      editUser: 'Edit user',
+      deleteUser: 'Delete user?',
+      noUsers: 'No registered users',
+      viewUser: 'View user',
+    },
     home: {
       title: 'Home',
       welcome: 'Welcome',
@@ -99,14 +164,6 @@ export const en: TranslationKeys = {
       unexpectedError: 'Unexpected error',
       unexpectedErrorMessage: 'An error occurred while saving your profile. Please try again.',
     },
-    users: {
-      title: 'User Management',
-      description: 'Registered users in the application',
-      addUser: 'Add user',
-      editUser: 'Edit user',
-      deleteUser: 'Delete user?',
-      noUsers: 'No registered users',
-    },
     family: {
       title: 'My Family',
       addMember: 'Add family member',
@@ -115,6 +172,7 @@ export const en: TranslationKeys = {
       deleteMember: 'Remove from my family',
       noMembers: 'No members in your family',
       searchPlaceholder: 'Search member, relation...',
+      noUsersFound: 'No users available',
     },
     members: {
       title: 'Members',
@@ -127,9 +185,10 @@ export const en: TranslationKeys = {
       noUsersFound: 'No users registered',
       noSearchResults: 'No users found with that search term',
     },
+    calendar: {
+      title: 'Calendar',
+    },
   },
-
-  // Authentication
   auth: {
     login: 'Login',
     logout: 'Logout',
@@ -151,20 +210,23 @@ export const en: TranslationKeys = {
     passwordPlaceholder: 'Password',
     fullNamePlaceholder: 'Full name',
   },
-
-  // Messages
   messages: {
     success: {
       saved: 'Saved successfully',
       deleted: 'Deleted successfully',
+      deletedFamilyMember: 'Family member removed from your family',
       updated: 'Updated successfully',
       created: 'Created successfully',
+      added: 'Added',
+      addedToFamily: 'has been added to your family',
     },
     error: {
       generic: 'An error occurred',
       notFound: 'Not found',
       unauthorized: 'Unauthorized',
       required: 'This field is required',
+      deleteFamilyMemberFailed: 'Could not remove the family member from the family',
+      addUserFailed: 'Could not add user to family',
     },
     validation: {
       emailInvalid: 'Email must contain an @',
@@ -173,15 +235,11 @@ export const en: TranslationKeys = {
       passwordsMustMatch: 'Passwords must match',
     },
   },
-
-  // UserCard
   userCard: {
     webAccess: 'Web access',
     member: 'Member',
     age: 'years old',
   },
-
-  // Family relations
   relations: {
     titular: 'Owner',
     spouse: 'Wife',
@@ -196,15 +254,36 @@ export const en: TranslationKeys = {
     grandson: 'Grandson',
     granddaughter: 'Granddaughter',
   },
-
-  // Calendar
+  table: {
+    perPageLabel: 'Per page',
+    pageLabel: 'Page',
+    ofLabel: 'of',
+    prevLabel: 'Previous',
+    nextLabel: 'Next',
+    searchPlaceholder: 'Search...', 
+    noDataMessage: 'No data to display',
+  },
   calendar: {
     today: 'Today',
     more: 'more',
+    birthdays: 'Birthdays',
+    events: 'Events',
     months: [
-      'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December'
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
     ],
     days: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
   },
 };
+
+export type TranslationKeys = typeof en;
