@@ -88,7 +88,11 @@ export default function RegisterForm() {
     event.preventDefault();
     setFormSubmitted(true);
     if (!isFormValid) return;
-    dispatch(startCreatingUserWithEmailPassword(values));
+    dispatch(startCreatingUserWithEmailPassword({
+      displayName: values.displayName,
+      email: values.email,
+      password: values.password
+    }));
   };
 
   return (

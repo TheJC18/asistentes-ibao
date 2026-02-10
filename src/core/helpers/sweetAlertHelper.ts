@@ -14,11 +14,34 @@ try {
   // Si no es posible, se usará el fallback más abajo
 }
 
-// Inyectar CSS para z-index alto
+// Inyectar CSS para z-index alto y solo margin-top en toast
 const style = document.createElement('style');
 style.textContent = `
   .swal-high-z-index {
     z-index: 10000 !important;
+  }
+  .swal-toast-below-header {
+    margin-top: 6% !important;
+  }
+  @media (max-width: 600px) {
+    .swal-toast-below-header {
+      margin-top: 10% !important;
+    }
+  }
+  @media (min-width: 601px) and (max-width: 900px) {
+    .swal-toast-below-header {
+      margin-top: 7% !important;
+    }
+  }
+  @media (min-width: 901px) and (max-width: 1200px) {
+    .swal-toast-below-header {
+      margin-top: 6% !important;
+    }
+  }
+  @media (min-width: 1201px) {
+    .swal-toast-below-header {
+      margin-top: 6% !important;
+    }
   }
 `;
 document.head.appendChild(style);
@@ -145,6 +168,9 @@ export const showToast = (icon: 'success' | 'error' | 'warning' | 'info' = 'info
     showConfirmButton: false,
     timer: 3000,
     timerProgressBar: true,
+    customClass: {
+      container: 'swal-high-z-index swal-toast-below-header',
+    },
     didOpen: (toast) => {
       toast.addEventListener('mouseenter', Swal.stopTimer)
       toast.addEventListener('mouseleave', Swal.resumeTimer)

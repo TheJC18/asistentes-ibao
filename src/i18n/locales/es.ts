@@ -1,4 +1,37 @@
 export const es = {
+  events: {
+    messages: {
+      created: 'Evento creado correctamente',
+      updated: 'Evento actualizado correctamente',
+      deleted: 'Evento eliminado correctamente',
+      error: 'Ocurrió un error al procesar el evento',
+      confirmDelete: '¿Estás seguro de eliminar este evento?',
+      cancel: 'Acción cancelada',
+    },
+    title: 'Gestión de eventos',
+    description: 'Eventos registrados en la aplicación',
+    add: 'Agregar evento',
+    edit: 'Editar evento',
+    delete: '¿Eliminar evento?',
+    view: 'Ver evento',
+    noData: 'No hay eventos registrados',
+    confirmDelete: '¿Estás seguro de eliminar este evento?',
+    loading: 'Cargando eventos...',
+    table: {
+      title: 'Título',
+      date: 'Fecha',
+      type: 'Tipo',
+      color: 'Color',
+    },
+    form: {
+      title: 'Título',
+      sectionTitle: 'Datos del evento',
+      description: 'Descripción',
+      date: 'Fecha',
+      type: 'Tipo',
+      color: 'Color',
+    },
+  },
   about: {
     title: 'Acerca de la plataforma',
     description: 'Plataforma diseñada para facilitar la gestión de grupos familiares y usuarios. Herramientas completas para administrar información de miembros y mantener registros organizados.',
@@ -49,6 +82,7 @@ export const es = {
     family: 'Mi Familia',
     members: 'Miembros',
     calendar: 'Calendario',
+    events: 'Eventos',
   },
   common: {
     save: 'Guardar',

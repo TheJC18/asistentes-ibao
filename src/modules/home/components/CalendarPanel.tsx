@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useTranslation } from '@/core/context/LanguageContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Calendar, { UserBirthday } from '@/core/components/ui/calendar/Calendar';
+import { useEvents } from '@/modules/events/store/useEvents';
+import { useEffect } from 'react';
 
 // Interface para eventos personalizados (reuniones, tareas, etc.)
 export interface CustomEvent {
@@ -31,6 +33,7 @@ export default function CalendarPanel({
 }: CalendarPanelProps) {
   const [activeFilter, setActiveFilter] = useState<ViewFilter>('all');
   const translate = useTranslation();
+  const { events: firebaseEvents, loading: eventsLoading } = useEvents();
 
   // Filtrar datos según vista activa
   const getFilteredBirthdays = (): UserBirthday[] => {
@@ -40,14 +43,15 @@ export default function CalendarPanel({
 
   const getFilteredEvents = (): CustomEvent[] => {
     if (activeFilter === 'birthdays') return [];
-    return events;
+    // Usar eventos de firebase
+    return firebaseEvents;
   };
 
-  const totalItems = birthdays.length + events.length;
+  const totalItems = birthdays.length + firebaseEvents.length;
   const birthdayCount = birthdays.length;
-  const eventCount = events.length;
+  const eventCount = firebaseEvents.length;
 
-  if (loading) {
+  if (loading || eventsLoading) {
     return (
       <div className="bg-card rounded-2xl shadow-lg border border-border p-6">
         <div className="flex justify-center items-center py-12">

@@ -109,7 +109,7 @@ export default function CalendarGrid({ currentDate, events = [], onDateClick, on
         {translate.calendar.days.map((day) => (
           <div
             key={day}
-            className="py-3 text-center text-sm font-semibold text-text-primary border-b border-border"
+            className="py-2 sm:py-3 text-center text-xs sm:text-sm font-semibold text-text-primary border-b border-border"
           >
             {day}
           </div>
@@ -125,18 +125,18 @@ export default function CalendarGrid({ currentDate, events = [], onDateClick, on
           return (
             <div
               key={index}
-              className={`min-h-[120px] border-b border-r border-border p-2 ${
+              className={`min-h-[60px] sm:min-h-[120px] border-b border-r border-border p-1 sm:p-2 ${
                 !isCurrentMonth ? 'bg-surface' : 'bg-card'
               } ${(index + 1) % 7 === 0 ? 'border-r-0' : ''} hover:bg-surface transition cursor-pointer`}
               onClick={() => handleDateClick(date)}
             >
-              <div className="flex justify-between items-start mb-1">
+              <div className="flex justify-between items-start mb-0.5 sm:mb-1">
                 <span
-                  className={`text-sm font-medium ${
+                  className={`text-xs sm:text-sm font-medium ${
                     !isCurrentMonth
                       ? 'text-text-disabled'
                       : isTodayDate
-                      ? 'bg-primary text-text-on-primary w-7 h-7 rounded-full flex items-center justify-center'
+                      ? 'bg-primary text-text-on-primary w-5 h-5 sm:w-7 sm:h-7 rounded-full flex items-center justify-center'
                       : isWeekend(date)
                       ? 'text-error'
                       : 'text-text-primary'
@@ -147,12 +147,12 @@ export default function CalendarGrid({ currentDate, events = [], onDateClick, on
               </div>
 
               {/* Eventos */}
-              <div className="space-y-1">
+              <div className="space-y-0.5 sm:space-y-1">
                 {dayEvents.slice(0, 3).map((event) => (
                   <div
                     key={event.id}
                     onClick={(e) => handleEventClick(event, e)}
-                    className={`text-xs px-2 py-1 rounded truncate cursor-pointer hover:opacity-80 transition ${
+                    className={`text-[10px] sm:text-xs px-1 sm:px-2 py-0.5 sm:py-1 rounded truncate cursor-pointer hover:opacity-80 transition ${
                       event.type === 'birthday'
                         ? 'bg-secondary-light text-secondary'
                         : event.color === 'blue'
@@ -169,7 +169,7 @@ export default function CalendarGrid({ currentDate, events = [], onDateClick, on
                   </div>
                 ))}
                 {dayEvents.length > 3 && (
-                  <div className="text-xs text-text-secondary px-2">
+                  <div className="text-[10px] sm:text-xs text-text-secondary px-1 sm:px-2">
                     +{dayEvents.length - 3} {translate.calendar.more}
                   </div>
                 )}

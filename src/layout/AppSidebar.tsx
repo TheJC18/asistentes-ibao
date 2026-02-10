@@ -61,6 +61,12 @@ const AppSidebar = () => {
         path: "/usuarios",
         roles: [ROLES.ADMIN],
       },
+      {
+        icon: <FontAwesomeIcon icon={["fas", "calendar-plus"]} />,
+        name: translate.nav.events,
+        path: "/eventos",
+        roles: [ROLES.ADMIN],
+      },
     ],
   };
 

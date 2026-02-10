@@ -4,6 +4,7 @@ import tailwindcss from '@tailwindcss/vite';
 import flowbiteReact from "flowbite-react/plugin/vite";
 import { VitePWA } from 'vite-plugin-pwa';
 import path from 'path';
+import { visualizer } from 'rollup-plugin-visualizer';
 
 export default defineConfig({
   resolve: {
@@ -15,6 +16,12 @@ export default defineConfig({
     tailwindcss(),
     react(),
     flowbiteReact(),
+    visualizer({
+      filename: 'dist/bundle-report.html',
+      open: false, // Cambia a true si quieres que se abra automáticamente
+      gzipSize: true,
+      brotliSize: true,
+    }),
     VitePWA({
       registerType: 'autoUpdate',
       manifest: {
@@ -76,4 +83,25 @@ export default defineConfig({
       },
     }),
   ],
+  build: {
+    sourcemap: true,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          firebase: [
+            'firebase/app',
+            'firebase/auth',
+            'firebase/firestore'
+          ],
+          sweetalert2: ['sweetalert2'],
+          fontawesome: [
+            '@fortawesome/fontawesome-svg-core',
+            '@fortawesome/free-solid-svg-icons',
+            '@fortawesome/react-fontawesome'
+          ],
+          // Puedes agregar más grupos aquí si lo deseas
+        }
+      }
+    }
+  }
 })

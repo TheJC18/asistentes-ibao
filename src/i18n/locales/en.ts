@@ -1,4 +1,37 @@
-  export const en = {
+export const en = {
+  events: {
+    messages: {
+      created: 'Event created successfully',
+      updated: 'Event updated successfully',
+      deleted: 'Event deleted successfully',
+      error: 'An error occurred while processing the event',
+      confirmDelete: 'Are you sure you want to delete this event?',
+      cancel: 'Action cancelled',
+    },
+    title: 'Event Management',
+    description: 'Events registered in the application',
+    add: 'Add event',
+    edit: 'Edit event',
+    delete: 'Delete event?',
+    view: 'View event',
+    noData: 'No events registered',
+    confirmDelete: 'Are you sure you want to delete this event?',
+    loading: 'Loading events...',
+    table: {
+      title: 'Title',
+      date: 'Date',
+      type: 'Type',
+      color: 'Color',
+    },
+    form: {
+      title: 'Title',
+      sectionTitle: 'Event details',
+      description: 'Description',
+      date: 'Date',
+      type: 'Type',
+      color: 'Color',
+    },
+  },
     about: {
       title: 'About the platform',
       description: 'Platform designed to facilitate the management of family groups and users. Complete tools to manage member information and keep records organized.',
@@ -49,6 +82,7 @@
     family: 'My Family',
     members: 'Members',
     calendar: 'Calendar',
+    events: 'Events',
   },
   common: {
     save: 'Save',

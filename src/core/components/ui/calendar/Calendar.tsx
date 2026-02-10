@@ -98,45 +98,45 @@ export default function Calendar({ events = [], birthdays = [], onDateClick, onE
   }
 
   return (
-    <div className={`bg-card rounded-lg shadow-lg border border-border ${className}`}>
+    <div
+      className={`bg-card rounded-lg shadow-lg border border-border ${className}`}
+    >
       {/* Header */}
-      <div className="p-6 border-b border-border bg-surface">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-2xl font-bold text-text-primary">
+      <div
+        className="p-4 sm:p-6 border-b border-border bg-surface"
+      >
+        <div className="flex flex-col sm:flex-row items-center sm:items-end justify-between mb-2 sm:mb-4 gap-2 sm:gap-0">
+          <h2 className="text-xl sm:text-2xl font-bold text-text-primary">
             {translate.calendar.months[currentDate.getMonth()]} {currentDate.getFullYear()}
           </h2>
-          
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 sm:gap-2">
             <button
               onClick={handleToday}
-              className="px-4 py-2 text-sm font-medium text-primary hover:bg-primary-light rounded-lg transition"
+              className="px-2 sm:px-4 py-1 sm:py-2 text-xs sm:text-sm font-medium text-primary hover:bg-primary-light rounded-lg transition"
             >
-              <FontAwesomeIcon icon={faCalendarDay} className="mr-2" />
+              <FontAwesomeIcon icon={faCalendarDay} className="mr-1 sm:mr-2" />
               {translate.calendar.today}
             </button>
-            
             <button
               onClick={handlePrevMonth}
-              className="p-2 text-text-secondary hover:bg-surface rounded-lg transition"
+              className="p-1 sm:p-2 text-text-secondary hover:bg-surface rounded-lg transition"
             >
               <FontAwesomeIcon icon={faChevronLeft} />
             </button>
-            
             <button
               onClick={handleNextMonth}
-              className="p-2 text-text-secondary hover:bg-surface rounded-lg transition"
+              className="p-1 sm:p-2 text-text-secondary hover:bg-surface rounded-lg transition"
             >
               <FontAwesomeIcon icon={faChevronRight} />
             </button>
           </div>
         </div>
-
         {/* Selectores de mes y año */}
-        <div className="flex gap-3">
+        <div className="flex gap-2 sm:gap-3 mt-2 sm:mt-0">
           <select
             value={selectedMonth}
             onChange={handleMonthChange}
-            className="flex-1 px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary bg-background text-text-primary"
+            className="flex-1 px-2 sm:px-3 py-1 sm:py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary bg-background text-text-primary text-xs sm:text-base"
           >
             {translate.calendar.months.map((month, index) => (
               <option key={index} value={index}>
@@ -144,11 +144,10 @@ export default function Calendar({ events = [], birthdays = [], onDateClick, onE
               </option>
             ))}
           </select>
-
           <select
             value={selectedYear}
             onChange={handleYearChange}
-            className="px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary bg-background text-text-primary"
+            className="px-2 sm:px-3 py-1 sm:py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary bg-background text-text-primary text-xs sm:text-base"
           >
             {years.map((year) => (
               <option key={year} value={year}>
@@ -158,9 +157,8 @@ export default function Calendar({ events = [], birthdays = [], onDateClick, onE
           </select>
         </div>
       </div>
-
       {/* Grid del calendario */}
-      <div className="p-6 bg-card">
+      <div className="p-2 sm:p-6 bg-card">
         <CalendarGrid
           currentDate={currentDate}
           events={allEvents}

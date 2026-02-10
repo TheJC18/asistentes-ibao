@@ -6,11 +6,7 @@ import Backdrop from '@/layout/Backdrop';
 import AppSidebar from '@/layout/AppSidebar';
 
 // Configuración de la biblioteca de FontAwesome
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { fas } from '@fortawesome/free-solid-svg-icons';
-import { far } from '@fortawesome/free-regular-svg-icons';
-import { fab } from '@fortawesome/free-brands-svg-icons';
-library.add(fas, far, fab);
+import '@/core/icons/fontawesome';
 
 const SIDEBAR_WIDTH_EXPANDED = 290;
 const SIDEBAR_WIDTH_COLLAPSED = 90;

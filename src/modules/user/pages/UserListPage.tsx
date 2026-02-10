@@ -2,7 +2,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useTranslation } from '@/core/context/LanguageContext';
 import Badge from '@/core/components/ui/badge/Badge';
 import FloatingActionButtons from '@/core/components/ui/FloatingActionButtons';
-import UserModal from '@/modules/user/components/UserModal';
+import { useSidebar } from "@/core/context/SidebarContext";
+import React, { Suspense } from 'react';
+const UserModal = React.lazy(() => import('@/modules/user/components/UserModal'));
 import EntityList from '@/core/components/ui/table/EntityList';
 import { getCountryNameByCode } from '@/modules/user/helpers/userUtils';
 import { useUserManagement } from '@/modules/user/hooks/useUserManagement';
@@ -10,6 +12,7 @@ import { getRoleBadgeColor, getRoleBadgeTranslationKey } from '@/core/constants/
 import { User } from '@/types';
 
 export default function UserListPage() {
+  const sidebar = useSidebar();
   const translate = useTranslation();
   
   // Hook de gestión de usuarios (contiene toda la lógica)
@@ -121,7 +124,12 @@ export default function UserListPage() {
         if (!userItem.birthdate) return <span className="text-text-disabled">-</span>;
         try {
           const date = new Date(userItem.birthdate);
-          return date.toLocaleDateString('es-ES', { year: 'numeric', month: '2-digit', day: '2-digit' });
+          // Corrige el año para evitar '20260' y muestra formato correcto
+          if (isNaN(date.getTime())) return <span className="text-text-disabled">-</span>;
+          const yyyy = date.getFullYear();
+          const mm = String(date.getMonth() + 1).padStart(2, '0');
+          const dd = String(date.getDate()).padStart(2, '0');
+          return `${dd}/${mm}/${yyyy}`;
         } catch {
           return <span className="text-text-disabled">-</span>;
         }
@@ -193,25 +201,29 @@ export default function UserListPage() {
         noDataMessage={translate.pages.users.noUsers}
       />
 
-      <FloatingActionButtons 
-        buttons={[
-          {
-            icon: ["fas", "plus"],
-            onClick: handleCreate,
-            title: translate.pages.users.addUser,
-            tooltip: translate.pages.users.addUser,
-            color: "blue"
-          }
-        ]}
-      />
+      {!(sidebar && sidebar.isMobileOpen) && (
+        <FloatingActionButtons 
+          buttons={[
+            {
+              icon: ["fas", "plus"],
+              onClick: handleCreate,
+              title: translate.pages.users.addUser,
+              tooltip: translate.pages.users.addUser,
+              color: "blue"
+            }
+          ]}
+        />
+      )}
 
-      <UserModal
-        open={modalOpen}
-        onClose={handleClose}
-        mode={modalMode}
-        user={selectedUser}
-        onSave={handleSave}
-      />
+      <Suspense fallback={<div className="flex justify-center items-center min-h-[20vh]"><span className="text-lg">Cargando modal...</span></div>}>
+        <UserModal
+          open={modalOpen}
+          onClose={handleClose}
+          mode={modalMode}
+          user={selectedUser}
+          onSave={handleSave}
+        />
+      </Suspense>
     </>
   );
 }

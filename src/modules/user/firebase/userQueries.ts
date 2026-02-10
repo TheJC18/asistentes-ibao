@@ -12,17 +12,18 @@ import {
   getCountFromServer,
   setDoc 
 } from 'firebase/firestore';
-import { FirebaseDB } from '@/firebase/config';
+import { FirebaseDB, FirebaseAuth } from '@/firebase/config';
 import { 
-  createAuthUser, 
-  updateUserPassword, 
-  checkEmailExists, 
-  linkEmailPassword 
+    createAuthUser, 
+    updateUserPassword, 
+    checkEmailExists, 
+    linkEmailPassword 
 } from '@/modules/auth/firebase/authQueries';
 import { 
-  convertDateFieldsToISO, 
-  dateToISOString 
+    convertDateFieldsToISO, 
+    dateToISOString 
 } from '@/core/helpers';
+import { addUserToFamily, updateUserIdInFamilies, removeUserFromFamily, getFamilyMembers, getUserById } from '@/modules/family/firebase/familyQueries';
 import { User, UserFilters } from '@/types';
 
 // === INTERFACES ===
@@ -335,10 +336,7 @@ export const createUserInFirebase = async (userData: CreateUserData): Promise<Cr
             // 4. Si se proporcionó familyId, agregar a esa familia (usuario creado como familiar)
             if (familyId && relation) {
 
-                const { addUserToFamily } = await import('@/modules/family/firebase/familyQueries');
-                
                 const currentUserId = userData.createdBy || uid!;
-                
                 await addUserToFamily(familyId, uid!, {
                     relation,
                     role: 'member',
@@ -409,11 +407,7 @@ export const createUserInFirebase = async (userData: CreateUserData): Promise<Cr
             
             // Los usuarios sin acceso web son siempre familiares, solo agregar a familia existente
             if (familyId && relation) {
-                // Importar funciones de familia
-                const { addUserToFamily } = await import('@/modules/family/firebase/familyQueries');
-                
                 const currentUserId = userData.createdBy || uid;
-                
                 // Solo agregar el nuevo usuario a la familia del creador
                 await addUserToFamily(familyId, uid, {
                     relation,
@@ -518,7 +512,6 @@ export const updateUserInFirebase = async (userId: string, userData: UpdateUserD
             
             // 2. Actualizar las referencias en las familias
             if (currentUserData.families && currentUserData.families.length > 0) {
-                const { updateUserIdInFamilies } = await import('@/modules/family/firebase/familyQueries');
                 await updateUserIdInFamilies(userId, newAuthUid, currentUserData.families);
             }
             
@@ -559,7 +552,7 @@ export const updateUserInFirebase = async (userId: string, userData: UpdateUserD
         // CASO 2: Usuario YA tenía acceso web y quiere cambiar/agregar contraseña
         else if (wasWebAccessEnabled && password && password.trim() !== '') {
             // Verificar si el usuario actual tiene el proveedor de contraseña
-            const { FirebaseAuth } = await import('@/firebase/config');
+            // Usar import estático para evitar advertencia de Vite.
             const currentUser = FirebaseAuth.currentUser;
             
             if (!currentUser) {
@@ -684,8 +677,6 @@ export const deleteUserFromFirebase = async (userId: string): Promise<DeleteUser
         
         // 1. Eliminar usuario de todas sus familias
         if (userFamilies.length > 0) {
-            const { removeUserFromFamily } = await import('@/modules/family/firebase/familyQueries');
-            
             const deletePromises = userFamilies.map(async (familyId: string) => {
                 try {
                     await removeUserFromFamily(familyId, userId);

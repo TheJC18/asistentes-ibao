@@ -1,15 +1,18 @@
 import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import UserModal from "@/modules/user/components/UserModal";
+import React, { Suspense } from 'react';
+const UserModal = React.lazy(() => import('@/modules/user/components/UserModal'));
 import FamilyMemberCard from "./FamilyMemberCard";
-import AddFamilyMemberModal from "./AddFamilyMemberModal";
+const AddFamilyMemberModal = React.lazy(() => import('./AddFamilyMemberModal'));
 import FloatingActionButtons, { FloatingActionButton } from "@/core/components/ui/FloatingActionButtons";
+import { useSidebar } from "@/core/context/SidebarContext";
 import { useModal } from "@/core/hooks/useModal";
 import { useUserActions } from "@/modules/user/hooks/useUserActions";
-import { createFamily, getFamilyMembers, getUserFamilies } from "@/modules/family/firebase/familyQueries";
+import { createFamily, getFamilyMembers, getUserFamilies, addUserToFamily, getUserById } from "@/modules/family/firebase/familyQueries";
 import { useSelector } from 'react-redux';
 import { RootState } from '@/core/store';
 import { useTranslation } from '@/core/context/LanguageContext';
+import { getInverseRelation } from '@/core/helpers';
 import { ROLES } from '@/core/constants/roles';
 
 interface FamilyData {
@@ -34,6 +37,7 @@ interface MemberData {
 }
 
 export default function FamilyListPage() {
+    const sidebar = useSidebar();
   const [search, setSearch] = useState("");
   const [members, setMembers] = useState<MemberData[]>([]);
   const [familyId, setFamilyId] = useState<string | null>(null);
@@ -93,8 +97,9 @@ export default function FamilyListPage() {
   // Establecer relaciones bidireccionales para usuarios que fueron agregados como familiares
   const setupBidirectionalRelations = async (myFamilyId: string, otherFamilies: FamilyData[]) => {
     try {
-      const { getFamilyMembers, addUserToFamily, getUserById } = await import('@/modules/family/firebase/familyQueries');
-      const { getInverseRelation } = await import('@/core/helpers');
+      // Los métodos ya están importados de forma estática arriba
+      // const { getFamilyMembers, addUserToFamily, getUserById } = await import('@/modules/family/firebase/familyQueries');
+      // getInverseRelation ya está importado de forma estática arriba
       
       // Por cada familia ajena donde estoy (familias donde NO soy el creador)
       for (const otherFamily of otherFamilies) {
@@ -222,43 +227,49 @@ export default function FamilyListPage() {
       </div>
       
       {/* Botones flotantes */}
-      <FloatingActionButtons 
-        buttons={[
-          {
-            icon: ["fas", "user-plus"],
-            onClick: openAddModal,
-            title: translate.pages.family.addFamiliar,
-            tooltip: translate.pages.family.addFamiliar,
-            color: "green"
-          },
-          {
-            icon: ["fas", "plus"],
-            onClick: openCreateModal,
-            title: translate.pages.family.addMember,
-            tooltip: translate.pages.family.addMember,
-            color: "blue"
-          }
-        ]}
-      />
-      
-      {/* Modal para crear nuevo integrante */}
-      <UserModal 
-        open={isCreateModalOpen} 
-        onClose={closeCreateModal} 
-        mode="family"
-        onSave={handleCreateMember}
-      />
-      
-      {/* Modal para agregar usuario existente */}
-      {familyId && currentUserId && (
-        <AddFamilyMemberModal
-          open={isAddModalOpen}
-          onClose={closeAddModal}
-          familyId={familyId}
-          currentUserId={currentUserId}
-          onMemberAdded={handleMemberAdded}
+      {!(sidebar && sidebar.isMobileOpen) && (
+        <FloatingActionButtons 
+          buttons={[
+            {
+              icon: ["fas", "user-plus"],
+              onClick: openAddModal,
+              title: translate.pages.family.addFamiliar,
+              tooltip: translate.pages.family.addFamiliar,
+              color: "green"
+            },
+            {
+              icon: ["fas", "plus"],
+              onClick: openCreateModal,
+              title: translate.pages.family.addMember,
+              tooltip: translate.pages.family.addMember,
+              color: "blue"
+            }
+          ]}
         />
       )}
+      
+      {/* Modal para crear nuevo integrante */}
+      <Suspense fallback={<div className="flex justify-center items-center min-h-[20vh]"><span className="text-lg">Cargando modal...</span></div>}>
+        <UserModal 
+          open={isCreateModalOpen} 
+          onClose={closeCreateModal} 
+          mode="family"
+          onSave={handleCreateMember}
+        />
+      </Suspense>
+      
+      {/* Modal para agregar usuario existente */}
+      <Suspense fallback={<div className="flex justify-center items-center min-h-[20vh]"><span className="text-lg">Cargando modal...</span></div>}>
+        {familyId && currentUserId && (
+          <AddFamilyMemberModal
+            open={isAddModalOpen}
+            onClose={closeAddModal}
+            familyId={familyId}
+            currentUserId={currentUserId}
+            onMemberAdded={handleMemberAdded}
+          />
+        )}
+      </Suspense>
     </div>
   );
 }
