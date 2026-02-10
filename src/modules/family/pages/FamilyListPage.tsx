@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React, { Suspense } from 'react';
-const UserModal = React.lazy(() => import('@/modules/user/components/UserModal'));
+import { lazy, Suspense } from 'react';
+const UserModal = lazy(() => import('@/modules/user/components/UserModal'));
 import FamilyMemberCard from "./FamilyMemberCard";
-const AddFamilyMemberModal = React.lazy(() => import('./AddFamilyMemberModal'));
+const AddFamilyMemberModal = lazy(() => import('./AddFamilyMemberModal'));
 import FloatingActionButtons, { FloatingActionButton } from "@/core/components/ui/FloatingActionButtons";
 import { useSidebar } from "@/core/context/SidebarContext";
 import { useModal } from "@/core/hooks/useModal";
@@ -132,7 +132,7 @@ export default function FamilyListPage() {
           // Agregar al creador a MI familia con la relación inversa
           await addUserToFamily(myFamilyId, whoAddedMe, {
             relation: inverseRelation,
-            role: ROLES.MEMBER,
+            role: ROLES.USER,
             addedBy: currentUserId || ''
           });
         }

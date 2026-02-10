@@ -73,7 +73,7 @@ export default function AddFamilyMemberModal({
 
     const result = await addUserToFamily(familyId, selectedUser.id, {
       relation: selectedRelation,
-      role: ROLES.MEMBER,
+      role: ROLES.USER,
       addedBy: currentUserId
     });
 

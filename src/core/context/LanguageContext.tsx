@@ -21,9 +21,7 @@ const translations: Record<Language, TranslationKeys> = {
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
-export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
+export const LanguageProvider = ({ children }: { children: React.ReactNode }) => {
   const [language, setLanguageState] = useState<Language>("es");
   const [isInitialized, setIsInitialized] = useState(false);
 

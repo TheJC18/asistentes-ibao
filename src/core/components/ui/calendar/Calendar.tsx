@@ -98,13 +98,9 @@ export default function Calendar({ events = [], birthdays = [], onDateClick, onE
   }
 
   return (
-    <div
-      className={`bg-card rounded-lg shadow-lg border border-border ${className}`}
-    >
+    <div className={`bg-card rounded-lg shadow-lg border border-border ${className}`}>
       {/* Header */}
-      <div
-        className="p-4 sm:p-6 border-b border-border bg-surface"
-      >
+      <div className="p-4 sm:p-6 border-b border-border bg-surface">
         <div className="flex flex-col sm:flex-row items-center sm:items-end justify-between mb-2 sm:mb-4 gap-2 sm:gap-0">
           <h2 className="text-xl sm:text-2xl font-bold text-text-primary">
             {translate.calendar.months[currentDate.getMonth()]} {currentDate.getFullYear()}

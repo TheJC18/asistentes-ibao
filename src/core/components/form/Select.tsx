@@ -18,7 +18,7 @@ interface SelectProps {
   required?: boolean;
 }
 
-const Select: React.FC<SelectProps> = ({
+const Select = ({
   options,
   placeholder = "Select an option",
   onChange,

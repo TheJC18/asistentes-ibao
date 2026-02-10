@@ -13,7 +13,7 @@ interface PaginationProps {
   perPageLabel?: string;
 }
 
-const Pagination: React.FC<PaginationProps> = ({
+const Pagination = ({
   page,
   totalPages,
   onPrev,

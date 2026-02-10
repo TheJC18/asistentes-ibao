@@ -18,7 +18,7 @@ interface BadgeProps {
   children: React.ReactNode; // Badge content
 }
 
-const Badge: React.FC<BadgeProps> = ({
+const Badge = ({
   variant = "light",
   color = "primary",
   size = "md",

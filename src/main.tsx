@@ -6,23 +6,20 @@ import { Provider } from 'react-redux';
 import { store } from '@/core/store';
 import { ThemeProvider } from '@/core/context/ThemeContext';
 import { LanguageProvider } from '@/core/context/LanguageContext';
-
-import './index.css';
-import { AppTheme } from '@/theme/AppTheme';
 import { AppRouter } from '@/router/AppRouter';
 
+import './index.css';
+
 createRoot(document.getElementById('root')!).render(
-  // <StrictMode>
+  <StrictMode>
     <Provider store={store}>
       <BrowserRouter>
         <ThemeProvider>
           <LanguageProvider>
-            <AppTheme>
-              <AppRouter />
-            </AppTheme>
+            <AppRouter />
           </LanguageProvider>
         </ThemeProvider>
       </BrowserRouter>
     </Provider>
-  // </StrictMode>,
+  </StrictMode>,
 );

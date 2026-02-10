@@ -11,7 +11,7 @@ interface DropdownItemProps {
   children: React.ReactNode;
 }
 
-export const DropdownItem: React.FC<DropdownItemProps> = ({
+export const DropdownItem = ({
   tag = "button",
   to,
   onClick,

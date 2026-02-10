@@ -28,6 +28,7 @@ interface UserModalProps {
   mode?: 'view' | 'edit' | 'create' | 'family';
   user?: Partial<User>;
   onSave?: (data: any) => void;
+  onPasswordReset?: (email: string) => Promise<void>;
 }
 
 interface UserFormData {

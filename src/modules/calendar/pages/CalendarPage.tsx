@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from '@/core/context/LanguageContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { UserBirthday } from '@/core/components/ui/calendar/Calendar';
-import CalendarPanel, { CustomEvent } from '@/modules/home/components/CalendarPanel';
+import Calendar, { UserBirthday } from '@/core/components/ui/calendar/Calendar';
 import { getAllUsersBirthdays } from '@/modules/user/firebase/userQueries';
 
 export default function CalendarPage() {
   const translate = useTranslation();
   const [birthdays, setBirthdays] = useState<UserBirthday[]>([]);
-  const [customEvents, setCustomEvents] = useState<CustomEvent[]>([]);
+  // Si necesitas eventos personalizados, puedes agregarlos aquí:
+  // const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -23,9 +23,7 @@ export default function CalendarPage() {
       const birthdaysData = await getAllUsersBirthdays();
       setBirthdays(birthdaysData);
 
-      // TODO: Aquí se pueden cargar eventos personalizados desde Firebase
-      // const eventsData = await getAllCustomEvents();
-      // setCustomEvents(eventsData);
+      // Si necesitas cargar eventos personalizados, hazlo aquí
       
     } catch (error) {
       console.error('Error al cargar datos del calendario:', error);
@@ -55,10 +53,9 @@ export default function CalendarPage() {
       </div>
 
       {/* Calendario */}
-      <CalendarPanel 
+      <Calendar
         birthdays={birthdays}
-        events={customEvents}
-        loading={loading}
+        // events={events} // Si tienes eventos personalizados, pásalos aquí
         onDateClick={handleDateClick}
         onEventClick={handleEventClick}
       />

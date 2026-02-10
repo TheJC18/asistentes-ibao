@@ -12,7 +12,7 @@ interface ButtonProps {
   type?: "button" | "submit" | "reset";
 }
 
-const Button: React.FC<ButtonProps> = ({
+const Button = ({
   children,
   size = "md",
   variant = "primary",

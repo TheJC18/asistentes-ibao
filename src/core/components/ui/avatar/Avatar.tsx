@@ -29,7 +29,7 @@ const statusColorClasses = {
   busy: "bg-warning-500",
 };
 
-const Avatar: React.FC<AvatarProps> = ({
+const Avatar = ({
   src,
   alt = "User Avatar",
   size = "medium",

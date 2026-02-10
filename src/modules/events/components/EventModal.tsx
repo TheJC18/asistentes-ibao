@@ -1,12 +1,21 @@
 
-import React from 'react';
 import Modal from '@/core/components/ui/modal/Modal';
 import { useTranslation } from '@/core/context/LanguageContext';
 import { EventData } from '../firebase/eventQueries';
+
+interface EventFormData {
+  title: string;
+  description?: string;
+  date: string;
+  type?: string;
+  color?: string;
+  createdBy: string;
+}
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import DatePicker from '@/core/components/form/date-picker';
 import Label from '@/core/components/form/Label';
 import Input from '@/core/components/form/input/InputField';
+import { useEffect, useState } from 'react';
 
 interface EventModalProps {
   open: boolean;
@@ -33,18 +42,17 @@ export default function EventModal({ open, onClose, mode = 'view', event = {}, o
     ? translate.events?.edit || translate.common.edit
     : translate.events?.add || translate.common.create;
 
-  const [formData, setFormData] = React.useState<EventData>({
-    title: event.title || '',
-    description: event.description || '',
-    date: event.date || '',
-    type: event.type || 'normal',
-    color: event.color || 'primary',
-    createdBy: event.createdBy || '',
-    id: event.id,
+  const [formData, setFormData] = useState<EventFormData>({
+    title: '',
+    description: '',
+    date: '',
+    type: 'normal',
+    color: 'primary',
+    createdBy: '',
   });
-  const [errors, setErrors] = React.useState<string[]>([]);
+  const [errors, setErrors] = useState<string[]>([]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (open) {
       setFormData({
         title: event.title || '',
@@ -53,13 +61,12 @@ export default function EventModal({ open, onClose, mode = 'view', event = {}, o
         type: event.type || 'normal',
         color: event.color || 'primary',
         createdBy: event.createdBy || '',
-        id: event.id,
       });
       setErrors([]);
     }
-  }, [open, event.title, event.description, event.date, event.type, event.color, event.createdBy, event.id]);
+  }, [open, event.title, event.description, event.date, event.type, event.color, event.createdBy]);
 
-  const handleChange = (field: keyof EventData, value: string) => {
+  const handleChange = (field: keyof EventFormData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
@@ -72,12 +79,14 @@ export default function EventModal({ open, onClose, mode = 'view', event = {}, o
     setErrors(newErrors);
     if (newErrors.length > 0) return;
     if (onSave) {
-      const { id, ...dataToSave } = formData;
-      onSave({
-        ...dataToSave,
-        type: 'normal',
-        color: 'primary',
-      });
+      // Si estamos editando, incluir id; si es creación, no
+      const dataToSave: EventData = {
+        ...formData,
+        type: formData.type || 'normal',
+        color: formData.color || 'primary',
+        id: isEdit && event.id ? event.id : '',
+      };
+      onSave(dataToSave);
     }
   };
 

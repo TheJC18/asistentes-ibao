@@ -6,7 +6,6 @@ import { IconName } from '@fortawesome/fontawesome-svg-core';
 export const ROLES = {
   ADMIN: 'admin',
   USER: 'user',
-  MEMBER: 'member',
 } as const;
 
 /**
@@ -20,7 +19,6 @@ export type RoleType = typeof ROLES[keyof typeof ROLES];
 export const ROLE_ICONS: Record<RoleType, IconName> = {
   [ROLES.ADMIN]: 'crown',
   [ROLES.USER]: 'user',
-  [ROLES.MEMBER]: 'users',
 };
 
 /**
@@ -29,7 +27,6 @@ export const ROLE_ICONS: Record<RoleType, IconName> = {
 export const ROLE_BADGE_COLORS: Record<RoleType, 'primary' | 'warning' | 'info' | 'success' | 'error'> = {
   [ROLES.ADMIN]: 'primary',
   [ROLES.USER]: 'warning',
-  [ROLES.MEMBER]: 'info',
 };
 
 /**
@@ -53,7 +50,6 @@ export const getRoleBadgeTranslationKey = (role: string): string => {
   const keys: Record<RoleType, string> = {
     [ROLES.ADMIN]: 'role.adminBadge',
     [ROLES.USER]: 'role.userBadge',
-    [ROLES.MEMBER]: 'role.memberBadge',
   };
   return keys[role as RoleType] || keys[ROLES.USER];
 };
@@ -65,7 +61,6 @@ export const getRoleNameTranslationKey = (role: string): string => {
   const keys: Record<RoleType, string> = {
     [ROLES.ADMIN]: 'role.admin',
     [ROLES.USER]: 'role.user',
-    [ROLES.MEMBER]: 'role.member',
   };
   return keys[role as RoleType] || keys[ROLES.USER];
 };

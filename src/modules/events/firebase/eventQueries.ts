@@ -11,7 +11,7 @@ import {
 } from 'firebase/firestore';
 
 export interface EventData {
-  id?: string;
+  id: string;
   title: string;
   description?: string;
   date: string; // ISO string

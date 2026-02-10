@@ -8,7 +8,7 @@ interface DropdownProps {
   className?: string;
 }
 
-export const Dropdown: React.FC<DropdownProps> = ({
+export const Dropdown = ({
   isOpen,
   onClose,
   children,

@@ -4,7 +4,12 @@ import tailwindcss from '@tailwindcss/vite';
 import flowbiteReact from "flowbite-react/plugin/vite";
 import { VitePWA } from 'vite-plugin-pwa';
 import path from 'path';
+// Solución para __dirname en ESM (Vite usa ESM)
+import { fileURLToPath } from 'url';
 import { visualizer } from 'rollup-plugin-visualizer';
+
+const __filename = typeof __filename !== 'undefined' ? __filename : fileURLToPath(import.meta.url);
+const __dirname = typeof __dirname !== 'undefined' ? __dirname : path.dirname(__filename);
 
 export default defineConfig({
   resolve: {
@@ -99,7 +104,6 @@ export default defineConfig({
             '@fortawesome/free-solid-svg-icons',
             '@fortawesome/react-fontawesome'
           ],
-          // Puedes agregar más grupos aquí si lo deseas
         }
       }
     }
