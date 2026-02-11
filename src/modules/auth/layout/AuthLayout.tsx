@@ -1,10 +1,4 @@
-import { ReactNode } from 'react';
-
-interface AuthLayoutProps {
-  children: ReactNode;
-  title?: string;
-  icon?: ReactNode;
-}
+import { AuthLayoutProps } from '@/modules/auth/types';
 
 export const AuthLayout = ({ children, title = '', icon }: AuthLayoutProps) => {
   return (

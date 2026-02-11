@@ -2,7 +2,8 @@ import { AppDispatch } from '@/core/store';
 import { loginWithEmailPassword, logoutFirebase, registerUserWithEmailPassword, singInWithGoogle } from '@/firebase/providers';
 import { getRole, getProfileCompleted, updateProfileCompleted, checkOrCreateUser, getUserByUID } from '@/modules/auth/firebase/authQueries';
 import { ROLES } from '@/core/constants/roles';
-import { chekingCredentials, login, logout, setRole, setProfileCompleted } from './authSlice';
+import { CreateUserParams, LoginParams, GetRoleParams, UpdateProfileCompletedParams, GetProfileCompletedParams} from '@/modules/auth/types';
+import { chekingCredentials, login, logout, setProfileCompleted, setRole } from '@/modules/auth/store';
 
 export const checkingAuthentication = () => {
     return async (dispatch: AppDispatch) => {
@@ -68,12 +69,6 @@ export const startGoogleSignIn = () => {
     };
 };
 
-interface CreateUserParams {
-    displayName: string;
-    email: string;
-    password: string;
-}
-
 export const startCreatingUserWithEmailPassword = ({ displayName, email, password }: CreateUserParams) => {
     return async (dispatch: AppDispatch) => {
         dispatch(chekingCredentials());
@@ -129,11 +124,6 @@ export const startCreatingUserWithEmailPassword = ({ displayName, email, passwor
         }
     };
 };
-
-interface LoginParams {
-    email: string;
-    password: string;
-}
 
 export const startLoginWithEmailPassword = ({ email, password }: LoginParams) => {
     return async (dispatch: AppDispatch) => {
@@ -202,10 +192,6 @@ export const startLogOut = () => {
     };
 };
 
-interface GetRoleParams {
-    uid: string;
-}
-
 export const startGetRole = ({ uid }: GetRoleParams) => {
     return async (dispatch: AppDispatch) => {
         try {
@@ -221,10 +207,6 @@ export const startGetRole = ({ uid }: GetRoleParams) => {
     };
 };
 
-interface GetProfileCompletedParams {
-    uid: string;
-}
-
 export const startGetProfileCompleted = ({ uid }: GetProfileCompletedParams) => {
     return async (dispatch: AppDispatch) => {
         try {
@@ -239,11 +221,6 @@ export const startGetProfileCompleted = ({ uid }: GetProfileCompletedParams) => 
         }
     };
 };
-
-interface UpdateProfileCompletedParams {
-    uid: string;
-    profileCompleted?: boolean;
-}
 
 export const startUpdateProfileCompleted = ({ uid, profileCompleted = true }: UpdateProfileCompletedParams) => {
     return async (dispatch: AppDispatch) => {

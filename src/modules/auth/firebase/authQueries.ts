@@ -1,32 +1,26 @@
 import { doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore';
-import { 
-    createUserWithEmailAndPassword, 
-    updatePassword, 
-    signOut, 
-    deleteUser, 
-    signInWithEmailAndPassword, 
-    fetchSignInMethodsForEmail, 
-    EmailAuthProvider, 
-    sendPasswordResetEmail, 
-    linkWithCredential, 
-    GoogleAuthProvider, 
-    signInWithPopup,
-    User
-} from 'firebase/auth';
+import {  createUserWithEmailAndPassword,  updatePassword,  signOut,  deleteUser,  signInWithEmailAndPassword,  fetchSignInMethodsForEmail,  EmailAuthProvider,  sendPasswordResetEmail,  linkWithCredential,  GoogleAuthProvider,  signInWithPopup } from 'firebase/auth';
 import { FirebaseDB, FirebaseAuth, SecondaryFirebaseAuth } from '@/firebase/config';
 import { ROLES } from '@/core/constants/roles';
-
-interface CheckOrCreateUserParams {
-    uid: string;
-    displayName: string;
-    photoURL?: string;
-    email: string;
-    role?: string;
-}
-
-interface CheckOrCreateUserResult {
-    isNewUser: boolean;
-}
+import {
+  CheckOrCreateUserParams,
+  CheckOrCreateUserResult,
+  GetUserByUIDParams,
+  GetUserByUIDResult,
+  GetRoleParams,
+  GetRoleResult,
+  GetProfileCompletedParams,
+  GetProfileCompletedResult,
+  UpdateProfileCompletedParams,
+  UpdateProfileCompletedResult,
+  CreateAuthUserResult,
+  LinkEmailPasswordResult,
+  LinkGoogleAccountResult,
+  UpdateUserPasswordResult,
+  SignOutUserResult,
+  CleanupOrphanAuthUserResult,
+  SendPasswordResetEmailResult
+} from '@/modules/auth/types';
 
 export const checkOrCreateUser = async({ uid, displayName, photoURL, email, role = 'user' }: CheckOrCreateUserParams): Promise<CheckOrCreateUserResult> => {
     const userRef = doc(FirebaseDB, `users/${uid}`);
@@ -55,18 +49,6 @@ export const checkOrCreateUser = async({ uid, displayName, photoURL, email, role
     
     return { isNewUser: false };
 };
-
-interface GetUserByUIDParams {
-    uid: string;
-}
-
-interface GetUserByUIDResult {
-    ok: boolean;
-    exists?: boolean;
-    user?: any;
-    data?: any;
-    error?: string;
-}
 
 export const getUserByUID = async({ uid }: GetUserByUIDParams): Promise<GetUserByUIDResult> => {
     if (!uid) throw new Error('El UID del usuario no existe.');
@@ -108,16 +90,6 @@ export const getUserByUID = async({ uid }: GetUserByUIDParams): Promise<GetUserB
     }
 };
 
-interface GetRoleParams {
-    uid: string;
-}
-
-interface GetRoleResult {
-    ok: boolean;
-    role?: string;
-    error?: string;
-}
-
 export const getRole = async({ uid }: GetRoleParams): Promise<GetRoleResult> => {
     try {
         const userResult = await getUserByUID({ uid });
@@ -143,16 +115,6 @@ export const getRole = async({ uid }: GetRoleParams): Promise<GetRoleResult> => 
         };
     }
 };
-
-interface GetProfileCompletedParams {
-    uid: string;
-}
-
-interface GetProfileCompletedResult {
-    ok: boolean;
-    profileCompleted?: boolean;
-    error?: string;
-}
 
 export const getProfileCompleted = async({ uid }: GetProfileCompletedParams): Promise<GetProfileCompletedResult> => {
     try {
@@ -180,17 +142,6 @@ export const getProfileCompleted = async({ uid }: GetProfileCompletedParams): Pr
     }
 };
 
-interface UpdateProfileCompletedParams {
-    uid: string;
-    profileCompleted?: boolean;
-}
-
-interface UpdateProfileCompletedResult {
-    ok: boolean;
-    profileCompleted?: boolean;
-    error?: string;
-}
-
 export const updateProfileCompleted = async({ uid, profileCompleted = true }: UpdateProfileCompletedParams): Promise<UpdateProfileCompletedResult> => {
     try {
         const userRef = doc(FirebaseDB, `users/${uid}`);
@@ -211,18 +162,6 @@ export const updateProfileCompleted = async({ uid, profileCompleted = true }: Up
         };
     }
 };
-
-// === OPERACIONES DE AUTHENTICATION ===
-
-interface CreateAuthUserResult {
-    ok: boolean;
-    uid?: string;
-    user?: User;
-    errorCode?: string;
-    errorMessage?: string;
-    email?: string;
-    canCleanup?: boolean;
-}
 
 export const createAuthUser = async (email: string, password: string): Promise<CreateAuthUserResult> => {
     try {
@@ -263,15 +202,6 @@ export const createAuthUser = async (email: string, password: string): Promise<C
         };
     }
 };
-
-interface LinkEmailPasswordResult {
-    ok: boolean;
-    message?: string;
-    errorMessage?: string;
-    alreadyLinked?: boolean;
-    errorCode?: string;
-    requiresReauth?: boolean;
-}
 
 export const linkEmailPassword = async (email: string, password: string): Promise<LinkEmailPasswordResult> => {
     try {
@@ -336,15 +266,6 @@ export const linkEmailPassword = async (email: string, password: string): Promis
         };
     }
 };
-
-interface LinkGoogleAccountResult {
-    ok: boolean;
-    message?: string;
-    errorMessage?: string;
-    alreadyLinked?: boolean;
-    errorCode?: string;
-    requiresReauth?: boolean;
-}
 
 export const linkGoogleAccount = async (): Promise<LinkGoogleAccountResult> => {
     try {
@@ -420,13 +341,6 @@ export const linkGoogleAccount = async (): Promise<LinkGoogleAccountResult> => {
     }
 };
 
-interface UpdateUserPasswordResult {
-    ok: boolean;
-    errorCode?: string;
-    errorMessage?: string;
-    requiresReauth?: boolean;
-}
-
 export const updateUserPassword = async (newPassword: string): Promise<UpdateUserPasswordResult> => {
     try {
         const currentUser = FirebaseAuth.currentUser;
@@ -472,11 +386,6 @@ export const updateUserPassword = async (newPassword: string): Promise<UpdateUse
     }
 };
 
-interface SignOutUserResult {
-    ok: boolean;
-    errorMessage?: string;
-}
-
 export const signOutUser = async (): Promise<SignOutUserResult> => {
     try {
         await signOut(FirebaseAuth);
@@ -489,12 +398,6 @@ export const signOutUser = async (): Promise<SignOutUserResult> => {
         };
     }
 };
-
-interface CleanupOrphanAuthUserResult {
-    ok: boolean;
-    message?: string;
-    errorMessage?: string;
-}
 
 export const cleanupOrphanAuthUser = async (email: string, password: string): Promise<CleanupOrphanAuthUserResult> => {
     try {
@@ -544,12 +447,6 @@ export const checkEmailExists = async (email: string): Promise<boolean> => {
         return false;
     }
 };
-
-interface SendPasswordResetEmailResult {
-    ok: boolean;
-    message?: string;
-    errorMessage?: string;
-}
 
 export const sendPasswordResetEmailToUser = async (email: string): Promise<SendPasswordResetEmailResult> => {
     try {

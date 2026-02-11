@@ -1,18 +1,9 @@
-import { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { UserCard } from '@/core/components/common';
 import UserModal from '@/modules/user/components/UserModal';
-import { useUserActions } from '@/modules/user/hooks/useUserActions';
-import { updateFamilyMember, deleteFamilyMember } from '@/modules/family/firebase/familyQueries';
-import { showDeleteConfirmAlert, showSuccessAlert, showErrorAlert } from '@/core/helpers/sweetAlertHelper';
 import { useTranslation } from '@/core/context/LanguageContext';
-
-interface FamilyMemberCardProps {
-  member: any;
-  familyId?: string;
-  onMemberUpdate?: (updatedMember: any) => void;
-  onMemberDelete?: (memberId: string) => void;
-}
+import { FamilyMemberCardProps } from '../types';
+import { useFamilyMemberCard } from '../hooks/useFamilyMemberCard';
 
 export default function FamilyMemberCard({ 
   member, 
@@ -20,65 +11,14 @@ export default function FamilyMemberCard({
   onMemberUpdate,
   onMemberDelete 
 }: FamilyMemberCardProps) {
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const { updateUser } = useUserActions();
   const translate = useTranslation();
-
-  const handleEditClick = () => {
-    setIsEditModalOpen(true);
-  };
-
-  const handleSaveEdit = async (editedData: any) => {
-    // Separar relación de datos de usuario
-    const { relation, ...userData } = editedData;
-    
-    // Actualizar datos del usuario (muestra toast automáticamente vía hook)
-    const result = await updateUser(member.id, userData);
-    
-    if (result.ok) {
-      // Si la relación cambió, actualizar en familia también
-      if (relation && familyId && relation !== member.relation) {
-        await updateFamilyMember(familyId, member.id, { relation });
-      }
-      
-      // Actualizar estado local si hay callback
-      if (onMemberUpdate) {
-        onMemberUpdate({ ...member, ...editedData });
-      }
-      
-      setIsEditModalOpen(false);
-    }
-  };
-
-  const handleDeleteClick = async () => {
-    if (!familyId) return;
-    
-    const result = await showDeleteConfirmAlert(
-      translate.pages.family.deleteMember,
-      `¿Estás seguro de eliminar a ${member.name} de tu familia?`
-    );
-    
-    if (result.isConfirmed) {
-      const deleteResult = await deleteFamilyMember(familyId, member.id);
-      
-      if (deleteResult.ok) {
-        await showSuccessAlert(
-          translate.messages?.success?.deleted || 'Eliminado',
-          deleteResult.message || translate.messages?.success?.deletedFamilyMember
-        );
-        
-        // Notificar al padre para actualizar la lista
-        if (onMemberDelete) {
-          onMemberDelete(member.id);
-        }
-      } else {
-        await showErrorAlert(
-          translate.messages?.error?.generic,
-          deleteResult.errorMessage || translate.messages?.error?.deleteFamilyMemberFailed
-        );
-      }
-    }
-  };
+  const {
+    isEditModalOpen,
+    setIsEditModalOpen,
+    handleEditClick,
+    handleSaveEdit,
+    handleDeleteClick,
+  } = useFamilyMemberCard({ member, familyId, onMemberUpdate, onMemberDelete, translate });
 
   return (
     <>
@@ -116,7 +56,13 @@ export default function FamilyMemberCard({
         open={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
         mode="edit"
-        user={member}
+        user={{
+          ...member,
+          role: member.role as import('@/core/constants/roles').RoleType,
+          gender: (member.gender === 'male' || member.gender === 'female' || member.gender === 'other' || member.gender === 'neutral')
+            ? member.gender
+            : 'other',
+        }}
         onSave={handleSaveEdit}
       />
     </>

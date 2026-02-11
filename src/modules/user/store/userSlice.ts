@@ -1,56 +1,27 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { User, UserFilters, Pagination } from '@/types';
-
-interface UserState {
-  // Estados para lista de usuarios
-  users: User[];
-  isLoading: boolean;
-  error: string | null;
-  
-  // Estados para usuario individual
-  currentUser: User | null;
-  isUserLoading: boolean;
-  userError: string | null;
-  
-  // Estados para operaciones CRUD
-  isCreating: boolean;
-  isUpdating: boolean;
-  isDeleting: boolean;
-  
-  // Filtros y paginación
-  filters: UserFilters;
-  pagination: Pagination;
-}
-
-interface SetUsersPayload {
-  users: User[];
-  pagination: Partial<Pagination>;
-}
+import { User, UserFilters, UserState, SetUsersPayload } from '@/types';
 
 const initialState: UserState = {
   users: [],
   isLoading: false,
   error: null,
-  
   currentUser: null,
   isUserLoading: false,
   userError: null,
-  
   isCreating: false,
   isUpdating: false,
   isDeleting: false,
-  
   filters: {
     searchTerm: '',
     role: '',
-    status: 'all'
+    status: 'all',
   },
   pagination: {
     currentPage: 1,
     totalPages: 1,
     totalUsers: 0,
-    limit: 10
-  }
+    limit: 10,
+  },
 };
 
 export const userSlice = createSlice({

@@ -1,23 +1,13 @@
-import { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { UserCard } from '@/core/components/common';
 import Select from '@/core/components/form/Select';
 import Label from '@/core/components/form/Label';
-import { searchUsersToAddToFamily, addUserToFamily } from '@/modules/family/firebase/familyQueries';
 import { relationsES, relationsEN } from '@/i18n/relations';
 import { useLanguage } from '@/core/context/LanguageContext';
-import { showSuccessAlert, showErrorAlert } from '@/core/helpers/sweetAlertHelper';
 import { useTranslation } from '@/core/context/LanguageContext';
-import { ROLES } from '@/core/constants/roles';
-
-interface AddFamilyMemberModalProps {
-  open: boolean;
-  onClose: () => void;
-  familyId: string;
-  currentUserId: string;
-  onMemberAdded?: () => void;
-}
+import { AddFamilyMemberModalProps } from '../types';
+import { useAddFamilyMemberModal } from '../hooks/useAddFamilyMemberModal';
 
 export default function AddFamilyMemberModal({
   open,
@@ -29,64 +19,28 @@ export default function AddFamilyMemberModal({
   const { language } = useLanguage();
   const translate = useTranslation();
   const relations = language === "es" ? relationsES : relationsEN;
-
-  const [search, setSearch] = useState('');
-  const [availableUsers, setAvailableUsers] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [selectedUser, setSelectedUser] = useState<any | null>(null);
-  const [selectedRelation, setSelectedRelation] = useState('');
-
-  useEffect(() => {
-    if (open) {
-      loadAvailableUsers();
-    } else {
-      // Reset al cerrar
-      setSearch('');
-      setSelectedUser(null);
-      setSelectedRelation('');
-    }
-  }, [open, familyId]);
-
-  const loadAvailableUsers = async (searchTerm: string = '') => {
-    setLoading(true);
-    const result = await searchUsersToAddToFamily(familyId, searchTerm);
-    if (result.ok) {
-      setAvailableUsers(result.users);
-    }
-    setLoading(false);
-  };
-
-  const handleSearch = (value: string) => {
-    setSearch(value);
-    loadAvailableUsers(value);
-  };
-
-  const handleSelectUser = (user: any) => {
-    setSelectedUser(user);
-  };
-
-  const handleAddToFamily = async () => {
-    if (!selectedUser || !selectedRelation) {
-      await showErrorAlert(translate.messages?.error?.generic, translate.messages?.error?.required);
-      return;
-    }
-
-    const result = await addUserToFamily(familyId, selectedUser.id, {
-      relation: selectedRelation,
-      role: ROLES.USER,
-      addedBy: currentUserId
-    });
-
-    if (result.ok) {
-      await showSuccessAlert(translate.messages?.success?.added, `${selectedUser.name} ${translate.messages?.success?.addedToFamily}`);
-      if (onMemberAdded) {
-        onMemberAdded();
-      }
+  const {
+    search,
+    setSearch,
+    availableUsers,
+    loading,
+    selectedUser,
+    setSelectedUser,
+    selectedRelation,
+    setSelectedRelation,
+    handleSearch,
+    handleAddToFamily
+  } = useAddFamilyMemberModal({
+    open,
+    familyId,
+    currentUserId,
+    onMemberAdded: () => {
+      if (onMemberAdded) onMemberAdded();
       onClose();
-    } else {
-      await showErrorAlert(translate.messages?.error?.generic, result.errorMessage || translate.messages?.error?.addUserFailed);
-    }
-  };
+    },
+    translate,
+    relations
+  });
 
   if (!open) return null;
 
@@ -152,7 +106,7 @@ export default function AddFamilyMemberModal({
                         ? 'ring-2 ring-primary shadow-lg'
                         : 'hover:shadow-md'
                     }`}
-                    onClick={() => handleSelectUser(user)}
+                    onClick={() => setSelectedUser(user)}
                   >
                     <UserCard 
                       user={user}
@@ -177,9 +131,10 @@ export default function AddFamilyMemberModal({
               <Label htmlFor="relation">{translate.form?.relation}</Label>
               <Select
                 id="relation"
+                name="relation"
                 value={selectedRelation}
                 onChange={setSelectedRelation}
-                options={Object.entries(relations).map(([key, value]) => ({ value: key, label: String(value) }))}
+                options={relations.map(r => ({ value: r.code, label: r.name }))}
                 placeholder={translate.form?.relationPlaceholder}
               />
             </div>
@@ -195,7 +150,10 @@ export default function AddFamilyMemberModal({
             {translate.common.cancel}
           </button>
           <button
-            onClick={handleAddToFamily}
+            onClick={async () => {
+              const ok = await handleAddToFamily();
+              if (ok) onClose();
+            }}
             disabled={!selectedUser || !selectedRelation}
             className="px-6 py-2 rounded-lg bg-primary text-text-on-primary hover:bg-primary-hover disabled:opacity-50 disabled:cursor-not-allowed"
           >

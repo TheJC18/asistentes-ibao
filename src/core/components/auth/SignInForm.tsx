@@ -1,43 +1,20 @@
-import { useMemo, useState, FormEvent } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { FaEye, FaEyeSlash, FaInfoCircle, FaGoogle, FaSignInAlt } from 'react-icons/fa';
-import { Spinner } from 'flowbite-react';
-import { useForm } from '@/core/hooks/useForm';
-import { useTranslation } from '@/core/context/LanguageContext';
-import Label from '@/core/components/form/Label';
-import Input from '@/core/components/form/input/InputField';
-import Button from '@/core/components/ui/button/Button';
-import { startGoogleSignIn, startLoginWithEmailPassword } from '@/modules/auth/store';
-import { RootState, AppDispatch } from '@/core/store';
 
-interface SignInFormData {
-  email: string;
-  password: string;
-}
-
-// Mueve formData fuera del componente para evitar bucles infinitos
-const formData: SignInFormData = { email: '', password: '' };
+import { useSignInForm } from '@/modules/auth/hooks/useSignInForm';
 
 export default function SignInForm() {
-  const dispatch = useDispatch<AppDispatch>();
-  const { status, errorMessage } = useSelector((state: RootState) => state.auth);
   const translate = useTranslation();
-
-  // Usa el formData definido fuera del componente
-  const { values, handleChange } = useForm(formData);
-  const { email, password } = values;
-  const isCheckingAuthentication = useMemo(() => status === 'checking', [status]);
-  const [showPassword, setShowPassword] = useState(false);
-
-  const onSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    dispatch(startLoginWithEmailPassword({ email, password }));
-  };
-
-  const onGoogleSignIn = () => {
-    dispatch(startGoogleSignIn());
-  };
+  const {
+    values,
+    handleChange,
+    email,
+    password,
+    isCheckingAuthentication,
+    showPassword,
+    setShowPassword,
+    onSubmit,
+    onGoogleSignIn,
+    errorMessage,
+  } = useSignInForm();
 
   return (
     <div className="flex flex-col flex-1 relative">

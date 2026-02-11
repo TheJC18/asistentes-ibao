@@ -1,53 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-
-interface AuthState {
-    status: 'checking' | 'not-authenticated' | 'authenticated';
-    uid: string | null;
-    email: string | null;
-    name: string | null;
-    birthdate: string | null;
-    displayName: string | null;
-    avatar: string | null;
-    photoURL: string | null;
-    phone: string | null;
-    gender: string | null;
-    relation: string | null;
-    errorMessage: string | null;
-    role: string | null;
-    profileCompleted: boolean | null;
-    nationality: string | null;
-    isMember: boolean;
-    hasWebAccess: boolean | null;
-}
-
-interface LoginPayload {
-    uid: string;
-    email: string;
-    name?: string;
-    birthdate?: string;
-    displayName: string;
-    avatar?: string;
-    photoURL?: string;
-    phone?: string;
-    gender?: string;
-    relation?: string;
-    profileCompleted?: boolean;
-    nationality?: string;
-    isMember?: boolean;
-    hasWebAccess?: boolean;
-}
-
-interface LogoutPayload {
-    errorMessage?: string;
-}
-
-interface SetRolePayload {
-    role: string;
-}
-
-interface SetProfileCompletedPayload {
-    profileCompleted: boolean;
-}
+import { AuthState, LoginPayload, LogoutPayload, SetRolePayload, SetProfileCompletedPayload } from '@/modules/auth/types';
 
 const initialState: AuthState = {
     status: 'checking',

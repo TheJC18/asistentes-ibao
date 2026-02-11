@@ -1,29 +1,9 @@
 import { FirebaseDB } from '@/firebase/config';
-import {
-  collection,
-  addDoc,
-  getDocs,
-  getDoc,
-  updateDoc,
-  deleteDoc,
-  doc,
-  Timestamp
-} from 'firebase/firestore';
-
-export interface EventData {
-  id: string;
-  title: string;
-  description?: string;
-  date: string; // ISO string
-  type?: string;
-  color?: string;
-  createdBy: string;
-}
-
-const EVENTS_COLLECTION = 'events';
+import { EventData } from '@/modules/events/types';
+import { collection, addDoc, getDocs, getDoc, updateDoc, deleteDoc, doc, Timestamp } from 'firebase/firestore';
 
 export async function createEvent(event: EventData) {
-  const docRef = await addDoc(collection(FirebaseDB, EVENTS_COLLECTION), {
+  const docRef = await addDoc(collection(FirebaseDB, 'events'), {
     ...event,
     date: Timestamp.fromDate(new Date(event.date)),
     createdAt: Timestamp.now(),
@@ -32,7 +12,7 @@ export async function createEvent(event: EventData) {
 }
 
 export async function getEvents() {
-  const querySnapshot = await getDocs(collection(FirebaseDB, EVENTS_COLLECTION));
+  const querySnapshot = await getDocs(collection(FirebaseDB, 'events'));
   return querySnapshot.docs.map(doc => ({
     id: doc.id,
     ...doc.data(),
@@ -41,7 +21,7 @@ export async function getEvents() {
 }
 
 export async function getEventById(id: string) {
-  const docRef = doc(FirebaseDB, EVENTS_COLLECTION, id);
+  const docRef = doc(FirebaseDB, 'events', id);
   const docSnap = await getDoc(docRef);
   if (!docSnap.exists()) return null;
   const data = docSnap.data();
@@ -53,7 +33,7 @@ export async function getEventById(id: string) {
 }
 
 export async function updateEvent(id: string, event: Partial<EventData>) {
-  const docRef = doc(FirebaseDB, EVENTS_COLLECTION, id);
+  const docRef = doc(FirebaseDB, 'events', id);
   await updateDoc(docRef, {
     ...event,
     ...(event.date ? { date: Timestamp.fromDate(new Date(event.date)) } : {}),
@@ -62,6 +42,6 @@ export async function updateEvent(id: string, event: Partial<EventData>) {
 }
 
 export async function deleteEvent(id: string) {
-  const docRef = doc(FirebaseDB, EVENTS_COLLECTION, id);
+  const docRef = doc(FirebaseDB, 'events', id);
   await deleteDoc(docRef);
 }

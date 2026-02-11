@@ -1,5 +1,5 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
-import { EventListPage } from '../pages';
+import EventListPage from '../pages/EventListPage';
 
 export const EventRoutes = () => {
   return (

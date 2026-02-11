@@ -1,73 +1,8 @@
-import { 
-    collection, 
-    doc, 
-    getDoc,
-    getDocs, 
-    setDoc,
-    deleteDoc,
-    updateDoc,
-    arrayUnion,
-    arrayRemove,
-    serverTimestamp
-} from 'firebase/firestore';
+import { collection,  doc,  getDoc, getDocs,  setDoc, deleteDoc, updateDoc, arrayUnion, arrayRemove, serverTimestamp } from 'firebase/firestore';
 import { FirebaseDB } from '@/firebase/config';
-import { User, Family, FamilyMember } from '@/types';
+import { CreateFamilyData, CreateFamilyResult, MemberData, AddUserToFamilyResult, RemoveUserFromFamilyResult, GetFamilyMembersResult, GetUserFamiliesResult, UpdateUserIdResult, GetUserByIdResult } from '@/modules/family/types';
+import type { User } from '@/types';
 import { ROLES } from '@/core/constants/roles';
-
-// === INTERFACES ===
-
-export interface CreateFamilyData {
-    name?: string;
-}
-
-export interface CreateFamilyResult {
-    ok: boolean;
-    familyId?: string;
-    family?: any;
-    errorMessage?: string;
-}
-
-export interface MemberData {
-    relation?: string;
-    role?: string;
-    addedBy?: string;
-    [key: string]: any;
-}
-
-export interface AddUserToFamilyResult {
-    ok: boolean;
-    message?: string;
-    errorMessage?: string;
-}
-
-export interface RemoveUserFromFamilyResult {
-    ok: boolean;
-    message?: string;
-    errorMessage?: string;
-}
-
-export interface GetFamilyMembersResult {
-    ok: boolean;
-    members: any[];
-    errorMessage?: string;
-}
-
-export interface GetUserFamiliesResult {
-    ok: boolean;
-    families: any[];
-    errorMessage?: string;
-}
-
-export interface UpdateUserIdResult {
-    ok: boolean;
-    errorMessage?: string;
-}
-
-export interface GetUserByIdResult {
-    ok: boolean;
-    user?: any;
-    errorMessage?: string;
-}
 
 /**
  * Crear una nueva familia
@@ -78,6 +13,7 @@ export const createFamily = async (familyData: CreateFamilyData, creatorUserId: 
         const familyId = familyRef.id;
         
         const newFamily = {
+            id: familyId,
             name: familyData.name || 'Mi Familia',
             createdBy: creatorUserId,
             createdAt: serverTimestamp(),
@@ -110,18 +46,14 @@ export const createFamily = async (familyData: CreateFamilyData, creatorUserId: 
 /**
  * Agregar un usuario existente a una familia
  */
-export const addUserToFamily = async (
-    familyId: string, 
-    userId: string, 
-    memberData: MemberData = {}
-): Promise<AddUserToFamilyResult> => {
+export const addUserToFamily = async ( familyId: string, userId: string, memberData: MemberData = {} ): Promise<AddUserToFamilyResult> => {
     try {
         // 1. Crear documento en families/{familyId}/members/{userId}
         const memberRef = doc(FirebaseDB, `families/${familyId}/members`, userId);
         
         const memberInfo = {
             relation: memberData.relation || '',
-            role: memberData.role || 'member',
+            role: memberData.role || ROLES.USER,
             addedBy: memberData.addedBy || userId,
             joinedAt: serverTimestamp(),
             ...memberData
@@ -152,11 +84,7 @@ export const addUserToFamily = async (
 /**
  * Actualizar datos de un miembro de la familia (incluyendo relación)
  */
-export const updateFamilyMember = async (
-    familyId: string,
-    userId: string,
-    memberData: Partial<MemberData>
-): Promise<AddUserToFamilyResult> => {
+export const updateFamilyMember = async ( familyId: string, userId: string, memberData: Partial<MemberData> ): Promise<AddUserToFamilyResult> => {
     try {
         const memberRef = doc(FirebaseDB, `families/${familyId}/members`, userId);
         
@@ -165,7 +93,10 @@ export const updateFamilyMember = async (
             updatedAt: serverTimestamp()
         };
         
-        await updateDoc(memberRef, updateData);
+                if (updateData.role && typeof updateData.role === 'string' && updateData.role !== ROLES.ADMIN && updateData.role !== ROLES.USER) {
+                    updateData.role = ROLES.USER;
+                }
+                await updateDoc(memberRef, updateData);
         
         return {
             ok: true,
@@ -300,11 +231,7 @@ export const getUserFamilies = async (userId: string): Promise<GetUserFamiliesRe
 /**
  * Actualizar el userId en todas las familias cuando se migra de Firestore UID a Auth UID
  */
-export const updateUserIdInFamilies = async (
-    oldUserId: string, 
-    newUserId: string, 
-    familyIds: string[]
-): Promise<UpdateUserIdResult> => {
+export const updateUserIdInFamilies = async ( oldUserId: string,  newUserId: string,  familyIds: string[] ): Promise<UpdateUserIdResult> => {
     try {
         const updatePromises = familyIds.map(async (familyId) => {
             // 1. Obtener datos del miembro con el oldUserId
@@ -460,10 +387,31 @@ export const searchUsersToAddToFamily = async (familyId: string, searchTerm: str
         // 3. Filtrar usuarios que no están en la familia
         let availableUsers: User[] = usersSnapshot.docs
             .filter(doc => !currentMemberIds.includes(doc.id))
-            .map(doc => ({
-                id: doc.id,
-                ...(doc.data() as Omit<User, 'id'>)
-            }));
+            .map(doc => {
+                const data = doc.data() as Partial<User>;
+                return {
+                    id: doc.id,
+                    name: data.name ?? '',
+                    role: data.role ?? ROLES.USER,
+                    email: data.email ?? '',
+                    avatar: data.avatar ?? '/user_default.png',
+                    photoURL: data.photoURL ?? '/user_default.png',
+                    displayName: data.displayName ?? '',
+                    gender: data.gender ?? '',
+                    birthdate: data.birthdate ?? '',
+                    nationality: data.nationality ?? '',
+                    phone: data.phone ?? '',
+                    isMember: data.isMember ?? false,
+                    hasWebAccess: data.hasWebAccess ?? false,
+                    profileCompleted: data.profileCompleted ?? false,
+                    status: data.status ?? 'active',
+                    families: data.families ?? [],
+                    relation: data.relation ?? '',
+                    createdAt: data.createdAt ?? '',
+                    updatedAt: data.updatedAt ?? '',
+                    ...data
+                } as User;
+            });
         // 4. Aplicar búsqueda si hay término
         if (searchTerm.trim()) {
             const term = searchTerm.toLowerCase();

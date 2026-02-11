@@ -4,185 +4,37 @@ import Select from "@/core/components/form/Select";
 import DatePicker from "@/core/components/form/date-picker";
 import Label from "@/core/components/form/Label";
 import Input from "@/core/components/form/input/InputField";
-import { countriesES, countriesEN } from "@/i18n/countries";
-import { gendersES, gendersEN } from "@/i18n/genders";
-import { relationsES, relationsEN } from "@/i18n/relations";
-import { useLanguage, useTranslation } from "@/core/context/LanguageContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { FileInput } from "flowbite-react";
-import { 
-  createFileUploadHandler, 
-  createFieldUpdater, 
-  createBirthdateUpdater, 
-  createAvatarRestorer 
-} from "@/modules/user/helpers/userFormHelpers";
-import { validateUserForm, prepareUserDataForSave } from "@/modules/user/helpers/userValidations";
-import { formatDate, convertISOToDate } from "@/core/helpers/dateUtils";
-import { linkGoogleAccount } from "@/modules/auth/firebase/authQueries";
-import { showSuccessAlert, showErrorAlert, showLoadingAlert, closeAlert } from "@/core/helpers/sweetAlertHelper";
-import { User } from "@/types";
+import { convertISOToDate } from "@/core/helpers/dateUtils";
+import { UserModalProps } from'@/modules/user/types';
+import { useUserModalLogic } from '../hooks/useUserModalLogic';
 
-interface UserModalProps {
-  open: boolean;
-  onClose: () => void;
-  mode?: 'view' | 'edit' | 'create' | 'family';
-  user?: Partial<User>;
-  onSave?: (data: any) => void;
-  onPasswordReset?: (email: string) => Promise<void>;
-}
+const UserModal: React.FC<UserModalProps> = ({
+  open,
+  onClose,
+  mode = "view",
+  user = {},
+  onSave,
+}) => {
+  const logic = useUserModalLogic({ open, onClose, mode, user, onSave });
+  const { translate, countries, genders, relations, isView, isEdit, isCreate, isFamily, formData, hasWebAccess, setHasWebAccess, password, setPassword, confirmPassword, setConfirmPassword, errors, setErrors, fileInputValue, originalHasWebAccess, onFileChange, onChange, onBirthdateChange, onRestoreAvatar, handleSubmit,
+  } = logic;
 
-interface UserFormData {
-  name: string;
-  email: string;
-  role: string;
-  nationality: string;
-  birthdate: string | null;
-  avatar: string;
-  isMember: boolean;
-  gender: string;
-  relation: string;
-  phone: string;
-}
+  const titleIcon = isView
+    ? ["fas", "eye"]
+    : isEdit
+    ? ["fas", "edit"]
+    : isFamily
+    ? ["fas", "user-friends"]
+    : ["fas", "user-plus"];
 
-
-export default function UserModal({ 
-  open, 
-  onClose, 
-  mode = "view", 
-  user = {}, 
-  onSave 
-}: UserModalProps) {
-  const { language } = useLanguage();
-  const translate = useTranslation();
-
-  const countries = language === "es" ? countriesES : countriesEN;
-  const genders = language === "es" ? gendersES : gendersEN;
-  const relations = language === "es" ? relationsES : relationsEN;
-
-  const isView = mode === "view";
-  const isEdit = mode === "edit";
-  const isCreate = mode === "create";
-  const isFamily = mode === "family";
-
-  const [formData, setFormData] = useState<UserFormData>({
-    name: "",
-    email: "",
-    role: "",
-    nationality: "",
-    birthdate: "",
-    avatar: "/user_default.png",
-    isMember: false,
-    gender: "",
-    relation: "",
-    phone: "",
-  });
-
-  const [hasWebAccess, setHasWebAccess] = useState(false);
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [errors, setErrors] = useState<string[]>([]);
-
-  const [originalAvatar, setOriginalAvatar] = useState("/user_default.png");
-  const [fileInputValue, setFileInputValue] = useState("");
-  const [originalHasWebAccess, setOriginalHasWebAccess] = useState(false);
-
-  useEffect(() => {
-    if (open) {
-      // En modo create, siempre empezar con hasWebAccess = false
-      const userHadWebAccess = isCreate ? false : (user.hasWebAccess || false);
-      const birthdateValue = user.birthdate ? (typeof user.birthdate === 'string' ? user.birthdate : user.birthdate.toISOString()) : null;
-      
-      setFormData({
-        name: user.name || "",
-        email: user.email || "",
-        role: user.role || "",
-        isMember: user.isMember || false,
-        nationality: user.nationality || "",
-        birthdate: birthdateValue,
-        avatar: user.avatar || user.photoURL || "/user_default.png",
-        gender: user.gender || "",
-        relation: (user as any).relation || "",
-        phone: user.phone || "",
-      });
-      <div>
-        <Label htmlFor="user-phone">Teléfono</Label>
-        <Input
-          id="user-phone"
-          type="tel"
-          value={formData.phone || ""}
-          disabled={isView}
-          onChange={(e: ChangeEvent<HTMLInputElement>) => onChange("phone", e.target.value)}
-          autoComplete="on"
-          placeholder="Ingresa el teléfono"
-        />
-      </div>
-      setOriginalAvatar(user.avatar || user.photoURL || "/user_default.png");
-      setFileInputValue("");
-      setPassword("");
-      setConfirmPassword("");
-      setErrors([]);
-      setHasWebAccess(userHadWebAccess);
-      setOriginalHasWebAccess(userHadWebAccess);
-    }
-  }, [open, user.id, isCreate]);
-
-  // Bloquear scroll del body cuando el modal está abierto
-  useEffect(() => {
-    if (open) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [open]);
-
-  // Usar helpers
-  const onFileChange = createFileUploadHandler(setFormData, setFileInputValue);
-  const onChange = createFieldUpdater(setFormData);
-  const onBirthdateChange = createBirthdateUpdater(onChange);
-  const onRestoreAvatar = createAvatarRestorer(setFormData, originalAvatar);
-
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    
-    // Validar usando helper
-    const validationErrors = validateUserForm({
-      formData,
-      password,
-      confirmPassword,
-      mode,
-      hasWebAccess
-    });
-
-    // Si hay errores, mostrarlos y detener
-    if (validationErrors.length > 0) {
-      setErrors(validationErrors);
-      return;
-    }
-
-    // Limpiar errores
-    setErrors([]);
-    
-    // Preparar datos usando helper
-    const dataToSave = prepareUserDataForSave({
-      formData,
-      password,
-      mode,
-      hasWebAccess
-    });
-    
-    if (onSave) onSave(dataToSave);
-  };
-
-  const titleIcon = isView ? ["fas", "eye"] : isEdit ? ["fas", "edit"] : isFamily ? ["fas", "user-friends"] : ["fas", "user-plus"];
   const titleText = isView
-    ? translate.pages?.users?.viewUser || translate.common.viewDetails 
+    ? translate.pages?.users?.viewUser || translate.common.viewDetails
     : isEdit
     ? translate.pages?.users?.editUser || translate.common.editUser
     : isFamily
-    ? translate.pages?.family?.addFamiliar 
+    ? translate.pages?.family?.addFamiliar
     : translate.pages?.users?.addUser || translate.common.create;
 
   const modalContent = (
@@ -296,8 +148,7 @@ export default function UserModal({
                   options={relations.map(r => ({ value: r.code, label: r.name }))}
                   placeholder={translate.form?.relationPlaceholder ?? ""}
                   onChange={(value: string) => onChange("relation", value)}
-                  defaultValue={formData.relation || ""}
-                />
+                  defaultValue={formData.relation || ""} value={undefined} name={undefined} id={undefined}/>
               )}
             </div>
           )}
@@ -316,8 +167,7 @@ export default function UserModal({
                 options={genders.map(g => ({ value: g.code, label: g.name }))}
                 placeholder={translate.form?.genderPlaceholder ?? ""}
                 onChange={(value: string) => onChange("gender", value)}
-                defaultValue={formData.gender || ""}
-              />
+                defaultValue={formData.gender || ""} value={undefined} name={undefined} id={undefined}/>
             )}
           </div>
 
@@ -370,8 +220,7 @@ export default function UserModal({
                   .map(country => ({ value: country.code, label: country.name }))}
                 placeholder={translate.form?.nationalityPlaceholder ?? ""}
                 onChange={(value: string) => onChange("nationality", value)}
-                defaultValue={formData.nationality || ""}
-              />
+                defaultValue={formData.nationality || ""} value={undefined} name={undefined} id={undefined}/>
             )}
           </div>
           </div>
@@ -610,4 +459,6 @@ export default function UserModal({
 
   const modalRoot = document.getElementById('modal-root');
   return ReactDOM.createPortal(modalContent, modalRoot);
-}
+};
+
+export default UserModal;

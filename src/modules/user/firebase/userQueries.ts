@@ -1,132 +1,10 @@
-import { 
-  collection, 
-  doc, 
-  getDocs, 
-  getDoc, 
-  updateDoc, 
-  deleteDoc, 
-  query, 
-  where, 
-  orderBy, 
-  limit, 
-  getCountFromServer,
-  setDoc 
-} from 'firebase/firestore';
+import { collection, doc, getDocs, getDoc, updateDoc, deleteDoc, query, where, orderBy, limit, getCountFromServer,setDoc } from 'firebase/firestore';
 import { FirebaseDB, FirebaseAuth } from '@/firebase/config';
-import { 
-    createAuthUser, 
-    updateUserPassword, 
-    checkEmailExists, 
-    linkEmailPassword 
-} from '@/modules/auth/firebase/authQueries';
-import { 
-    convertDateFieldsToISO, 
-    dateToISOString 
-} from '@/core/helpers';
-import { addUserToFamily, updateUserIdInFamilies, removeUserFromFamily, getFamilyMembers, getUserById } from '@/modules/family/firebase/familyQueries';
-import { User, UserFilters } from '@/types';
-
-// === INTERFACES ===
-
-export interface GetUsersParams {
-  searchTerm?: string;
-  role?: string;
-  status?: string;
-  page?: number;
-  limit?: number;
-}
-
-export interface GetUsersResult {
-  ok: boolean;
-  users?: User[];
-  currentPage?: number;
-  totalPages?: number;
-  totalUsers?: number;
-  limit?: number;
-  errorMessage?: string;
-}
-
-export interface GetUserByIdResult {
-  ok: boolean;
-  user?: User;
-  errorMessage?: string;
-}
-
-export interface CreateUserData {
-  email?: string;
-  password?: string;
-  name?: string;
-  displayName?: string;
-  birthdate?: string | null;
-  gender?: string;
-  nationality?: string;
-  isMember?: boolean;
-  status?: string;
-  role?: string;
-  avatar?: string;
-  photoURL?: string;
-  hasWebAccess?: boolean;
-  familyId?: string;
-  relation?: string;
-  createdBy?: string;
-  [key: string]: any;
-}
-
-export interface CreateUserResult {
-  ok: boolean;
-  user?: User;
-  message?: string;
-  errorMessage?: string;
-  email?: string;
-  canCleanup?: boolean;
-}
-
-export interface UpdateUserData {
-  email?: string;
-  password?: string;
-  name?: string;
-  displayName?: string;
-  birthdate?: string | null;
-  gender?: string;
-  nationality?: string;
-  isMember?: boolean;
-  status?: string;
-  role?: string;
-  avatar?: string;
-  photoURL?: string;
-  hasWebAccess?: boolean;
-  [key: string]: any;
-}
-
-export interface UpdateUserResult {
-  ok: boolean;
-  user?: User;
-  migrated?: boolean;
-  oldId?: string;
-  newId?: string;
-  errorCode?: string;
-  errorMessage?: string;
-  requiresReauth?: boolean;
-}
-
-export interface DeleteUserResult {
-  ok: boolean;
-  warning?: string | null;
-  familiesCleanedUp?: number;
-  errorMessage?: string;
-}
-
-export interface FindUserByEmailResult {
-  ok: boolean;
-  user?: any;
-  errorMessage?: string;
-}
-
-export interface GetUsersByRoleResult {
-  ok: boolean;
-  users?: User[];
-  errorMessage?: string;
-}
+import { createAuthUser, updateUserPassword, checkEmailExists, linkEmailPassword } from '@/modules/auth/firebase/authQueries';
+import { convertDateFieldsToISO, dateToISOString } from '@/core/helpers';
+import { addUserToFamily, updateUserIdInFamilies, removeUserFromFamily } from '@/modules/family/firebase/familyQueries';
+import { User } from '@/types';
+import { UserBirthday, GetUsersParams, GetUsersResult, GetUserByIdResult, CreateUserData, CreateUserResult, UpdateUserData, UpdateUserResult, DeleteUserResult, FindUserByEmailResult, GetUsersByRoleResult } from'@/modules/user/types';
 
 // === OBTENER LISTA DE USUARIOS ===
 export const getUsersFromFirebase = async (params: GetUsersParams = {}): Promise<GetUsersResult> => {
@@ -297,7 +175,13 @@ export const createUserInFirebase = async (userData: CreateUserData): Promise<Cr
             const authResult = await createAuthUser(userData.email, userData.password);
             
             if (!authResult.ok) {
-                return authResult; // Retornar error con canCleanup si aplica
+                // Solo propagamos los campos compatibles
+                return {
+                    ok: false,
+                    errorMessage: authResult.errorMessage,
+                    // email eliminado, solo campos compatibles
+                    canCleanup: authResult.canCleanup
+                };
             }
             
             const { uid } = authResult;
@@ -347,7 +231,7 @@ export const createUserInFirebase = async (userData: CreateUserData): Promise<Cr
             // 5. Retornar usuario creado
             const createdUser: User = {
                 id: uid!,
-                ...convertDateFieldsToISO(newUserData, ['createdAt', 'updatedAt', 'birthdate']) as any,
+                ...convertDateFieldsToISO(newUserData) as any,
                 uid: uid!,
                 email: userData.email,
                 name: userData.name || '',
@@ -419,7 +303,7 @@ export const createUserInFirebase = async (userData: CreateUserData): Promise<Cr
             // Retornar usuario creado
             const createdUser: User = {
                 id: uid,
-                ...convertDateFieldsToISO(newUserData, ['createdAt', 'updatedAt', 'birthdate']) as any,
+                ...convertDateFieldsToISO(newUserData) as any,
                 uid,
                 email: userData.email || '',
                 name: userData.name || '',
@@ -489,7 +373,11 @@ export const updateUserInFirebase = async (userId: string, userData: UpdateUserD
             const authResult = await createAuthUser(email, password);
             
             if (!authResult.ok) {
-                return authResult;
+                // Solo propagamos los campos compatibles
+                return {
+                    ok: false,
+                    errorMessage: authResult.errorMessage
+                };
             }
             
             const newAuthUid = authResult.uid!;
@@ -523,7 +411,7 @@ export const updateUserInFirebase = async (userId: string, userData: UpdateUserD
             const migratedUserData = migratedSnapshot.data();
             const migratedUser: User = {
                 id: migratedSnapshot.id,
-                ...convertDateFieldsToISO(migratedUserData, ['createdAt', 'updatedAt', 'birthdate']) as any,
+                ...convertDateFieldsToISO(migratedUserData) as any,
                 uid: migratedSnapshot.id,
                 email: migratedUserData?.email || '',
                 name: migratedUserData?.name || '',
@@ -613,7 +501,7 @@ export const updateUserInFirebase = async (userId: string, userData: UpdateUserD
             const updatedUserData = updatedSnapshot.data();
             const updatedUser: User = {
                 id: updatedSnapshot.id,
-                ...convertDateFieldsToISO(updatedUserData, ['createdAt', 'updatedAt', 'birthdate']) as any,
+                ...convertDateFieldsToISO(updatedUserData) as any,
                 uid: updatedUserData.uid || updatedSnapshot.id,
                 email: updatedUserData.email || '',
                 name: updatedUserData.name || '',
@@ -712,7 +600,6 @@ export const deleteUserFromFirebase = async (userId: string): Promise<DeleteUser
 };
 
 // === FUNCIONES AUXILIARES ===
-
 // Buscar usuarios por email (útil para validaciones)
 export const findUserByEmail = async (email: string): Promise<FindUserByEmailResult> => {
     try {
@@ -756,7 +643,7 @@ export const getUsersByRole = async (role: string): Promise<GetUsersByRoleResult
             const data = doc.data();
             return {
                 id: doc.id,
-                ...convertDateFieldsToISO(data, ['createdAt', 'updatedAt', 'birthdate']) as any,
+                ...convertDateFieldsToISO(data) as any,
                 uid: data.uid || doc.id,
                 email: data.email || '',
                 name: data.name || '',
@@ -788,13 +675,6 @@ export const getUsersByRole = async (role: string): Promise<GetUsersByRoleResult
         };
     }
 };
-
-// === OBTENER CUMPLEAÑOS DE TODOS LOS USUARIOS ===
-export interface UserBirthday {
-    uid: string;
-    name: string;
-    birthdate: string;
-}
 
 export const getAllUsersBirthdays = async (): Promise<UserBirthday[]> => {
     try {

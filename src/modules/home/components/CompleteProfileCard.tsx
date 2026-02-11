@@ -1,99 +1,25 @@
-import { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useTranslation } from '@/core/context/LanguageContext';
-import { startUpdateProfileCompleted } from '@/modules/auth/store';
 import UserModal from '@/modules/user/components/UserModal';
-import { updateUserInFirebase } from '@/modules/user/firebase/userQueries';
-import { sendPasswordResetEmailToUser } from '@/modules/auth/firebase/authQueries';
-import { showSuccessAlert, showErrorAlert, showLoadingAlert, closeAlert } from '@/core/helpers/sweetAlertHelper';
-import { RootState, AppDispatch } from '@/core/store';
+import { useCompleteProfile } from '../hooks/useCompleteProfile';
 
 export default function CompleteProfileCard() {
-  const dispatch = useDispatch<AppDispatch>();
-  const { uid, displayName, email, photoURL, profileCompleted } = useSelector((state: RootState) => state.auth);
-  const translate = useTranslation();
-  const [showModal, setShowModal] = useState(false);
+  const {
+    shouldShow,
+    showModal,
+    setShowModal,
+    handleCompleteProfile,
+    handleSaveProfile,
+    handlePasswordReset,
+    currentUser,
+    translate,
+  } = useCompleteProfile();
 
-  // Si el perfil ya está completado o aún no se ha verificado (null), no mostrar nada
-  if (profileCompleted !== false) {
+  // displayName debe venir de currentUser
+  const displayName = currentUser?.displayName || '';
+
+  if (!shouldShow) {
     return null;
   }
-
-  const handleCompleteProfile = () => {
-    setShowModal(true);
-  };
-
-  const handleSaveProfile = async (userData: any) => {
-    try {
-      // Mostrar loading
-      showLoadingAlert(translate.pages.home.savingProfile, translate.pages.home.pleaseWait);
-
-      // Guardar los datos del usuario en Firestore
-      const result = await updateUserInFirebase(uid || '', userData);
-      
-      if (result.ok) {
-        // Marcar el perfil como completado
-        await dispatch(startUpdateProfileCompleted({ uid: uid || '', profileCompleted: true }));
-        
-        // Cerrar loading y mostrar éxito
-        closeAlert();
-        await showSuccessAlert(
-          translate.pages.home.profileCompleted,
-          translate.pages.home.profileCompletedMessage
-        );
-        
-        // Cerrar el modal
-        setShowModal(false);
-      } else {
-        closeAlert();
-        showErrorAlert(
-          translate.pages.home.errorSaving,
-          result.errorMessage || translate.pages.home.errorSavingMessage
-        );
-      }
-    } catch (error) {
-      closeAlert();
-      console.error('Error al guardar el perfil:', error);
-      showErrorAlert(
-        translate.pages.home.unexpectedError,
-        translate.pages.home.unexpectedErrorMessage
-      );
-    }
-  };
-  
-  const handlePasswordReset = async (email: string) => {
-    try {
-      const result = await sendPasswordResetEmailToUser(email);
-      
-      if (result.ok) {
-        await showSuccessAlert(
-          'Email enviado',
-          `Se ha enviado un email de restablecimiento a ${email}`
-        );
-      } else {
-        showErrorAlert(
-          'Error',
-          result.errorMessage || 'No se pudo enviar el email'
-        );
-      }
-    } catch (error) {
-      console.error('Error al enviar email:', error);
-      showErrorAlert(
-        'Error',
-        'Ocurrió un error al enviar el email de restablecimiento'
-      );
-    }
-  };
-
-  const currentUser = {
-    uid: uid || '',
-    displayName: displayName || '',
-    email: email || '',
-    photoURL: photoURL || '',
-    avatar: photoURL || '',
-    name: displayName || '',
-  };
 
   return (
     <div className="col-span-12">

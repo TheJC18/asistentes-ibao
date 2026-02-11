@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { EventData, getEvents, createEvent, updateEvent, deleteEvent } from '../firebase/eventQueries';
+import { getEvents, createEvent, updateEvent, deleteEvent } from '../firebase/eventQueries';
+import { EventData } from '@/modules/events/types';
 
 export function useEvents() {
   const [events, setEvents] = useState<EventData[]>([]);

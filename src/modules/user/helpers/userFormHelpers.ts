@@ -1,5 +1,4 @@
-// Tipos para React Dispatch
-type SetStateAction<T> = React.Dispatch<React.SetStateAction<T>>;
+import { SetStateAction } from'@/modules/user/types';
 
 // createFieldUpdater: crea función para actualizar campos del formulario
 export function createFieldUpdater(setFormData: SetStateAction<any>) {
@@ -23,8 +22,8 @@ export function createFileUploadHandler(
   };
 }
 
-// createBirthdateUpdater: crea función para actualizar la fecha de nacimiento
-export function createBirthdateUpdater(fieldUpdater: (field: string, value: any) => void) {
+// createDateFieldUpdater: crea función para actualizar cualquier campo de fecha (evita desfases de zona horaria)
+export function createDateFieldUpdater(fieldUpdater: (field: string, value: any) => void, fieldName: string) {
   return (selectedDates: Date[]) => {
     if (Array.isArray(selectedDates) && selectedDates[0]) {
       const date = selectedDates[0];
@@ -33,8 +32,7 @@ export function createBirthdateUpdater(fieldUpdater: (field: string, value: any)
       const month = String(date.getMonth() + 1).padStart(2, '0');
       const day = String(date.getDate()).padStart(2, '0');
       const dateString = `${year}-${month}-${day}`;
-      
-      fieldUpdater("birthdate", dateString);
+      fieldUpdater(fieldName, dateString);
     }
   };
 }

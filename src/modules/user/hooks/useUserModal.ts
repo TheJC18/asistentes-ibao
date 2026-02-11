@@ -1,14 +1,5 @@
 import { useState } from "react";
-import { User } from "@/types";
-
-interface UseUserModalReturn {
-  open: boolean;
-  mode: 'view' | 'edit' | 'create' | 'family';
-  user: User & { onChange: (field: string, value: any) => void };
-  handleOpen: (mode: 'view' | 'edit' | 'create' | 'family', userData?: Partial<User>) => void;
-  handleClose: () => void;
-  setUser: React.Dispatch<React.SetStateAction<Partial<User>>>;
-}
+import { User, UseUserModalReturn } from "@/types";
 
 export function useUserModal(): UseUserModalReturn {
   const [open, setOpen] = useState(false);

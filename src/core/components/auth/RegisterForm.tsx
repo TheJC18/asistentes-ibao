@@ -1,99 +1,26 @@
-import { useMemo, useState, FormEvent } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { FaEye, FaEyeSlash, FaInfoCircle } from 'react-icons/fa';
 
-import { useForm } from '@/core/hooks/useForm';
-import { useTranslation } from '@/core/context/LanguageContext';
-import Label from '@/core/components/form/Label';
-import Input from '@/core/components/form/input/InputField';
-import Button from '@/core/components/ui/button/Button';
-import { startCreatingUserWithEmailPassword } from '@/modules/auth/store';
-import { RootState, AppDispatch } from '@/core/store';
-import { FormValidationRules } from '@/types';
-
-interface RegisterFormData {
-  displayName: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-}
-
-type FormValues = RegisterFormData;
-
-// Datos iniciales del formulario
-const formData: RegisterFormData = { 
-  displayName: '', 
-  email: '', 
-  password: '', 
-  confirmPassword: '' 
-};
+import { useRegisterForm } from '@/modules/auth/hooks/useRegisterForm';
 
 export default function RegisterForm() {
-  const dispatch = useDispatch<AppDispatch>();
-  const { status, errorMessage } = useSelector((state: RootState) => state.auth);
   const translate = useTranslation();
-  const isCheckingAuthentication = useMemo(() => status === 'checking', [status]);
-  const [formSubmitted, setFormSubmitted] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
-  const formValidations: FormValidationRules<RegisterFormData> = {
-    email: [ (value) => value.includes('@'), translate.messages.validation.emailInvalid ],
-    password: [ (value) => value.length >= 6, translate.messages.validation.passwordLength ],
-    displayName: [ (value) => value.length >= 1, translate.messages.validation.nameRequired ],
-    confirmPassword: [ 
-      (value, formState) => value === formState?.password, 
-      translate.messages.validation.passwordsMustMatch
-    ]
-  };
-
-  // Función de validación adaptada al nuevo hook
-  const validate = (values: FormValues) => {
-    const errors: { [key: string]: string } = {};
-    
-    // Validar displayName
-    if (!values.displayName || values.displayName.length < 1) {
-      errors.displayName = translate.messages.validation.nameRequired;
-    }
-    
-    // Validar email
-    if (!values.email || !values.email.includes('@')) {
-      errors.email = translate.messages.validation.emailInvalid;
-    }
-    
-    // Validar password
-    if (!values.password || values.password.length < 6) {
-      errors.password = translate.messages.validation.passwordLength;
-    }
-    
-    // Validar confirmPassword
-    if (values.password !== values.confirmPassword) {
-      errors.confirmPassword = translate.messages.validation.passwordsMustMatch;
-    }
-    
-    return errors;
-  };
-
   const {
     values,
     errors,
     handleChange,
-  } = useForm(formData, undefined, validate);
-
-  const { displayName, email, password, confirmPassword } = values;
-  const isFormValid = Object.keys(errors).length === 0;
-
-  const onSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setFormSubmitted(true);
-    if (!isFormValid) return;
-    dispatch(startCreatingUserWithEmailPassword({
-      displayName: values.displayName,
-      email: values.email,
-      password: values.password
-    }));
-  };
+    displayName,
+    email,
+    password,
+    confirmPassword,
+    isCheckingAuthentication,
+    formSubmitted,
+    setFormSubmitted,
+    showPassword,
+    setShowPassword,
+    showConfirmPassword,
+    setShowConfirmPassword,
+    onSubmit,
+    errorMessage,
+  } = useRegisterForm();
 
   return (
     <div className="flex flex-col flex-1">

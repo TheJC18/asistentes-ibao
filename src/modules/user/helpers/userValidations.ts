@@ -1,14 +1,5 @@
-/**
- * Validaciones para formularios de usuario
- */
-
-interface ValidateUserFormParams {
-  formData: any;
-  password: string;
-  confirmPassword: string;
-  mode: 'create' | 'edit' | 'view' | 'family';
-  hasWebAccess?: boolean;
-}
+import { PrepareUserDataParams } from'@/modules/user/types';
+import { ValidateUserFormParams } from'@/modules/user/types';
 
 /**
  * Valida los datos del formulario de usuario
@@ -100,16 +91,10 @@ const validatePassword = (password: string, confirmPassword: string, required: b
 
   return errors;
 };
+
 /**
  * Prepara los datos del formulario para guardar
  */
-export interface PrepareUserDataParams {
-    formData: any;
-    password: string;
-    mode: string;
-    hasWebAccess?: boolean;
-}
-
 export const prepareUserDataForSave = ({ 
     formData, 
     password, 

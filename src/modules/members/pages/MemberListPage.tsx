@@ -1,45 +1,25 @@
-import { useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useTranslation } from '@/core/context/LanguageContext';
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState, AppDispatch } from '@/core/store';
-import { fetchAllMembers, setFilter, setSearchTerm } from '@/modules/members/store';
 import { UserCard } from '@/core/components/common';
-
-type FilterType = 'all' | 'members' | 'non-members';
+import { useMemberList } from '../hooks/useMemberList';
 
 export default function MemberListPage() {
-	const translate = useTranslation();
-	const dispatch = useDispatch<AppDispatch>();
-	
-	const { 
-		members,
-		filteredMembers, 
-		isLoading, 
-		error, 
-		filter, 
-		searchTerm,
-		totalMembers 
-	} = useSelector((state: RootState) => state.members);
-	
-	// Cargar todos los miembros al montar el componente (solo una vez)
-	useEffect(() => {
-		dispatch(fetchAllMembers({ filter: 'all' }));
-	}, [dispatch]);
-	
-	const handleFilterChange = (newFilter: FilterType) => {
-		dispatch(setFilter(newFilter));
-	};
-	
-	const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		dispatch(setSearchTerm(e.target.value));
-	};
-	
-	// Calcular estadísticas sobre TODOS los miembros (no los filtrados)
-	const membersCount = members.filter(m => m.isMember).length;
-	const nonMembersCount = members.filter(m => !m.isMember).length;
-	
-	return (
+  const translate = useTranslation();
+  const {
+    members,
+    filteredMembers,
+    isLoading,
+    error,
+    filter,
+    searchTerm,
+    totalMembers,
+    membersCount,
+    nonMembersCount,
+    handleFilterChange,
+    handleSearchChange,
+  } = useMemberList();
+
+  return (
 		<div className="relative min-h-[80vh]">
 			<div className="p-4 md:p-6">
 				{/* Header con icono centrado - mismo estilo que otras páginas */}

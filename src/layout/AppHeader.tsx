@@ -9,7 +9,7 @@ import { RootState } from '@/core/store';
 
 const AppHeader = () => {
   const [isApplicationMenuOpen, setApplicationMenuOpen] = useState(false);
-  const { isMobileOpen, isExpanded, toggleSidebar, toggleMobileSidebar } = useSidebar();
+  const { isMobileOpen, toggleSidebar, toggleMobileSidebar } = useSidebar();
   const { uid, displayName, email, photoURL, role } = useSelector((state: RootState) => state.auth);
 
   // Cierra el menú del header si se abre el sidebar móvil
@@ -18,14 +18,6 @@ const AppHeader = () => {
       setApplicationMenuOpen(false);
     }
   }, [isMobileOpen, isApplicationMenuOpen]);
-
-  // Cierra el sidebar móvil si se abre el menú del header
-  const handleToggleApplicationMenu = () => {
-    if (!isApplicationMenuOpen && isMobileOpen && window.innerWidth < 1024) {
-      toggleMobileSidebar();
-    }
-    setApplicationMenuOpen((prev) => !prev);
-  };
 
   const handleToggle = () => {
     if (window.innerWidth >= 1024) {

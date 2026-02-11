@@ -1,34 +1,8 @@
 import { createUserInFirebase, updateUserInFirebase, deleteUserFromFirebase, getUserByIdFromFirebase } from '@/modules/user/firebase/userQueries';
-import { cleanupOrphanAuthUser, sendPasswordResetEmailToUser } from '@/modules/auth/firebase/authQueries';
+import { sendPasswordResetEmailToUser } from '@/modules/auth/firebase/authQueries';
 import { showDeleteConfirmAlert, showSuccessAlert, showErrorAlert, showToast } from '@/core/helpers/sweetAlertHelper';
-
-interface CreateUserResult {
-  ok: boolean;
-  user?: any;
-  errorMessage?: string;
-}
-
-interface UpdateUserResult {
-  ok: boolean;
-  user?: any;
-  migrated?: boolean;
-  oldId?: string;
-  newId?: string;
-  errorMessage?: string;
-  errorCode?: string;
-  requiresReauth?: boolean;
-}
-
-interface DeleteUserResult {
-  ok: boolean;
-  errorMessage?: string;
-  cancelled?: boolean;
-}
-
-interface PasswordResetResult {
-  ok: boolean;
-  errorMessage?: string;
-}
+import { CreateUserResult, UpdateUserResult, DeleteUserResult } from'@/modules/user/types';
+import { PasswordResetResult } from '@/types';
 
 /**
  * Hook para manejar las acciones CRUD de usuarios

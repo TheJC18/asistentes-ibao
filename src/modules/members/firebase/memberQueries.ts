@@ -4,20 +4,8 @@ import {
 } from 'firebase/firestore';
 import { FirebaseDB } from '@/firebase/config';
 import { dateToISOString } from '@/core/helpers';
-import { User } from '@/types';
-
-// === INTERFACES ===
-
-export interface GetAllMembersParams {
-  filter?: 'all' | 'members' | 'non-members'; // Filtro por tipo de asistente
-}
-
-export interface GetAllMembersResult {
-  ok: boolean;
-  users?: User[];
-  totalUsers?: number;
-  errorMessage?: string;
-}
+import { GetAllMembersParams, GetAllMembersResult } from '../types';
+import type { User } from '@/types';
 
 // === OBTENER TODOS LOS USUARIOS (SIN PAGINACIÓN) ===
 export const getAllMembers = async (params: GetAllMembersParams = {}): Promise<GetAllMembersResult> => {

@@ -1,5 +1,6 @@
 import { AppDispatch } from '@/core/store';
-import { getAllMembers, GetAllMembersParams } from '../firebase/memberQueries';
+import { getAllMembers } from '../firebase/memberQueries';
+import { GetAllMembersParams } from '../types';
 import { loadMembers, setLoading, setError } from './memberSlice';
 
 export const fetchAllMembers = (params: GetAllMembersParams = {}) => {

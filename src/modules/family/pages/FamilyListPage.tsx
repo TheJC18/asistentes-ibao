@@ -1,156 +1,37 @@
-import { useState, useEffect } from "react";
+import { useState, lazy, Suspense } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { lazy, Suspense } from 'react';
-const UserModal = lazy(() => import('@/modules/user/components/UserModal'));
 import FamilyMemberCard from "./FamilyMemberCard";
-const AddFamilyMemberModal = lazy(() => import('./AddFamilyMemberModal'));
-import FloatingActionButtons, { FloatingActionButton } from "@/core/components/ui/FloatingActionButtons";
+import FloatingActionButtons from "@/core/components/ui/FloatingActionButtons";
 import { useSidebar } from "@/core/context/SidebarContext";
 import { useModal } from "@/core/hooks/useModal";
 import { useUserActions } from "@/modules/user/hooks/useUserActions";
-import { createFamily, getFamilyMembers, getUserFamilies, addUserToFamily, getUserById } from "@/modules/family/firebase/familyQueries";
 import { useSelector } from 'react-redux';
 import { RootState } from '@/core/store';
 import { useTranslation } from '@/core/context/LanguageContext';
-import { getInverseRelation } from '@/core/helpers';
-import { ROLES } from '@/core/constants/roles';
-
-interface FamilyData {
-  id: string;
-  createdBy: string;
-  name?: string;
-  [key: string]: any;
-}
-
-interface MemberData {
-  id: string;
-  name: string;
-  email: string;
-  avatar: string;
-  birthdate: string;
-  age: number | string;
-  phone: string;
-  type: string;
-  relation?: string;
-  gender?: string;
-  [key: string]: any;
-}
+import { useFamilyList } from '../hooks/useFamilyList';
+const UserModal = lazy(() => import('@/modules/user/components/UserModal'));
+const AddFamilyMemberModal = lazy(() => import('./AddFamilyMemberModal'));
 
 export default function FamilyListPage() {
-    const sidebar = useSidebar();
+  const sidebar = useSidebar();
   const [search, setSearch] = useState("");
-  const [members, setMembers] = useState<MemberData[]>([]);
-  const [familyId, setFamilyId] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
   const { isOpen: isCreateModalOpen, openModal: openCreateModal, closeModal: closeCreateModal } = useModal();
   const { isOpen: isAddModalOpen, openModal: openAddModal, closeModal: closeAddModal } = useModal();
   const { createUser } = useUserActions();
   const { uid: currentUserId } = useSelector((state: RootState) => state.auth);
   const translate = useTranslation();
+  const {
+    members,
+    setMembers,
+    familyId,
+    loading,
+    removeMember,
+    updateMember,
+    reloadMembers,
+  } = useFamilyList({ currentUserId });
 
-  // Inicializar familia al cargar
-  useEffect(() => {
-    const initializeFamily = async () => {
-      if (!currentUserId) return;
-      
-      // 1. Verificar si el usuario ya tiene familias
-      const userFamiliesResult = await getUserFamilies(currentUserId);
-      
-      if (userFamiliesResult.ok && userFamiliesResult.families.length > 0) {
-        // Buscar si tiene una familia que ÉL creó (donde es el createdBy)
-        const ownFamily = userFamiliesResult.families.find((fam: FamilyData) => fam.createdBy === currentUserId);
-        
-        if (ownFamily) {
-          // Ya tiene su propia familia
-          setFamilyId(ownFamily.id);
-          loadFamilyMembers(ownFamily.id);
-        } else {
-          // Está en familias de otros, pero no tiene la suya propia
-          // Crear su familia y establecer relaciones bidireccionales
-          const result = await createFamily({ name: 'Mi Familia' }, currentUserId);
-          
-          if (result.ok && result.familyId) {
-            setFamilyId(result.familyId);
-            
-            // Establecer relaciones bidireccionales con los que lo agregaron
-            await setupBidirectionalRelations(result.familyId, userFamiliesResult.families);
-            
-            loadFamilyMembers(result.familyId);
-          } 
-        }
-      } else {
-        // No tiene familias, crear una nueva
-        const result = await createFamily({ name: 'Mi Familia' }, currentUserId);
-        
-        if (result.ok && result.familyId) {
-          setFamilyId(result.familyId);
-          loadFamilyMembers(result.familyId);
-        }
-      }
-      
-      setLoading(false);
-    };
-    
-    initializeFamily();
-  }, [currentUserId]);
-
-  // Establecer relaciones bidireccionales para usuarios que fueron agregados como familiares
-  const setupBidirectionalRelations = async (myFamilyId: string, otherFamilies: FamilyData[]) => {
-    try {
-      // Los métodos ya están importados de forma estática arriba
-      // const { getFamilyMembers, addUserToFamily, getUserById } = await import('@/modules/family/firebase/familyQueries');
-      // getInverseRelation ya está importado de forma estática arriba
-      
-      // Por cada familia ajena donde estoy (familias donde NO soy el creador)
-      for (const otherFamily of otherFamilies) {
-        if (otherFamily.createdBy === currentUserId) continue; // Saltar mi propia familia
-        
-        // Obtener los miembros de esa familia
-        const otherFamilyMembersResult = await getFamilyMembers(otherFamily.id);
-        if (!otherFamilyMembersResult.ok) continue;
-        
-        // Buscar mi entrada en esa familia para obtener mi relación
-        const myEntryInOtherFamily = otherFamilyMembersResult.members.find(m => m.id === currentUserId);
-        if (!myEntryInOtherFamily || !myEntryInOtherFamily.relation) continue;
-        
-        // El creador de esa familia es quien me agregó
-        const whoAddedMe = otherFamily.createdBy;
-        
-        // Obtener datos del creador para obtener su género
-        const creatorData = await getUserById(whoAddedMe);
-        if (!creatorData.ok || !creatorData.user) continue;
-        
-        // Calcular la relación inversa según el género del creador
-        const creatorGender = creatorData.user.gender || 'male';
-        const inverseRelation = getInverseRelation(myEntryInOtherFamily.relation, creatorGender);
-        
-        // Verificar si el creador ya está en mi familia
-        const myFamilyMembersResult = await getFamilyMembers(myFamilyId);
-        const creatorAlreadyInMyFamily = myFamilyMembersResult.members?.some(m => m.id === whoAddedMe);
-        
-        if (!creatorAlreadyInMyFamily) {
-          // Agregar al creador a MI familia con la relación inversa
-          await addUserToFamily(myFamilyId, whoAddedMe, {
-            relation: inverseRelation,
-            role: ROLES.USER,
-            addedBy: currentUserId || ''
-          });
-        }
-      }
-    } catch (error) {
-      console.error('Error estableciendo relaciones bidireccionales:', error);
-    }
-  };
-
-  const loadFamilyMembers = async (fId: string) => {
-    const result = await getFamilyMembers(fId);
-    if (result.ok) {
-      setMembers(result.members);
-    }
-  };
-
-  const filteredMembers = members.filter(m => 
-    m.name.toLowerCase().includes(search.toLowerCase()) || 
+  const filteredMembers = members.filter(m =>
+    m.name.toLowerCase().includes(search.toLowerCase()) ||
     m.relation?.toLowerCase().includes(search.toLowerCase())
   );
 
@@ -159,32 +40,24 @@ export default function FamilyListPage() {
       console.error('No hay familia creada');
       return;
     }
-    
-    // Agregar familyId y createdBy al memberData
     const dataWithFamily = {
       ...memberData,
       familyId,
       createdBy: currentUserId
     };
-    
-    // Usar el flujo normal de creación de usuarios
     const result = await createUser(dataWithFamily);
-    
     if (result.ok) {
-      // Recargar miembros de la familia
-      await loadFamilyMembers(familyId);
+      await reloadMembers();
       closeCreateModal();
     }
   };
 
   const handleMemberAdded = async () => {
-    if (familyId) {
-      await loadFamilyMembers(familyId);
-    }
+    await reloadMembers();
   };
 
   const handleMemberDeleted = (memberId: string) => {
-    setMembers(members.filter(m => m.id !== memberId));
+    removeMember(memberId);
   };
 
   if (loading) {

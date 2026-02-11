@@ -1,46 +1,11 @@
-import { useEffect, useState } from 'react';
 import { useTranslation } from '@/core/context/LanguageContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import Calendar, { UserBirthday } from '@/core/components/ui/calendar/Calendar';
-import { getAllUsersBirthdays } from '@/modules/user/firebase/userQueries';
+import Calendar from '@/core/components/ui/calendar/Calendar';
+import { useCalendarPageLogic } from '../hooks/useCalendarPageLogic';
 
-export default function CalendarPage() {
+export function CalendarPage() {
   const translate = useTranslation();
-  const [birthdays, setBirthdays] = useState<UserBirthday[]>([]);
-  // Si necesitas eventos personalizados, puedes agregarlos aquí:
-  // const [events, setEvents] = useState<CalendarEvent[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-
-  useEffect(() => {
-    loadCalendarData();
-  }, []);
-
-  const loadCalendarData = async () => {
-    setLoading(true);
-    try {
-      // Cargar cumpleaños de todos los usuarios
-      const birthdaysData = await getAllUsersBirthdays();
-      setBirthdays(birthdaysData);
-
-      // Si necesitas cargar eventos personalizados, hazlo aquí
-      
-    } catch (error) {
-      console.error('Error al cargar datos del calendario:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleDateClick = (date: Date) => {
-    console.log('Fecha seleccionada:', date);
-    // TODO: Abrir modal para agregar evento en esta fecha
-  };
-
-  const handleEventClick = (event: any) => {
-    console.log('Evento seleccionado:', event);
-    // TODO: Abrir modal con detalles del evento o perfil de usuario
-  };
+  const { birthdays, loading, handleDateClick, handleEventClick } = useCalendarPageLogic();
 
   return (
     <div className="p-6">

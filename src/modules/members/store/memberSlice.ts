@@ -1,17 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { User } from '@/types';
-
-type FilterType = 'all' | 'members' | 'non-members';
-
-interface MemberState {
-  members: User[];
-  filteredMembers: User[];
-  isLoading: boolean;
-  error: string | null;
-  filter: FilterType;
-  searchTerm: string;
-  totalMembers: number;
-}
+import { FilterType, MemberState } from '../types';
+import { User } from '@/modules/family/types';
 
 const initialState: MemberState = {
   members: [],
