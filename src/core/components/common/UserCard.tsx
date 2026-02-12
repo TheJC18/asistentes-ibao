@@ -5,6 +5,7 @@ import { getCountryName } from "@/core/helpers/countries";
 import { getGenderName } from "@/core/helpers/genders";
 import { useLanguage, useTranslation } from "@/core/context/LanguageContext";
 import type { UserCardProps } from "../types/index";
+import { calculateAge } from '@/core/helpers/dateUtils';
 
 export function UserCard({ 
   user, 
@@ -29,17 +30,6 @@ export function UserCard({
   const getCountryFlagUrl = (countryCode: string): string => {
     if (!countryCode || countryCode.length !== 2) return '';
     return `https://flagsapi.com/${countryCode.toUpperCase()}/flat/64.png`;
-  };
-
-  const calculateAge = (birthdate: string | Date): number => {
-    const birth = new Date(birthdate);
-    const today = new Date();
-    let age = today.getFullYear() - birth.getFullYear();
-    const monthDiff = today.getMonth() - birth.getMonth();
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
-      age--;
-    }
-    return age;
   };
 
   const userAge = user.age || (user.birthdate ? calculateAge(user.birthdate) : null);

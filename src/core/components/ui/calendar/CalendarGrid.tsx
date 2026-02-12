@@ -133,9 +133,9 @@ export default function CalendarGrid({ currentDate, events = [], onDateClick, on
                 {dayEvents.slice(0, 3).map((event) => (
                   <div
                     key={event.id}
-                    onClick={(e) => handleEventClick(event, e)}
-                    className={`text-[10px] sm:text-xs px-1 sm:px-2 py-0.5 sm:py-1 rounded truncate cursor-pointer hover:opacity-80 transition ${
-                      event.type === 'birthday'
+                    // onClick eliminado para deshabilitar el click directo sobre el evento
+                    className={`text-[10px] sm:text-xs px-1 sm:px-2 py-0.5 sm:py-1 rounded truncate transition
+                      ${event.type === 'birthday'
                         ? 'bg-secondary-light text-secondary'
                         : event.color === 'blue'
                         ? 'bg-info-light text-info'

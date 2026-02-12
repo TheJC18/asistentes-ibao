@@ -6,7 +6,6 @@ import { useMemberList } from '../hooks/useMemberList';
 export default function MemberListPage() {
   const translate = useTranslation();
   const {
-    members,
     filteredMembers,
     isLoading,
     error,

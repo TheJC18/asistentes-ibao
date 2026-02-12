@@ -106,3 +106,28 @@ export const convertISOToDate = (isoString: string | null | undefined): Date | n
     return null;
   }
 };
+
+/**
+ * Calcula la edad actual a partir de una fecha de nacimiento
+ */
+export function calculateAge(birthdate: string | Date): number {
+  const birth = new Date(birthdate);
+  const today = new Date();
+  let age = today.getFullYear() - birth.getFullYear();
+  const monthDiff = today.getMonth() - birth.getMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+    age--;
+  }
+  return age;
+}
+
+/**
+ * Calcula la edad que cumple una persona en una fecha específica (por ejemplo, para cumpleaños)
+ * Siempre devuelve la edad que cumple ese año, sin importar si ya pasó el cumpleaños o no.
+ */
+export function calculateBirthdayAge(birthdate: string | Date, onDate: Date = new Date()): number {
+  const birth = new Date(birthdate);
+  let age = onDate.getFullYear() - birth.getFullYear();
+  // Si aún no ha pasado el cumpleaños este año, igual se muestra la edad que cumple
+  return age;
+}

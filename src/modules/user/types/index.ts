@@ -118,12 +118,6 @@ export interface GetUsersByRoleResult {
   errorMessage?: string;
 }
 
-export interface UserBirthday {
-    uid: string;
-    name: string;
-    birthdate: string;
-}
-
 export interface ValidateUserFormParams {
   formData: any;
   password: string;

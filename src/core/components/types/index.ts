@@ -52,6 +52,8 @@ export interface UserBirthday {
 	uid: string;
 	name: string;
 	birthdate: string;
+	avatar: string;
+	gender: string
 }
 export interface CalendarGridProps {
 	currentDate: Date;

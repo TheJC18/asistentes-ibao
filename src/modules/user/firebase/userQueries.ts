@@ -685,18 +685,18 @@ export const getAllUsersBirthdays = async (): Promise<UserBirthday[]> => {
         
         snapshot.forEach((doc) => {
             const data = doc.data();
-            
             // Solo incluir usuarios que tengan fecha de nacimiento
             if (data.birthdate) {
                 const birthdateStr = typeof data.birthdate === 'string' 
                     ? data.birthdate 
                     : data.birthdate.toDate().toISOString();
-                
                 birthdays.push({
                     uid: doc.id,
                     name: data.name || data.displayName || 'Usuario sin nombre',
-                    birthdate: birthdateStr
-                });
+                    birthdate: birthdateStr,
+                    avatar: data.avatar || data.photoURL || '/user_default.png',
+                    gender: data.gender,
+              });
             }
         });
         
