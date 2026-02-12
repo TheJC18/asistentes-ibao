@@ -8,40 +8,39 @@ export { ThemeToggleButton } from "./common/ThemeToggleButton";
 export * from "./common/index";
 
 // Form Components
-export { Label } from "./form/Label";
-export { Select } from "./form/Select";
-export { DatePicker } from "./form/date-picker";
-export { InputField } from "./form/input/InputField";
+export { default as Label } from "./form/Label";
+export { default as Select } from "./form/Select";
+export { default as DatePicker } from "./form/date-picker";
+export { default as InputField } from "./form/input/InputField";
 
 // Header Components
-export { UserDropdown } from "./header/UserDropdown";
+export { default as UserDropdown } from "./header/UserDropdown";
 
 // UI Components - General
-export { ChekingAuth } from "./ui/ChekingAuth";
+export { default as ChekingAuth } from "./ui/ChekingAuth";
 export { default as FloatingActionButtons } from "./ui/FloatingActionButtons";
-export type { FloatingActionButton } from "./ui/FloatingActionButtons";
 
 // UI - Avatar
-export { Avatar } from "./ui/avatar/Avatar";
+export { default as Avatar } from "./ui/avatar/Avatar";
 
 // UI - Badge
-export { Badge } from "./ui/badge/Badge";
+export { default as Badge } from "./ui/badge/Badge";
 
 // UI - Button
-export { Button } from "./ui/button/Button";
+export { default as Button } from "./ui/button/Button";
 
 // UI - Calendar
-export { Calendar } from "./ui/calendar/Calendar";
-export { CalendarGrid } from "./ui/calendar/CalendarGrid";
+export { default as Calendar } from "./ui/calendar/Calendar";
+export { default as CalendarGrid } from "./ui/calendar/CalendarGrid";
 
 // UI - Dropdown
-export { Dropdown } from "./ui/dropdown/Dropdown";
-export { DropdownItem } from "./ui/dropdown/DropdownItem";
+export { default as Dropdown } from "./ui/dropdown/Dropdown";
+export { default as DropdownItem } from "./ui/dropdown/DropdownItem";
 
 // UI - Modal
 export * from "./ui/modal/index";
 
 // UI - Table
-export { Pagination } from "./ui/table/Pagination";
-export { TableDefault } from "./ui/table/TableDefault";
-export { EntityList } from "./ui/table/EntityList";
+export { default as Pagination } from "./ui/table/Pagination";
+export { default as TableDefault } from "./ui/table/TableDefault";
+export { default as EntityList } from "./ui/table/EntityList";

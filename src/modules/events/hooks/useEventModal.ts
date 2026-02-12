@@ -9,11 +9,13 @@ export function useEventModal({ open, event = {}, mode = 'view', onSave }: UseEv
   const isCreate = mode === 'create';
 
   const [formData, setFormData] = useState<EventFormData>({
+    id: '', // Mantener el id
     title: '',
     description: '',
     date: '',
+    hour: '',
     type: 'normal',
-    color: 'primary',
+    color: 'bg-blue-500',
     createdBy: '',
   });
   const [errors, setErrors] = useState<string[]>([]);
@@ -33,16 +35,18 @@ export function useEventModal({ open, event = {}, mode = 'view', onSave }: UseEv
   useEffect(() => {
     if (open) {
       setFormData({
+        id: event.id || '', // Mantener el id
         title: event.title || '',
         description: event.description || '',
         date: event.date || '',
+        hour: event.hour || '',
         type: event.type || 'normal',
-        color: event.color || 'primary',
+        color: event.color || 'bg-blue-500',
         createdBy: event.createdBy || '',
       });
       setErrors([]);
     }
-  }, [open, event.title, event.description, event.date, event.type, event.color, event.createdBy]);
+  }, [open, event.title, event.description, event.date, event.hour, event.type, event.color, event.createdBy, event.id]);
 
   const handleChange = (field: keyof EventFormData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -59,8 +63,8 @@ export function useEventModal({ open, event = {}, mode = 'view', onSave }: UseEv
       const dataToSave: EventData = {
         ...formData,
         type: formData.type || 'normal',
-        color: formData.color || 'primary',
-        id: isEdit && event.id ? event.id : '',
+        color: formData.color || 'bg-blue-500',
+        id: formData.id || '', // Usar el id del evento
       };
       onSave(dataToSave);
     }

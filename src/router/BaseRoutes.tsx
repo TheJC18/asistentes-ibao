@@ -7,7 +7,7 @@ const UsersRoutes = lazy(() => import('@/modules/user/routes/UsersRoutes').then(
 const MemberRoutes = lazy(() => import('@/modules/members/routes/MemberRoutes').then(m => ({ default: m.MemberRoutes })));
 const CalendarRoutes = lazy(() => import('@/modules/calendar/routes/CalendarRoutes').then(m => ({ default: m.CalendarRoutes })));
 const EventRoutes = lazy(() => import('@/modules/events/routes/EventRoutes').then(m => ({ default: m.EventRoutes })));
-import { ROLES } from '@/core/constants/roles';
+import { ROLES } from '@/core/helpers/roles';
 import { ProtectedRoute } from './ProtectedRoute';
 import { RoleProtectedRoute } from './RoleProtectedRoute';
 

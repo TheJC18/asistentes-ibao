@@ -1,27 +1,8 @@
 import { useState, useMemo, ReactNode } from 'react';
 import TableDefault from './TableDefault';
 import Pagination from './Pagination';
-import { ColumnConfig } from '@/types';
+import type { EntityListProps } from '../../types/index';
 import { useTranslation } from '@/core/context/LanguageContext';
-
-interface EntityListProps<T> {
-  title: ReactNode;
-  description?: string;
-  data?: T[];
-  columns?: ColumnConfig<T>[];
-  renderActions?: (item: T) => ReactNode;
-  filterFunction?: (item: T, search: string) => boolean;
-  perPageOptions?: number[];
-  defaultPerPage?: number;
-  searchPlaceholder?: string;
-  onSearchChange?: (search: string) => void;
-  FloatingButton?: ReactNode;
-  ModalComponent?: ReactNode;
-  isLoading?: boolean;
-  error?: string | null;
-  onRetry?: () => void;
-  noDataMessage?: string;
-}
 
 export default function EntityList<T extends { id?: string | number }>({
   title,

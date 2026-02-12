@@ -1,4 +1,5 @@
-import { useState, useEffect, ChangeEvent, FormEvent } from "react";
+import { ChangeEvent } from "react";
+import { Button } from '@/core/components';
 import ReactDOM from "react-dom";
 import Select from "@/core/components/form/Select";
 import DatePicker from "@/core/components/form/date-picker";
@@ -50,13 +51,18 @@ const UserModal: React.FC<UserModalProps> = ({
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
-        <button
+        <Button
           className="absolute top-4 right-4 z-10 p-2 rounded-lg text-text-tertiary hover:text-text-primary hover:bg-surface-hover transition-colors"
           onClick={onClose}
           aria-label="Close"
+          type="button"
+          variant="outline"
+          size="sm"
+          startIcon={<FontAwesomeIcon icon={["fas", "times"]} className="text-lg" />}
+          endIcon={undefined}
         >
-          <FontAwesomeIcon icon={["fas", "times"]} className="text-lg" />
-        </button>
+          <></>
+        </Button>
 
         {/* Header */}
         <div className="px-6 sm:px-8 pt-6 pb-4 border-b border-border">
@@ -91,14 +97,17 @@ const UserModal: React.FC<UserModalProps> = ({
                 <div className="flex flex-col sm:flex-row sm:items-center gap-2 relative group w-full">
                   <FileInput value={fileInputValue} onChange={onFileChange} className="custom-class flex-1" />
                   <div className="flex sm:block w-full sm:w-auto">
-                    <button
+                    <Button
                       type="button"
                       className="flex items-center justify-center rounded-full p-2 bg-surface text-text-secondary hover:bg-secondary hover:text-text-on-primary transition focus:outline-none focus:ring-2 focus:ring-secondary w-full sm:w-auto"
-                      title={""}
                       onClick={onRestoreAvatar}
+                      variant="outline"
+                      size="sm"
+                      startIcon={<FontAwesomeIcon icon={["fas", "arrow-rotate-left"]} className="w-4 h-4" />}
+                      endIcon={undefined}
                     >
-                      <FontAwesomeIcon icon={["fas", "arrow-rotate-left"]} className="w-4 h-4" />
-                    </button>
+                      <></>
+                    </Button>
                   </div>
                 </div>
               </>
@@ -191,12 +200,10 @@ const UserModal: React.FC<UserModalProps> = ({
                   <FontAwesomeIcon icon={["fas", "calendar-alt"]} />
                 </span>
                 <DatePicker
-                  key={`birthdate-${user.id || 'new'}-${formData.birthdate || 'empty'}`}
                   id="user-birthdate"
-                  label=""
                   placeholder={translate.form?.birthdatePlaceholder ?? ""}
                   inputClassName="pl-10 pr-3"
-                  hideRightIcon
+                  hideRightIcon={true}
                   defaultDate={convertISOToDate(formData.birthdate || null)}
                   onChange={onBirthdateChange}
                 />
@@ -253,7 +260,7 @@ const UserModal: React.FC<UserModalProps> = ({
               </div>
             ) : (
               <div className="flex gap-3">
-                <button
+                <Button
                   type="button"
                   onClick={() => onChange("isMember", true)}
                   className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 transition-all ${
@@ -261,15 +268,14 @@ const UserModal: React.FC<UserModalProps> = ({
                       ? 'border-success bg-success-light text-success'
                       : 'border-border bg-card text-text-secondary hover:border-success'
                   }`}
+                  variant="outline"
+                  size="sm"
+                  startIcon={<FontAwesomeIcon icon={["fas", "check-circle"]} className={`text-xl ${formData.isMember ? 'text-success' : 'text-text-disabled'}`} />}
+                  endIcon={undefined}
                 >
-                  <FontAwesomeIcon 
-                    icon={["fas", "check-circle"]} 
-                    className={`text-xl ${formData.isMember ? 'text-success' : 'text-text-disabled'}`}
-                  />
                   <span className="font-medium">{translate.formLabels?.memberYes}</span>
-                </button>
-                
-                <button
+                </Button>
+                <Button
                   type="button"
                   onClick={() => onChange("isMember", false)}
                   className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 transition-all ${
@@ -277,13 +283,13 @@ const UserModal: React.FC<UserModalProps> = ({
                       ? 'border-error bg-error-light text-error'
                       : 'border-border bg-card text-text-secondary hover:border-error'
                   }`}
+                  variant="outline"
+                  size="sm"
+                  startIcon={<FontAwesomeIcon icon={["fas", "times-circle"]} className={`text-xl ${!formData.isMember ? 'text-error' : 'text-text-disabled'}`} />}
+                  endIcon={undefined}
                 >
-                  <FontAwesomeIcon 
-                    icon={["fas", "times-circle"]} 
-                    className={`text-xl ${!formData.isMember ? 'text-error' : 'text-text-disabled'}`}
-                  />
                   <span className="font-medium">{translate.formLabels?.memberNo}</span>
-                </button>
+                </Button>
               </div>
             )}
           </div>
@@ -444,12 +450,17 @@ const UserModal: React.FC<UserModalProps> = ({
           )}
 
           {!isView && (
-            <button
+            <Button
               type="submit"
               className="w-full mt-6 py-2.5 rounded-lg bg-secondary hover:bg-secondary-hover text-text-on-primary font-medium shadow-sm hover:shadow transition-all"
+              variant="primary"
+              size="md"
+              startIcon={undefined}
+              endIcon={undefined}
+              onClick={undefined}
             >
               {isEdit ? (translate.common?.save) : isFamily ? (translate.pages?.family?.addFamiliar) : (translate.pages?.users?.addUser)}
-            </button>
+            </Button>
           )}
         </form>
         </div>

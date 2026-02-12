@@ -1,3 +1,19 @@
+/**
+ * Obtener el nombre traducido del rol según idioma
+ */
+export function getRoleName(role: string, lang: 'es' | 'en' = 'es'): string {
+  const names = {
+    es: {
+      [ROLES.ADMIN]: 'Administrador',
+      [ROLES.USER]: 'Usuario',
+    },
+    en: {
+      [ROLES.ADMIN]: 'Admin',
+      [ROLES.USER]: 'User',
+    },
+  };
+  return (names[lang]?.[role as RoleType]) || (lang === 'en' ? 'Not specified' : 'No especificado');
+}
 import { IconName } from '@fortawesome/fontawesome-svg-core';
 
 /**

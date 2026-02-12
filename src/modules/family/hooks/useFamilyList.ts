@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { getUserFamilies, createFamily, getFamilyMembers, addUserToFamily, getUserById } from '@/modules/family/firebase/familyQueries';
-import { ROLES } from '@/core/constants/roles';
+import { ROLES } from '@/core/helpers/roles';
 import { getInverseRelation } from '@/core/helpers';
 import { UseFamilyListOptions } from '../types';
 import { Family, FamilyMember } from '@/modules/family/types';
@@ -94,6 +94,34 @@ export function useFamilyList({ currentUserId }: UseFamilyListOptions) {
     }
   };
 
+  // Crear miembro en la familia
+  const createFamilyMember = async (memberData: any, createUser: (data: any) => Promise<any>, closeCreateModal: () => void, currentUserId: string | undefined) => {
+    if (!familyId) {
+      console.error('No hay familia creada');
+      return;
+    }
+    const dataWithFamily = {
+      ...memberData,
+      familyId,
+      createdBy: currentUserId
+    };
+    const result = await createUser(dataWithFamily);
+    if (result.ok) {
+      await reloadMembers();
+      closeCreateModal();
+    }
+  };
+
+  // Handler para cuando se agrega un miembro
+  const handleMemberAdded = async () => {
+    await reloadMembers();
+  };
+
+  // Handler para eliminar miembro
+  const handleMemberDeleted = (memberId: string) => {
+    removeMember(memberId);
+  };
+
   return {
     members,
     setMembers,
@@ -104,5 +132,16 @@ export function useFamilyList({ currentUserId }: UseFamilyListOptions) {
     removeMember,
     updateMember,
     reloadMembers,
+    createFamilyMember,
+    handleMemberAdded,
+    handleMemberDeleted,
   };
+}
+
+// Filtrar miembros por nombre o relación
+export function useFilteredFamilyMembers(members: FamilyMember[], search: string) {
+  return members.filter(m =>
+    m.name.toLowerCase().includes(search.toLowerCase()) ||
+    m.relation?.toLowerCase().includes(search.toLowerCase())
+  );
 }

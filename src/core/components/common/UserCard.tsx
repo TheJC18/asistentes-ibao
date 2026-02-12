@@ -1,33 +1,10 @@
+import { getRelationLabel } from '@/core/helpers/relations';
 import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { countriesES, countriesEN } from "@/i18n/countries";
-import { getGenderNameByLocale } from "@/i18n/genders";
-import { getRelationLabelByLocale } from "@/i18n/relations";
+import { getCountryName } from "@/core/helpers/countries";
+import { getGenderName } from "@/core/helpers/genders";
 import { useLanguage, useTranslation } from "@/core/context/LanguageContext";
-
-interface UserCardProps {
-  user: {
-    id: string;
-    uid?: string;
-    name?: string;
-    displayName?: string;
-    email?: string;
-    avatar?: string;
-    photoURL?: string;
-    birthdate?: string | Date;
-    age?: number | string;
-    phone?: string;
-    type?: string;
-    relation?: string;
-    gender?: string;
-    nationality?: string;
-    isMember?: boolean;
-    hasWebAccess?: boolean;
-  };
-  showRelation?: boolean;
-  showPhone?: boolean;
-  showNationality?: boolean;
-}
+import type { UserCardProps } from "../types/index";
 
 export function UserCard({ 
   user, 
@@ -41,24 +18,17 @@ export function UserCard({
 
   const userName = user.name || user.displayName || translate.form.noName;
   const userAvatar = user.avatar || user.photoURL || "/user_default.png";
-  const countries = language === "es" ? countriesES : countriesEN;
   const dateLocale = language === "es" ? "es-ES" : "en-US";
   const yearsLabel = translate.userCard?.age || (language === "es" ? "años" : "years");
 
   const relationLabel = user.relation
-    ? getRelationLabelByLocale(language, user.relation, user.gender || "neutral")
+    ? getRelationLabel(user.relation, user.gender, language)
     : "";
 
   // Obtener URL de la bandera desde FlagsAPI
   const getCountryFlagUrl = (countryCode: string): string => {
     if (!countryCode || countryCode.length !== 2) return '';
     return `https://flagsapi.com/${countryCode.toUpperCase()}/flat/64.png`;
-  };
-
-  // Obtener nombre del país por código
-  const getCountryName = (code: string): string => {
-    const country = countries.find(c => c.code === code.toUpperCase());
-    return country ? country.name : code;
   };
 
   const calculateAge = (birthdate: string | Date): number => {
@@ -101,12 +71,12 @@ export function UserCard({
           
           {/* Overlay con lupa */}
           <div 
-            className="absolute inset-0 rounded-full bg-black/0 group-hover:bg-black/20 transition-all flex items-center justify-center cursor-pointer"
+            className="absolute inset-0 rounded-full bg-overlay/0 group-hover:bg-overlay/20 transition-all flex items-center justify-center cursor-pointer"
             onClick={() => setIsAvatarExpanded(true)}
           >
             <FontAwesomeIcon 
               icon={["fas", "search-plus"]} 
-              className="text-white text-2xl opacity-0 group-hover:opacity-100 transition-opacity"
+              className="text-text-on-primary text-2xl opacity-0 group-hover:opacity-100 transition-opacity"
             />
           </div>
 
@@ -114,12 +84,12 @@ export function UserCard({
           {user.isMember !== undefined && (
             <div className={`absolute -bottom-2 -right-2 w-10 h-10 rounded-full flex items-center justify-center border-4 border-card shadow-lg ${
               user.isMember
-                ? 'bg-green-500'
-                : 'bg-gray-400'
+                ? 'bg-success'
+                : 'bg-warning'
             }`}>
               <FontAwesomeIcon 
                 icon={["fas", user.isMember ? "check" : "minus"]} 
-                className="text-white text-lg"
+                className={`text-text-on-primary text-lg ${!user.isMember ? 'text-warning-contrast' : ''}`}
               />
             </div>
           )}
@@ -150,7 +120,7 @@ export function UserCard({
           {/* Nacionalidad con bandera - Solo si existe */}
           {showNationality && user.nationality && (
             <div className="flex items-center gap-3">
-              <FontAwesomeIcon icon={["fas", "flag"]} className="text-blue-500 flex-shrink-0" />
+              <FontAwesomeIcon icon={["fas", "flag"]} className="text-primary flex-shrink-0" />
               {user.nationality.length === 2 ? (
                 <>
                   <span>{getCountryName(user.nationality)}</span>
@@ -169,7 +139,7 @@ export function UserCard({
           {/* Email - Solo si existe */}
           {user.email && (
             <div className="flex items-start gap-3">
-              <FontAwesomeIcon icon={["fas", "envelope"]} className="text-blue-500 mt-1 flex-shrink-0" />
+              <FontAwesomeIcon icon={["fas", "envelope"]} className="text-primary mt-1 flex-shrink-0" />
               <span className="break-words line-clamp-2">{user.email}</span>
             </div>
           )}
@@ -177,7 +147,7 @@ export function UserCard({
           {/* Edad y Nacimiento - Solo si existe */}
           {formattedBirthdate && (
             <div className="flex items-start gap-3">
-              <FontAwesomeIcon icon={["fas", "birthday-cake"]} className="text-blue-500 mt-1 flex-shrink-0" />
+              <FontAwesomeIcon icon={["fas", "birthday-cake"]} className="text-primary mt-1 flex-shrink-0" />
               <span>
                 {formattedBirthdate}
                 {userAge && (
@@ -194,10 +164,10 @@ export function UserCard({
             <div className="flex items-start gap-3">
               <FontAwesomeIcon 
                 icon={["fas", user.gender === 'male' ? 'mars' : user.gender === 'female' ? 'venus' : 'genderless']} 
-                className="text-blue-500 mt-1 flex-shrink-0"
+                className="text-primary mt-1 flex-shrink-0"
               />
               <span>
-                {getGenderNameByLocale(language, user.gender)}
+                {getGenderName(user.gender, language)}
               </span>
             </div>
           )}
@@ -205,14 +175,14 @@ export function UserCard({
           {/* Teléfono - Solo si existe */}
           {showPhone && user.phone && (
             <div className="flex items-start gap-3">
-              <FontAwesomeIcon icon={["fas", "phone"]} className="text-blue-500 mt-1 flex-shrink-0" />
+              <FontAwesomeIcon icon={["fas", "phone"]} className="text-primary mt-1 flex-shrink-0" />
               <span className="break-words">{user.phone}</span>
             </div>
           )}
           {/* Acceso Web - Solo si está definido */}
           {user.hasWebAccess !== undefined && (
             <div className="flex items-start gap-3">
-              <FontAwesomeIcon icon={["fas", "globe"]} className="text-blue-500 mt-1 flex-shrink-0" />
+              <FontAwesomeIcon icon={["fas", "globe"]} className="text-primary mt-1 flex-shrink-0" />
               <span className="flex items-center gap-2">
                 {translate.userCard?.webAccess || translate.form?.hasWebAccess || 'Acceso web'}:
                 <span className={`font-semibold ${
@@ -231,12 +201,12 @@ export function UserCard({
       {/* Modal de imagen expandida */}
       {isAvatarExpanded && (
         <div
-          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-overlay/80 backdrop-blur-sm p-4"
           onClick={() => setIsAvatarExpanded(false)}
         >
           <div className="relative max-w-2xl w-full">
             <button
-              className="absolute -top-12 right-0 p-2 rounded-lg text-white hover:text-gray-300 hover:bg-white/10 transition-colors"
+              className="absolute -top-12 right-0 p-2 rounded-lg text-text-on-primary hover:text-text-secondary hover:bg-surface/10 transition-colors"
               onClick={() => setIsAvatarExpanded(false)}
               aria-label="Cerrar"
             >

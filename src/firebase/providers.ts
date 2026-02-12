@@ -1,26 +1,11 @@
-import { 
-  GoogleAuthProvider, 
-  signInWithPopup, 
-  createUserWithEmailAndPassword,
-  updateProfile,
-  signInWithEmailAndPassword,
-  signOut
-} from 'firebase/auth';
+import { GoogleAuthProvider, signInWithPopup, createUserWithEmailAndPassword, updateProfile, signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import { FirebaseAuth } from './config';
 import { checkOrCreateUser } from '@/modules/auth/firebase/authQueries';
-import { FirebaseResponse } from '@/types';
-
-const googleProvider = new GoogleAuthProvider();
-
-interface SignInResult extends FirebaseResponse {
-  uid?: string;
-  email?: string;
-  displayName?: string;
-  photoURL?: string;
-}
+import type { SignInResult, RegisterParams, LoginParams } from '@/types';
 
 export const singInWithGoogle = async (): Promise<SignInResult> => {
   try {
+    const googleProvider = new GoogleAuthProvider();
     const result = await signInWithPopup(FirebaseAuth, googleProvider);
     const { displayName, email, photoURL, uid } = result.user;
 
@@ -48,12 +33,6 @@ export const singInWithGoogle = async (): Promise<SignInResult> => {
   }
 };
 
-interface RegisterParams {
-  email: string;
-  password: string;
-  displayName: string;
-}
-
 export const registerUserWithEmailPassword = async ({
   email,
   password,
@@ -80,11 +59,6 @@ export const registerUserWithEmailPassword = async ({
     };
   }
 };
-
-interface LoginParams {
-  email: string;
-  password: string;
-}
 
 export const loginWithEmailPassword = async ({
   email,

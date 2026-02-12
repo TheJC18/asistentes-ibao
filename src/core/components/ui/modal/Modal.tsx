@@ -41,11 +41,12 @@ export default function Modal({
     };
   }, [open]);
 
+
   if (!open) return null;
 
   const modalContent = (
     <div
-      className="fixed inset-0 z-[9999] flex items-start justify-center bg-black/60 backdrop-blur-sm overflow-y-auto p-4"
+      className="fixed inset-0 z-[9999] flex items-start justify-center bg-overlay/60 backdrop-blur-sm overflow-y-auto p-4"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
@@ -91,5 +92,5 @@ export default function Modal({
   );
 
   const modalRoot = document.getElementById('modal-root');
-  return ReactDOM.createPortal(modalContent, modalRoot);
+  return modalRoot ? ReactDOM.createPortal(modalContent, modalRoot) : null;
 }

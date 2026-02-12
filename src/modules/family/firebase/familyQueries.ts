@@ -2,7 +2,7 @@ import { collection,  doc,  getDoc, getDocs,  setDoc, deleteDoc, updateDoc, arra
 import { FirebaseDB } from '@/firebase/config';
 import { CreateFamilyData, CreateFamilyResult, MemberData, AddUserToFamilyResult, RemoveUserFromFamilyResult, GetFamilyMembersResult, GetUserFamiliesResult, UpdateUserIdResult, GetUserByIdResult } from '@/modules/family/types';
 import type { User } from '@/types';
-import { ROLES } from '@/core/constants/roles';
+import { ROLES } from '@/core/helpers/roles';
 
 /**
  * Crear una nueva familia

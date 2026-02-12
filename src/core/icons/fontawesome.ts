@@ -1,5 +1,7 @@
 // src/core/icons/fontawesome.ts
 import { library } from '@fortawesome/fontawesome-svg-core';
+import { faGoogle } from '@fortawesome/free-brands-svg-icons';
+
 import {
   faAddressBook,
   faArrowLeft,
@@ -42,6 +44,7 @@ import {
   faPlus,
   faRightFromBracket,
   faSearchPlus,
+  faSignInAlt,
   faSpinner,
   faTimes,
   faTimesCircle,
@@ -98,6 +101,7 @@ library.add(
   faPlus,
   faRightFromBracket,
   faSearchPlus,
+  faSignInAlt,
   faSpinner,
   faTimes,
   faTimesCircle,
@@ -109,5 +113,6 @@ library.add(
   faUserPlus,
   faUserXmark,
   faUsers,
-  faUsersSlash
+  faUsersSlash,
+  faGoogle
 );

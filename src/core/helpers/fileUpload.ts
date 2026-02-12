@@ -6,7 +6,7 @@ export const fileUpload = async (file: File): Promise<string | null> => {
     throw new Error('No hay archivo para subir');
   }
 
-  const cloudUrl = 'https://api.cloudinary.com/v1_1/dcz6hppom/upload';
+  const cloudUrl = 'https://api.cloudinary.com/v1_1/dkgd92zor/upload';
 
   const formData = new FormData();
   formData.append('upload_preset', 'react-journal');

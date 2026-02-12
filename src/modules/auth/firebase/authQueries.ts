@@ -1,25 +1,35 @@
+// Actualiza la foto del usuario en Firestore si es diferente
+export const updateUserPhotoURL = async (uid: string, newPhotoURL: string) => {
+    if (!uid || !newPhotoURL) return;
+    const userRef = doc(FirebaseDB, `users/${uid}`);
+    await setDoc(userRef, {
+        photoURL: newPhotoURL,
+        avatar: newPhotoURL,
+        updatedAt: serverTimestamp(),
+    }, { merge: true });
+};
 import { doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore';
-import {  createUserWithEmailAndPassword,  updatePassword,  signOut,  deleteUser,  signInWithEmailAndPassword,  fetchSignInMethodsForEmail,  EmailAuthProvider,  sendPasswordResetEmail,  linkWithCredential,  GoogleAuthProvider,  signInWithPopup } from 'firebase/auth';
+import { createUserWithEmailAndPassword, updatePassword, signOut, deleteUser, signInWithEmailAndPassword, fetchSignInMethodsForEmail, EmailAuthProvider, sendPasswordResetEmail, linkWithCredential, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { FirebaseDB, FirebaseAuth, SecondaryFirebaseAuth } from '@/firebase/config';
-import { ROLES } from '@/core/constants/roles';
+import { ROLES } from '@/core/helpers/roles';
 import {
-  CheckOrCreateUserParams,
-  CheckOrCreateUserResult,
-  GetUserByUIDParams,
-  GetUserByUIDResult,
-  GetRoleParams,
-  GetRoleResult,
-  GetProfileCompletedParams,
-  GetProfileCompletedResult,
-  UpdateProfileCompletedParams,
-  UpdateProfileCompletedResult,
-  CreateAuthUserResult,
-  LinkEmailPasswordResult,
-  LinkGoogleAccountResult,
-  UpdateUserPasswordResult,
-  SignOutUserResult,
-  CleanupOrphanAuthUserResult,
-  SendPasswordResetEmailResult
+    CheckOrCreateUserParams,
+    CheckOrCreateUserResult,
+    GetUserByUIDParams,
+    GetUserByUIDResult,
+    GetRoleParams,
+    GetRoleResult,
+    GetProfileCompletedParams,
+    GetProfileCompletedResult,
+    UpdateProfileCompletedParams,
+    UpdateProfileCompletedResult,
+    CreateAuthUserResult,
+    LinkEmailPasswordResult,
+    LinkGoogleAccountResult,
+    UpdateUserPasswordResult,
+    SignOutUserResult,
+    CleanupOrphanAuthUserResult,
+    SendPasswordResetEmailResult
 } from '@/modules/auth/types';
 
 export const checkOrCreateUser = async({ uid, displayName, photoURL, email, role = 'user' }: CheckOrCreateUserParams): Promise<CheckOrCreateUserResult> => {

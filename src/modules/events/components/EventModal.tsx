@@ -8,6 +8,7 @@ import Label from '@/core/components/form/Label';
 import Input from '@/core/components/form/input/InputField';
 import { useEventModal } from '../hooks/useEventModal';
 import { createDateFieldUpdater } from '@/modules/user/helpers/userFormHelpers';
+import { Button } from '@/core/components';
 
 export default function EventModal({ open, onClose, mode = 'view', event = {}, onSave }: EventModalProps) {
   const {
@@ -64,18 +65,78 @@ export default function EventModal({ open, onClose, mode = 'view', event = {}, o
               />
             </div>
             <div>
-              <label className="block mb-1">{translate.events?.form?.date}</label>
-              <DatePicker
-                id="event-date"
-                label=""
-                defaultDate={convertISOToDate(formData.date || null)}
-                placeholder={translate.events?.form?.date}
-                inputClassName=""
-                hideRightIcon={false}
+              <Label htmlFor="event-date">{translate.events?.form?.date}</Label>
+              {isView ? (
+                <div className="relative flex items-center">
+                  <span className="absolute left-3 text-text-tertiary z-10">
+                    <FontAwesomeIcon icon={["fas", "calendar-alt"]} />
+                  </span>
+                  <input
+                    className="w-full rounded-lg border pl-10 pr-3 py-2 text-base bg-background text-text-primary border-border"
+                    type="text"
+                    value={formData.date ? new Date(formData.date).toLocaleDateString('es-ES', { year: 'numeric', month: '2-digit', day: '2-digit' }) : ""}
+                    disabled
+                  />
+                </div>
+              ) : (
+                <div className="relative flex items-center">
+                  <span className="absolute left-3 text-text-tertiary z-10">
+                    <FontAwesomeIcon icon={["fas", "calendar-alt"]} />
+                  </span>
+                  <DatePicker
+                    id="event-date"
+                    label=""
+                    defaultDate={convertISOToDate(formData.date || null)}
+                    placeholder={translate.events?.form?.date}
+                    inputClassName="pl-10 pr-3"
+                    hideRightIcon
+                    disabled={isView}
+                    required
+                    onChange={onDateChange}
+                  />
+                </div>
+              )}
+            </div>
+            <div>
+              <Label htmlFor="event-hour">{translate.events?.form?.hour || 'Hora'}</Label>
+              <Input
+                id="event-hour"
+                type="time"
+                value={formData.hour}
+                onChange={e => handleChange('hour', e.target.value)}
+                required={!isView}
                 disabled={isView}
-                required
-                onChange={onDateChange}
+                placeholder={translate.events?.form?.hour || 'Hora'}
               />
+            </div>
+            <div>
+              <Label htmlFor="event-type">{translate.events?.form?.type || 'Tipo'}</Label>
+              <select
+                id="event-type"
+                value={formData.type}
+                onChange={e => handleChange('type', e.target.value)}
+                disabled={isView}
+                className="w-full rounded-xl border border-border px-3 py-2 text-base focus:ring-2 focus:ring-primary bg-background text-text-primary shadow-sm"
+              >
+                <option value="normal">{translate.events?.form?.typeNormal || 'Normal'}</option>
+                <option value="important">{translate.events?.form?.typeImportant || 'Importante'}</option>
+                <option value="meeting">{translate.events?.form?.typeMeeting || 'Reunión'}</option>
+              </select>
+            </div>
+            <div>
+              <Label htmlFor="event-color">{translate.events?.form?.color || 'Color'}</Label>
+              <select
+                id="event-color"
+                value={formData.color}
+                onChange={e => handleChange('color', e.target.value)}
+                disabled={isView}
+                className="w-full rounded-xl border border-border px-3 py-2 text-base focus:ring-2 focus:ring-primary bg-background text-text-primary shadow-sm"
+              >
+                <option value="bg-blue-500">Azul</option>
+                <option value="bg-red-500">Rojo</option>
+                <option value="bg-green-500">Verde</option>
+                <option value="bg-yellow-500">Amarillo</option>
+              </select>
             </div>
           </div>
           {errors.length > 0 && (
@@ -86,12 +147,14 @@ export default function EventModal({ open, onClose, mode = 'view', event = {}, o
             </div>
           )}
           {!isView && (
-            <button
+            <Button
               type="submit"
               className="w-full mt-6 py-2.5 rounded-lg bg-secondary hover:bg-secondary-hover text-text-on-primary font-medium shadow-sm hover:shadow transition-all"
+              variant="primary"
+              size="md"
             >
               {isEdit ? translate.common?.save : translate.events?.add}
-            </button>
+            </Button>
           )}
         </form>
       </div>

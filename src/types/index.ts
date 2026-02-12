@@ -1,6 +1,47 @@
-import { RoleType } from '@/core/constants/roles';
+import { ReactNode } from 'react';
+// Tipos para rutas protegidas
+export interface ProtectedRouteProps {
+	children: ReactNode;
+}
+
+export interface RoleProtectedRouteProps {
+	children: ReactNode;
+	allowedRoles?: string[];
+}
+// Tipo para países
+export interface Country {
+	code: string;
+	name: string;
+}
+import { RoleType } from '@/core/helpers/roles';
+import { GenderType } from '@/core/helpers';
+import type { UserStatus } from '@/core/helpers/status';
 
 export type ModalMode = 'view' | 'edit' | 'create';
+
+// Tipo para opciones de género en i18n
+export interface Gender {
+	code: string;
+	name: string;
+}
+// Resultado de autenticación
+export interface SignInResult extends FirebaseResponse {
+	uid?: string;
+	email?: string;
+	displayName?: string;
+	photoURL?: string;
+}
+// Tipos para autenticación Firebase
+export interface RegisterParams {
+	email: string;
+	password: string;
+	displayName: string;
+}
+
+export interface LoginParams {
+	email: string;
+	password: string;
+}
 
 // Respuesta estándar para operaciones Firebase
 export interface FirebaseResponse {
@@ -24,9 +65,9 @@ export interface User {
 	email?: string;
 	photoURL?: string;
 	avatar?: string;
-	role: RoleType | string;
+	role: RoleType;
 	isMember?: boolean;
-	gender?: 'male' | 'female' | 'other' | 'neutral' | string;
+	gender?: GenderType;
 	birthdate?: string | Date | null;
 	nationality?: string;
 	phone?: string;
@@ -35,11 +76,20 @@ export interface User {
 	createdBy?: string;
 	hasWebAccess?: boolean;
 	profileCompleted?: boolean;
-	status?: 'active' | 'inactive' | 'suspended' | string;
+	status?: UserStatus;
 	createdAt?: string | Date;
 	updatedAt?: string | Date;
 	families?: string[];
 	[key: string]: any;
 }
-// Tipos globales para la app
+
+// Tipos de respuesta estándar reutilizables
+export interface StandardResponse {
+	ok: boolean;
+	errorMessage?: string;
+}
+
+export interface StandardMessageResponse extends StandardResponse {
+	message?: string;
+}
 

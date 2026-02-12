@@ -1,16 +1,5 @@
 import { ReactNode } from "react";
-
-interface ButtonProps {
-  children: ReactNode;
-  size?: "sm" | "md";
-  variant?: "primary" | "outline";
-  startIcon?: ReactNode;
-  endIcon?: ReactNode;
-  onClick?: () => void;
-  disabled?: boolean;
-  className?: string;
-  type?: "button" | "submit" | "reset";
-}
+import type { ButtonProps } from '../../types/index';
 
 const Button = ({
   children,
@@ -22,7 +11,7 @@ const Button = ({
   className = "",
   disabled = false,
   type = "button",
-}) => {
+}: ButtonProps) => {
   // Size Classes
   const sizeClasses = {
     sm: "px-4 py-3 text-sm",

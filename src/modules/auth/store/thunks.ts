@@ -1,8 +1,8 @@
 import { AppDispatch } from '@/core/store';
 import { loginWithEmailPassword, logoutFirebase, registerUserWithEmailPassword, singInWithGoogle } from '@/firebase/providers';
-import { getRole, getProfileCompleted, updateProfileCompleted, checkOrCreateUser, getUserByUID } from '@/modules/auth/firebase/authQueries';
-import { ROLES } from '@/core/constants/roles';
-import { CreateUserParams, LoginParams, GetRoleParams, UpdateProfileCompletedParams, GetProfileCompletedParams} from '@/modules/auth/types';
+import { ROLES } from '@/core/helpers/roles';
+import { getRole, getProfileCompleted, updateProfileCompleted, checkOrCreateUser, getUserByUID, updateUserPhotoURL } from '@/modules/auth/firebase/authQueries';
+import { LoginParams, GetRoleParams, UpdateProfileCompletedParams, GetProfileCompletedParams, CheckOrCreateUserParams } from '@/modules/auth/types';
 import { chekingCredentials, login, logout, setProfileCompleted, setRole } from '@/modules/auth/store';
 
 export const checkingAuthentication = () => {
@@ -34,6 +34,11 @@ export const startGoogleSignIn = () => {
 
         if (userDataResult.ok && userDataResult.user) {
             const userData = userDataResult.user;
+
+            // Si la foto de Google es diferente a la guardada, actualiza en Firestore
+            if (result.photoURL && userData.photoURL !== result.photoURL) {
+                await updateUserPhotoURL(result.uid!, result.photoURL);
+            }
 
             dispatch(login({
                 uid: result.uid!,
@@ -69,7 +74,7 @@ export const startGoogleSignIn = () => {
     };
 };
 
-export const startCreatingUserWithEmailPassword = ({ displayName, email, password }: CreateUserParams) => {
+export const startCreatingUserWithEmailPassword = ({ displayName, email, password }: LoginParams & { displayName: string }) => {
     return async (dispatch: AppDispatch) => {
         dispatch(chekingCredentials());
 

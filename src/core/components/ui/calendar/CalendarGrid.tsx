@@ -1,27 +1,7 @@
 import { useTranslation } from '@/core/context';
+import type { CalendarEvent, DayCell, CalendarGridProps } from '../../types';
 
-interface CalendarEvent {
-  id: string | number;
-  title: string;
-  date: string | Date;
-  type?: string;
-  color?: 'blue' | 'green' | 'red' | 'pink' | string;
-  allDay?: boolean;
-}
-
-interface DayCell {
-  date: Date;
-  isCurrentMonth: boolean;
-}
-
-interface CalendarGridProps {
-  currentDate: Date;
-  events?: CalendarEvent[];
-  onDateClick?: (date: Date) => void;
-  onEventClick?: (event: CalendarEvent) => void;
-}
-
-export default function CalendarGrid({ currentDate, events = [], onDateClick, onEventClick }: CalendarGridProps) {
+export default function CalendarGrid({ currentDate, events = [], onDateClick, onEventClick, readOnly = false }: CalendarGridProps) {
   const translate = useTranslation();
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
@@ -90,12 +70,14 @@ export default function CalendarGrid({ currentDate, events = [], onDateClick, on
   };
 
   const handleDateClick = (date: Date): void => {
+    if (readOnly) return;
     if (onDateClick) {
       onDateClick(date);
     }
   };
 
   const handleEventClick = (event: CalendarEvent, e: React.MouseEvent): void => {
+    if (readOnly) return;
     if (onEventClick) {
       e.stopPropagation();
       onEventClick(event);
@@ -125,9 +107,9 @@ export default function CalendarGrid({ currentDate, events = [], onDateClick, on
           return (
             <div
               key={index}
-              className={`min-h-[60px] sm:min-h-[120px] border-b border-r border-border p-1 sm:p-2 ${
+              className={`min-h-[80px] sm:min-h-[140px] border-b border-r border-border p-1 sm:p-2 ${
                 !isCurrentMonth ? 'bg-surface' : 'bg-card'
-              } ${(index + 1) % 7 === 0 ? 'border-r-0' : ''} hover:bg-surface transition cursor-pointer`}
+              } ${(index + 1) % 7 === 0 ? 'border-r-0' : ''} ${readOnly ? '' : 'hover:bg-surface cursor-pointer'} transition`}
               onClick={() => handleDateClick(date)}
             >
               <div className="flex justify-between items-start mb-0.5 sm:mb-1">

@@ -1,9 +1,4 @@
-interface AvatarProps {
-  src: string; // URL of the avatar image
-  alt?: string; // Alt text for the avatar
-  size?: "xsmall" | "small" | "medium" | "large" | "xlarge" | "xxlarge"; // Avatar size
-  status?: "online" | "offline" | "busy" | "none"; // Status indicator
-}
+import type { AvatarProps } from '../../types/index';
 
 const sizeClasses = {
   xsmall: "h-6 w-6 max-w-6",

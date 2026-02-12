@@ -3,14 +3,7 @@ import { createContext, useState, useContext, useEffect } from "react";
 import { es } from "@/i18n/locales/es";
 import { en } from "@/i18n/locales/en";
 import type { TranslationKeys } from "@/i18n/locales/es";
-
-type Language = "es" | "en";
-
-type LanguageContextType = {
-  language: Language;
-  setLanguage: (lang: Language) => void;
-  translate: TranslationKeys;
-};
+import { Language, LanguageContextType } from "@/core/types";
 
 const translations: Record<Language, TranslationKeys> = {
   es,

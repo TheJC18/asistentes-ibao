@@ -3,31 +3,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faChevronRight, faCalendarDay } from '@fortawesome/free-solid-svg-icons';
 import CalendarGrid from './CalendarGrid';
 import { useTranslation } from '@/core/context';
+import type { CalendarEvent, CalendarProps, UserBirthday } from '../../types';
 
-interface CalendarEvent {
-  id: string | number;
-  title: string;
-  date: string | Date;
-  type?: string;
-  color?: string;
-  allDay?: boolean;
-}
-
-export interface UserBirthday {
-  uid: string;
-  name: string;
-  birthdate: string;
-}
-
-interface CalendarProps {
-  events?: CalendarEvent[];
-  birthdays?: UserBirthday[];
-  onDateClick?: (date: Date) => void;
-  onEventClick?: (event: CalendarEvent) => void;
-  className?: string;
-}
-
-export default function Calendar({ events = [], birthdays = [], onDateClick, onEventClick, className = '' }: CalendarProps) {
+export default function Calendar({ events = [], birthdays = [], onDateClick, onEventClick, className = '', readOnly = false, disableNavigation = false }: CalendarProps) {
   const translate = useTranslation();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedMonth, setSelectedMonth] = useState(currentDate.getMonth());
@@ -109,6 +87,7 @@ export default function Calendar({ events = [], birthdays = [], onDateClick, onE
             <button
               onClick={handleToday}
               className="px-2 sm:px-4 py-1 sm:py-2 text-xs sm:text-sm font-medium text-primary hover:bg-primary-light rounded-lg transition"
+              disabled={disableNavigation || readOnly}
             >
               <FontAwesomeIcon icon={faCalendarDay} className="mr-1 sm:mr-2" />
               {translate.calendar.today}
@@ -116,12 +95,14 @@ export default function Calendar({ events = [], birthdays = [], onDateClick, onE
             <button
               onClick={handlePrevMonth}
               className="p-1 sm:p-2 text-text-secondary hover:bg-surface rounded-lg transition"
+              disabled={disableNavigation || readOnly}
             >
               <FontAwesomeIcon icon={faChevronLeft} />
             </button>
             <button
               onClick={handleNextMonth}
               className="p-1 sm:p-2 text-text-secondary hover:bg-surface rounded-lg transition"
+              disabled={disableNavigation || readOnly}
             >
               <FontAwesomeIcon icon={faChevronRight} />
             </button>
@@ -133,6 +114,7 @@ export default function Calendar({ events = [], birthdays = [], onDateClick, onE
             value={selectedMonth}
             onChange={handleMonthChange}
             className="flex-1 px-2 sm:px-3 py-1 sm:py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary bg-background text-text-primary text-xs sm:text-base"
+            disabled={disableNavigation || readOnly}
           >
             {translate.calendar.months.map((month, index) => (
               <option key={index} value={index}>
@@ -144,6 +126,7 @@ export default function Calendar({ events = [], birthdays = [], onDateClick, onE
             value={selectedYear}
             onChange={handleYearChange}
             className="px-2 sm:px-3 py-1 sm:py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary bg-background text-text-primary text-xs sm:text-base"
+            disabled={disableNavigation || readOnly}
           >
             {years.map((year) => (
               <option key={year} value={year}>
@@ -158,8 +141,9 @@ export default function Calendar({ events = [], birthdays = [], onDateClick, onE
         <CalendarGrid
           currentDate={currentDate}
           events={allEvents}
-          onDateClick={onDateClick}
-          onEventClick={onEventClick}
+          onDateClick={readOnly ? undefined : onDateClick}
+          onEventClick={readOnly ? undefined : onEventClick}
+          readOnly={readOnly}
         />
       </div>
     </div>

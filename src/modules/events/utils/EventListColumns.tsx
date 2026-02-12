@@ -1,5 +1,6 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { EventData } from '@/modules/events/types';
+import { getEventTypeLabel, getEventTypes } from '@/core/helpers/eventUtils';
 
 export function getEventColumns(translate: any) {
   return [
@@ -30,16 +31,36 @@ export function getEventColumns(translate: any) {
       label: translate.events?.table?.type || 'Tipo',
       className: 'text-start text-text-primary',
       visibleOn: ["lg", "xl"],
-      render: (event: EventData) => event.type || <span className="text-text-disabled">-</span>,
+      render: (event: EventData) => {
+        const eventTypes = getEventTypes(translate.language);
+        const found = eventTypes.find(t => t.color === event.color);
+        const typeCode = (event.type as import('@/core/helpers/eventUtils').EventTypeCode) || 'normal';
+        return (
+          <span className="flex items-center gap-2">
+            <span className="text-sm">{found ? found.label : getEventTypeLabel(typeCode, translate.language)}</span>
+          </span>
+        );
+      },
     },
     {
       key: 'color',
       label: translate.events?.table?.color || 'Color',
       className: 'text-start',
       visibleOn: ["lg", "xl"],
-      render: (event: EventData) => (
-        <span className="inline-block w-4 h-4 rounded-full border border-border" style={{ background: event.color || '#ccc' }} />
-      ),
+      render: (event: EventData) => {
+        return (
+          <span className="flex items-center gap-2">
+            <span className={`inline-block w-4 h-4 rounded-full border border-border ${event.color}`} />
+          </span>
+        );
+      },
+    },
+    {
+      key: 'hour',
+      label: translate.events?.table?.hour || 'Hora',
+      className: 'text-start text-text-primary',
+      visibleOn: ["md", "lg", "xl"],
+      render: (event: EventData) => event.hour || <span className="text-text-disabled">-</span>,
     },
   ];
 }

@@ -65,10 +65,13 @@ export default function EventListPage() {
         {showForm && (
           <EventModal
             open={showForm}
-            onClose={() => { setShowForm(false); setEditingEvent(null); }}
+            onClose={() => setShowForm(false)}
             mode={editingEvent ? 'edit' : 'create'}
             event={editingEvent || {}}
-            onSave={handleSave}
+            onSave={async (data) => {
+              await handleSave(data);
+              setEditingEvent(null); // Limpiar solo después de guardar
+            }}
           />
         )}
         {viewingEvent && (

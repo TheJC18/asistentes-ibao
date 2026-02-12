@@ -5,7 +5,7 @@ import { useSidebar } from "@/core/context/SidebarContext";
 import { lazy, Suspense } from 'react';
 import EntityList from '@/core/components/ui/table/EntityList';
 import { useUserManagement } from '@/modules/user/hooks/useUserManagement';
-import { getUserColumns } from '../utils/columns';
+import { useUserColumns } from '../utils/columns';
 import { filterUserBySearch, renderUserActions } from '../utils/userTableUtils';
 import { User } from '@/types';
 
@@ -30,7 +30,7 @@ export default function UserListPage() {
     isDeleting,
     handleSave
   } = useUserManagement();
-  const columns = getUserColumns(translate);
+  const columns = useUserColumns(translate);
 
   const filterFunction = filterUserBySearch;
   const renderActions = (userItem: User) => renderUserActions({

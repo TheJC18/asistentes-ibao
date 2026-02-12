@@ -1,9 +1,9 @@
 import { useState, useEffect, FormEvent } from "react";
 import { UserModalProps, UserFormData } from'@/modules/user/types';
-import { useLanguage, useTranslation } from '@/core/context/LanguageContext';
-import { countriesES, countriesEN } from '@/i18n/countries';
-import { gendersES, gendersEN } from '@/i18n/genders';
-import { relationsES, relationsEN } from '@/i18n/relations';
+import { useTranslation } from '@/core/context/LanguageContext';
+import { useCountryUtils } from '@/core/hooks/useCountryUtils';
+import { useGenderUtils } from '@/core/hooks/useGenderUtils';
+import { useRelationUtils } from '@/core/hooks/useRelationUtils';
 import { 
   createFileUploadHandler, 
   createFieldUpdater, 
@@ -13,12 +13,10 @@ import {
 import { validateUserForm, prepareUserDataForSave } from '@/modules/user/helpers/userValidations';
 
 export function useUserModalLogic({ open, mode = 'view', user = {}, onSave }: UserModalProps) {
-  const { language } = useLanguage();
   const translate = useTranslation();
-
-  const countries = language === "es" ? countriesES : countriesEN;
-  const genders = language === "es" ? gendersES : gendersEN;
-  const relations = language === "es" ? relationsES : relationsEN;
+  const { countries } = useCountryUtils();
+  const { genders } = useGenderUtils();
+  const { relations } = useRelationUtils();
 
   const isView = mode === "view";
   const isEdit = mode === "edit";

@@ -1,12 +1,4 @@
-import { Gender } from "@/types";
-
-export const gendersES: Gender[] = [
+export const gendersES = [
   { code: "male", name: "Masculino" },
   { code: "female", name: "Femenino" },
-  { code: "other", name: "Otro" },
 ];
-
-export const getGenderNameES = (genderCode?: string): string => {
-  const gender = gendersES.find((g) => g.code === genderCode?.toLowerCase());
-  return gender ? gender.name : "No especificado";
-};

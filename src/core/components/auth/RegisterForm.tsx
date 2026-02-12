@@ -1,10 +1,14 @@
-
+import { Link as RouterLink } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useTranslation } from '@/core/context';
 import { useRegisterForm } from '@/modules/auth/hooks/useRegisterForm';
+import Input from '../form/input/InputField';
+import Label from '../form/Label';
+import { Button } from '@/core/components';
 
-export default function RegisterForm() {
+export function RegisterForm() {
   const translate = useTranslation();
   const {
-    values,
     errors,
     handleChange,
     displayName,
@@ -13,7 +17,6 @@ export default function RegisterForm() {
     confirmPassword,
     isCheckingAuthentication,
     formSubmitted,
-    setFormSubmitted,
     showPassword,
     setShowPassword,
     showConfirmPassword,
@@ -92,7 +95,8 @@ export default function RegisterForm() {
                       onClick={() => setShowPassword(!showPassword)}
                       className="absolute z-5 -translate-y-1/2 cursor-pointer right-4 top-1/2"
                     >
-                      {showPassword ? <FaEyeSlash /> : <FaEye />}
+                      {showPassword ? <FontAwesomeIcon icon="eye-slash" /> : <FontAwesomeIcon icon="eye" />
+}
                     </span>
                   </div>
                   {formSubmitted && errors.password && (
@@ -117,7 +121,8 @@ export default function RegisterForm() {
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                       className="absolute z-5 -translate-y-1/2 cursor-pointer right-4 top-1/2"
                     >
-                      {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+                      {showConfirmPassword ? <FontAwesomeIcon icon="eye-slash" /> : <FontAwesomeIcon icon="eye" />
+}
                     </span>
                   </div>
                   {formSubmitted && errors.confirmPassword && (
@@ -126,7 +131,7 @@ export default function RegisterForm() {
                 </div>
                 {errorMessage && (
                   <div className="mb-5 mt-2 text-error-500 text-sm font-medium flex items-center gap-2">
-                    <FaInfoCircle />
+                    <FontAwesomeIcon icon="info-circle" />
                     <span>{errorMessage}</span>
                   </div>
                 )}
@@ -136,6 +141,9 @@ export default function RegisterForm() {
                     size="sm"
                     type="submit"
                     disabled={isCheckingAuthentication}
+                    startIcon={null}
+                    endIcon={null}
+                    onClick={undefined}
                   >
                     {translate.auth.signUp}
                   </Button>
@@ -156,3 +164,5 @@ export default function RegisterForm() {
     </div>
   );
 }
+
+export default RegisterForm;

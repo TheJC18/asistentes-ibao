@@ -1,17 +1,5 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { IconProp } from '@fortawesome/fontawesome-svg-core';
-
-export interface FloatingActionButton {
-  icon: IconProp;
-  onClick: () => void;
-  title: string;
-  color?: 'blue' | 'green' | 'red' | 'purple' | 'pink' | 'yellow';
-  tooltip?: string;
-}
-
-interface FloatingActionButtonsProps {
-  buttons: FloatingActionButton[];
-}
+import type { FloatingActionButton, FloatingActionButtonsProps } from '@/types';
 
 const colorClasses = {
   blue: 'bg-info hover:bg-info/80',

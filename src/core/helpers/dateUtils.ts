@@ -65,11 +65,11 @@ export const formatDateFields = <T extends Record<string, any>>(obj: T): T => {
   if (!obj) return obj;
 
   const result = { ...obj };
-  const dateFields = ['birthdate', 'createdAt', 'updatedAt', 'date'];
+  const dateFields = ['birthdate', 'createdAt', 'updatedAt', 'date'] as const;
 
   dateFields.forEach(field => {
-    if (result[field]) {
-      result[field] = formatDate(result[field]);
+    if (field in result && result[field as keyof T]) {
+      (result as any)[field] = formatDate(result[field as keyof T]);
     }
   });
 
@@ -83,11 +83,11 @@ export const convertDateFieldsToISO = <T extends Record<string, any>>(obj: T): T
   if (!obj) return obj;
 
   const result = { ...obj };
-  const dateFields = ['birthdate', 'createdAt', 'updatedAt', 'date'];
+  const dateFields = ['birthdate', 'createdAt', 'updatedAt', 'date'] as const;
 
   dateFields.forEach(field => {
-    if (result[field]) {
-      result[field] = dateToISOString(result[field]);
+    if (field in result && result[field as keyof T]) {
+      (result as any)[field] = dateToISOString(result[field as keyof T]);
     }
   });
 

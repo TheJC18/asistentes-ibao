@@ -1,9 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
 import { searchUsersToAddToFamily, addUserToFamily } from '@/modules/family/firebase/familyQueries';
-import { ROLES } from '@/core/constants/roles';
+import { ROLES } from '@/core/helpers/roles';
 import { showSuccessAlert, showErrorAlert } from '@/core/helpers/sweetAlertHelper';
 import { UseAddFamilyMemberModalProps } from '@/modules/family/types';
 import type { User } from '@/types';
+
+import { getRelations } from '@/core/helpers';
 
 export function useAddFamilyMemberModal({
   open,
@@ -11,13 +13,15 @@ export function useAddFamilyMemberModal({
   currentUserId,
   onMemberAdded,
   translate,
-  relations
-}: UseAddFamilyMemberModalProps) {
+  relations,
+  language = 'es',
+}: UseAddFamilyMemberModalProps & { language?: 'es' | 'en' }) {
   const [search, setSearch] = useState('');
   const [availableUsers, setAvailableUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [selectedRelation, setSelectedRelation] = useState('');
+  const relationOptions = relations || getRelations(language);
 
   useEffect(() => {
     if (open) {
@@ -81,6 +85,6 @@ export function useAddFamilyMemberModal({
     setSelectedRelation,
     handleSearch,
     handleAddToFamily,
-    relations,
+    relations: relationOptions,
   };
 }

@@ -1,12 +1,5 @@
 import { useEffect, useState, ReactNode } from "react";
-import { ColumnConfig } from '@/types';
-
-interface TableDefaultProps<T> {
-  data: T[];
-  columns: ColumnConfig<T>[];
-  actions?: (item: T) => ReactNode;
-  className?: string;
-}
+import type { ColumnConfig, TableDefaultProps } from '../../types/index';
 
 // Helper para obtener el breakpoint actual
 function useBreakpoint() {
@@ -73,7 +66,12 @@ function TableDefault<T extends { id?: string | number }>({
                   key={String(col.key)}
                   className={`px-4 py-3 text-start border-b border-divider text-text-primary ${col.className || ""}`}
                 >
-                  {col.render ? col.render(item) : (item[col.key] as React.ReactNode)}
+                  {col.render
+                    ? col.render(item)
+                    : (typeof col.key === 'string'
+                        ? (item[col.key as keyof T] as React.ReactNode)
+                        : (item[col.key] as React.ReactNode)
+                      )}
                 </td>
               ))}
               {showActions && (

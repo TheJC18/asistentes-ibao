@@ -1,11 +1,11 @@
 import { useMemo, useState, FormEvent } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { startCreatingUserWithEmailPassword } from '@/modules/auth/store';
 import { RootState, AppDispatch } from '@/core/store';
-import { RegisterFormData } from '@/modules/auth/types';
-import { useForm } from '@/core/hooks/useForm';
-import { FormValidationRules } from '@/types';
 import { useTranslation } from '@/core/context/LanguageContext';
+import { useForm } from '@/core/hooks/useForm';
+import { startCreatingUserWithEmailPassword } from '@/modules/auth/store';
+import { RegisterFormData } from '@/modules/auth/types';
+import { FormValidationRules } from '@/types';
 
 export function useRegisterForm() {
   const dispatch = useDispatch<AppDispatch>();

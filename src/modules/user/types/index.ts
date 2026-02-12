@@ -1,7 +1,8 @@
+// Tipo centralizado para los modos del UserModal
+export type ModeUserModal = 'view' | 'edit' | 'create' | 'family';
 import type { User } from '@/types';
 export type SetStateAction<T> = React.Dispatch<React.SetStateAction<T>>;
 export type UserRole = typeof USER_ROLES[keyof typeof USER_ROLES];
-export type UserStatus = typeof USER_STATUS[keyof typeof USER_STATUS];
 
 export const USER_ROLES = {
   USER: 'user',
@@ -127,7 +128,7 @@ export interface ValidateUserFormParams {
   formData: any;
   password: string;
   confirmPassword: string;
-  mode: 'create' | 'edit' | 'view' | 'family';
+  mode: ModeUserModal;
   hasWebAccess?: boolean;
 }
 
@@ -168,7 +169,7 @@ export interface DisplayUser extends UserData {
 export interface UserModalProps {
   open: boolean;
   onClose: () => void;
-  mode?: 'view' | 'edit' | 'create' | 'family';
+  mode?: ModeUserModal;
   user?: Partial<User>;
   onSave?: (data: any) => void;
   onPasswordReset?: (email: string) => Promise<void>;

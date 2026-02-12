@@ -5,7 +5,7 @@ export interface UseFamilyMemberCardProps {
   onMemberDelete?: (memberId: string) => void;
   translate: any;
 }
-// User ahora se importa del tipo global
+
 // Definición local de Relation para el módulo family
 export interface Relation {
   code: string;
@@ -13,7 +13,7 @@ export interface Relation {
   gender?: string;
 }
 // Tipos y interfaces para el módulo de familia
-import { RoleType } from '@/core/constants/roles';
+import { RoleType } from '@/core/helpers/roles';
 import { FieldValue } from 'firebase/firestore';
 
 export interface UseAddFamilyMemberModalProps {
@@ -22,7 +22,8 @@ export interface UseAddFamilyMemberModalProps {
   currentUserId: string;
   onMemberAdded?: () => void;
   translate: any;
-  relations: Relation[];
+  relations?: Relation[];
+  language?: 'es' | 'en';
 }
 
 export interface UpdateUserIdResult {

@@ -3,7 +3,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from '@/core/context/LanguageContext';
 import { useTheme } from '@/core/context/ThemeContext';
 import { useLanguage } from '@/core/context/LanguageContext';
-import { DropdownItem } from '@/core/components/ui/dropdown/DropdownItem';
+import DropdownItem from '@/core/components/ui/dropdown/DropdownItem';
+import Button from '@/core/components/ui/button/Button';
 import { Dropdown } from '@/core/components/ui/dropdown/Dropdown';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { startLogOut } from '@/modules/auth/store';
@@ -11,16 +12,12 @@ import UserModal from '@/modules/user/components/UserModal';
 import { updateUserInFirebase } from '@/modules/user/firebase/userQueries';
 import { showToast, showErrorAlert, showSuccessAlert } from '@/core/helpers/sweetAlertHelper';
 import { sendPasswordResetEmailToUser } from '@/modules/auth/firebase/authQueries';
-import { getRoleIcon, RoleType, ROLES } from '@/core/constants/roles';
+import { useRoleUtils } from '@/core/hooks/useRoleUtils';
 import { RootState, AppDispatch } from '@/core/store';
 
-interface UserDropdownProps {
-  displayName: string;
-  email: string;
-  photoURL: string;
-  role: string;
-  uid: string;
-}
+import type { UserDropdownProps } from '@/core/components/types';
+import { GenderType } from '@/core/helpers';
+import { ROLES, RoleType } from '@/core/helpers/roles';
 
 const UserDropdown = ({ displayName, email, photoURL, role }: UserDropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -110,11 +107,13 @@ const UserDropdown = ({ displayName, email, photoURL, role }: UserDropdownProps)
     }
   }
 
+  const { getRoleIcon } = useRoleUtils();
   return (
     <div className="relative">
-      <button
+      <Button
         onClick={toggleDropdown}
-        className="flex items-center text-text-primary dropdown-toggle"
+        className="flex items-center text-text-primary dropdown-toggle bg-transparent border-none shadow-none p-0 hover:bg-transparent focus:bg-transparent"
+        type="button"
       >
         <span className="mr-2 lg:mr-3 overflow-hidden rounded-full h-10 w-10 lg:h-11 lg:w-11 border flex-shrink-0">
           <img src={photoURL || "/user_default.png"} alt="User" />
@@ -128,7 +127,7 @@ const UserDropdown = ({ displayName, email, photoURL, role }: UserDropdownProps)
             isOpen ? "rotate-180" : ""
           } text-text-secondary`}
         />
-      </button>
+      </Button>
 
       <Dropdown
         isOpen={isOpen}
@@ -148,13 +147,13 @@ const UserDropdown = ({ displayName, email, photoURL, role }: UserDropdownProps)
 
         <ul className="flex flex-col gap-1 pt-4 pb-3 border-b border-border">
           <li>
-            <button
-              onClick={handleEditProfile}
+            <DropdownItem
+              onItemClick={handleEditProfile}
               className="flex items-center gap-3 px-3 py-2 font-medium text-text-primary rounded-lg group text-theme-sm hover:bg-surface w-full text-left"
             >
               <FontAwesomeIcon icon={["fas", "user"]} className="text-text-secondary group-hover:text-text-primary" />
               {translate.common.editProfile}
-            </button>
+            </DropdownItem>
           </li>
           <li>
             <DropdownItem
@@ -231,13 +230,13 @@ const UserDropdown = ({ displayName, email, photoURL, role }: UserDropdownProps)
           </div>
         </div>
 
-        <button
-          onClick={handleLogout}
+        <DropdownItem
+          onItemClick={handleLogout}
           className="flex items-center gap-3 px-3 py-2 mt-3 font-medium text-text-primary rounded-lg group text-theme-sm hover:bg-surface w-full"
         >
           <FontAwesomeIcon icon={["fas", "right-from-bracket"]} className="text-text-secondary group-hover:text-text-primary" />
           {translate.auth.logout}
-        </button>
+        </DropdownItem>
       </Dropdown>
       
       {/* Modal de edición de perfil */}
@@ -256,7 +255,7 @@ const UserDropdown = ({ displayName, email, photoURL, role }: UserDropdownProps)
           birthdate: birthdate || '',
           nationality: nationality || '',
           isMember: isMember || false,
-          gender: (gender || 'other') as 'male' | 'female' | 'other' | 'neutral',
+          gender: (gender ) as GenderType,
           phone: phone || '',
           relation: relation || '',
           hasWebAccess: hasWebAccess ?? false,

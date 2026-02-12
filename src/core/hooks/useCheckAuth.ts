@@ -3,14 +3,8 @@ import { onAuthStateChanged } from "firebase/auth";
 import { useAppDispatch, useAppSelector } from "./index";
 import { FirebaseAuth } from "@/firebase/config";
 import { checkOrCreateUser, getUserByUID } from "@/modules/auth/firebase/authQueries";
-import { ROLES } from "@/core/constants/roles";
-import {
-  chekingCredentials,
-  login,
-  logout,
-  setProfileCompleted,
-  setRole,
-} from "@/modules/auth/store/authSlice";
+import { ROLES } from "@/core/helpers/roles";
+import { chekingCredentials, login, logout, setProfileCompleted, setRole } from "@/modules/auth/store/authSlice";
 
 export const useCheckAuth = () => {
   const dispatch = useAppDispatch();

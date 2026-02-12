@@ -1,6 +1,5 @@
-import { Routes, Route } from 'react-router-dom';
 import { lazy, Suspense } from 'react';
-
+import { Routes, Route } from 'react-router-dom';
 const LoginPage = lazy(() => import('@/modules/auth/pages/LoginPage').then(m => ({ default: m.LoginPage })));
 const RegisterPage = lazy(() => import('@/modules/auth/pages/RegisterPage').then(m => ({ default: m.RegisterPage })));
 

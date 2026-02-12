@@ -1,17 +1,7 @@
 import React from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useTranslation } from '@/core/context/LanguageContext';
-
-interface PaginationProps {
-  page: number;
-  totalPages: number;
-  onPrev: () => void;
-  onNext: () => void;
-  perPage: number;
-  setPerPage: (n: number) => void;
-  perPageOptions?: number[];
-  perPageLabel?: string;
-}
+import type { PaginationProps } from '../../types/index';
 
 const Pagination = ({
   page,

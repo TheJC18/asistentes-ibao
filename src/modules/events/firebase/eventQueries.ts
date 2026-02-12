@@ -7,7 +7,10 @@ export async function createEvent(event: EventData) {
     ...event,
     date: Timestamp.fromDate(new Date(event.date)),
     createdAt: Timestamp.now(),
+    id: '', // Temporal, se actualiza después
   });
+  // Actualizar el campo id en el documento
+  await updateDoc(docRef, { id: docRef.id });
   return { ...event, id: docRef.id };
 }
 

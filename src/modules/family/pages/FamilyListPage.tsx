@@ -9,6 +9,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from '@/core/store';
 import { useTranslation } from '@/core/context/LanguageContext';
 import { useFamilyList } from '../hooks/useFamilyList';
+import { useFilteredFamilyMembers } from '../hooks/useFamilyList';
 const UserModal = lazy(() => import('@/modules/user/components/UserModal'));
 const AddFamilyMemberModal = lazy(() => import('./AddFamilyMemberModal'));
 
@@ -28,37 +29,12 @@ export default function FamilyListPage() {
     removeMember,
     updateMember,
     reloadMembers,
+    createFamilyMember,
+    handleMemberAdded,
+    handleMemberDeleted,
   } = useFamilyList({ currentUserId });
 
-  const filteredMembers = members.filter(m =>
-    m.name.toLowerCase().includes(search.toLowerCase()) ||
-    m.relation?.toLowerCase().includes(search.toLowerCase())
-  );
-
-  const handleCreateMember = async (memberData: any) => {
-    if (!familyId) {
-      console.error('No hay familia creada');
-      return;
-    }
-    const dataWithFamily = {
-      ...memberData,
-      familyId,
-      createdBy: currentUserId
-    };
-    const result = await createUser(dataWithFamily);
-    if (result.ok) {
-      await reloadMembers();
-      closeCreateModal();
-    }
-  };
-
-  const handleMemberAdded = async () => {
-    await reloadMembers();
-  };
-
-  const handleMemberDeleted = (memberId: string) => {
-    removeMember(memberId);
-  };
+  const filteredMembers = useFilteredFamilyMembers(members, search);
 
   if (loading) {
     return <div className="flex justify-center items-center min-h-[80vh]">
@@ -127,7 +103,7 @@ export default function FamilyListPage() {
           open={isCreateModalOpen} 
           onClose={closeCreateModal} 
           mode="family"
-          onSave={handleCreateMember}
+          onSave={(memberData: any) => createFamilyMember(memberData, createUser, closeCreateModal, currentUserId)}
         />
       </Suspense>
       

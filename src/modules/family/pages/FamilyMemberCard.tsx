@@ -58,10 +58,11 @@ export default function FamilyMemberCard({
         mode="edit"
         user={{
           ...member,
-          role: member.role as import('@/core/constants/roles').RoleType,
-          gender: (member.gender === 'male' || member.gender === 'female' || member.gender === 'other' || member.gender === 'neutral')
-            ? member.gender
-            : 'other',
+          role: member.role as import('@/core/helpers/roles').RoleType,
+          gender:
+            member.gender === 'male' || member.gender === 'female'
+              ? member.gender
+              : undefined,
         }}
         onSave={handleSaveEdit}
       />

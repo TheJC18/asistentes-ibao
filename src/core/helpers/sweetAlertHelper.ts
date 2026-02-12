@@ -1,18 +1,4 @@
-
 import Swal, { SweetAlertOptions, SweetAlertResult } from 'sweetalert2';
-import { useTranslation } from '@/core/context/LanguageContext';
-
-// Helper para obtener traducciones fuera de componentes React
-// NOTA: Esto es un workaround porque useTranslation es un hook de React y no puede usarse fuera de componentes.
-// Si necesitas textos traducidos aquí, pásalos como argumento desde el componente llamador, o usa un objeto fallback claro.
-// Por defecto, se usan textos en español si no se proveen traducciones.
-let translations: any = null;
-try {
-  // Intenta obtener el objeto de traducciones actual (solo funcionará si hay contexto React)
-  translations = require('@/core/context/LanguageContext').useTranslation();
-} catch {
-  // Si no es posible, se usará el fallback más abajo
-}
 
 // Inyectar CSS para z-index alto y solo margin-top en toast
 const style = document.createElement('style');
@@ -47,7 +33,7 @@ style.textContent = `
 document.head.appendChild(style);
 
 // Configuración base para todos los alerts
-const getBaseConfig = () => {
+const getBaseConfig = (translate?: any) => {
   // Si no hay traducción disponible, fallback a español
   const fallback = {
     accept: 'Aceptar',
@@ -56,8 +42,8 @@ const getBaseConfig = () => {
     loading: 'Cargando...'
   };
   // Si hay traducciones, úsalas, si no, usa fallback
-  const acceptText = translations?.common?.accept || fallback.accept;
-  const cancelText = translations?.common?.cancel || fallback.cancel;
+  const acceptText = translate?.common?.accept || fallback.accept;
+  const cancelText = translate?.common?.cancel || fallback.cancel;
   return {
     confirmButtonColor: '#2563eb',
     cancelButtonColor: '#6b7280',
@@ -70,9 +56,9 @@ const getBaseConfig = () => {
   };
 };
 
-export const showSuccessAlert = (title: string, text?: string): Promise<SweetAlertResult> => {
+export const showSuccessAlert = (title: string, text?: string, translate?: any): Promise<SweetAlertResult> => {
   return Swal.fire({
-    ...getBaseConfig(),
+    ...getBaseConfig(translate),
     icon: 'success',
     title,
     text,
@@ -81,39 +67,39 @@ export const showSuccessAlert = (title: string, text?: string): Promise<SweetAle
   });
 };
 
-export const showErrorAlert = (title: string, text?: string): Promise<SweetAlertResult> => {
+export const showErrorAlert = (title: string, text?: string, translate?: any): Promise<SweetAlertResult> => {
   return Swal.fire({
-    ...getBaseConfig(),
+    ...getBaseConfig(translate),
     icon: 'error',
     title,
     text
   });
 };
 
-export const showWarningAlert = (title: string, text?: string): Promise<SweetAlertResult> => {
+export const showWarningAlert = (title: string, text?: string, translate?: any): Promise<SweetAlertResult> => {
   return Swal.fire({
-    ...getBaseConfig(),
+    ...getBaseConfig(translate),
     icon: 'warning',
     title,
     text
   });
 };
 
-export const showInfoAlert = (title: string, text?: string): Promise<SweetAlertResult> => {
+export const showInfoAlert = (title: string, text?: string, translate?: any): Promise<SweetAlertResult> => {
   return Swal.fire({
-    ...getBaseConfig(),
+    ...getBaseConfig(translate),
     icon: 'info',
     title,
     text
   });
 };
 
-export const showConfirmAlert = (title: string, text: string, confirmButtonText?: string): Promise<SweetAlertResult> => {
+export const showConfirmAlert = (title: string, text: string, translate?: any, confirmButtonText?: string): Promise<SweetAlertResult> => {
   // Usa traducción si está disponible, si no, fallback
-  const acceptText = translations?.common?.accept || 'Aceptar';
-  const cancelText = translations?.common?.cancel || 'Cancelar';
+  const acceptText = translate?.common?.accept || 'Aceptar';
+  const cancelText = translate?.common?.cancel || 'Cancelar';
   return Swal.fire({
-    ...getBaseConfig(),
+    ...getBaseConfig(translate),
     icon: 'question',
     title,
     text,
@@ -123,14 +109,14 @@ export const showConfirmAlert = (title: string, text: string, confirmButtonText?
   });
 };
 
-export const showDeleteConfirmAlert = (title?: string, text?: string): Promise<SweetAlertResult> => {
+export const showDeleteConfirmAlert = (title?: string, text?: string, translate?: any): Promise<SweetAlertResult> => {
   // Usa traducción si está disponible, si no, fallback
-  const deleteText = translations?.common?.delete || 'Eliminar';
-  const cancelText = translations?.common?.cancel || 'Cancelar';
-  const defaultTitle = translations?.messages?.deleteConfirmTitle || '¿Estás seguro?';
-  const defaultText = translations?.messages?.deleteConfirmText || 'Esta acción no se puede deshacer';
+  const deleteText = translate?.common?.delete || 'Eliminar';
+  const cancelText = translate?.common?.cancel || 'Cancelar';
+  const defaultTitle = translate?.messages?.deleteConfirmTitle || '¿Estás seguro?';
+  const defaultText = translate?.messages?.deleteConfirmText || 'Esta acción no se puede deshacer';
   return Swal.fire({
-    ...getBaseConfig(),
+    ...getBaseConfig(translate),
     icon: 'warning',
     title: title || defaultTitle,
     text: text || defaultText,
@@ -141,11 +127,11 @@ export const showDeleteConfirmAlert = (title?: string, text?: string): Promise<S
   });
 };
 
-export const showLoadingAlert = (title?: string, text?: string): void => {
+export const showLoadingAlert = (title?: string, text?: string, translate?: any): void => {
   // Usa traducción si está disponible, si no, fallback
-  const loadingText = translations?.common?.loading || 'Cargando...';
+  const loadingText = translate?.common?.loading || 'Cargando...';
   Swal.fire({
-    ...getBaseConfig(),
+    ...getBaseConfig(translate),
     title: title || loadingText,
     text,
     allowOutsideClick: false,

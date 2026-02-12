@@ -1,8 +1,8 @@
 import { useSelector } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useTranslation } from '@/core/context/LanguageContext';
-import CompleteProfileCard  from '@/modules/home/components/CompleteProfileCard';
 import { RootState } from '@/core/store';
+import { useTranslation } from '@/core/context/LanguageContext';
+import CompleteProfileCard from '@/modules/home/components/CompleteProfileCard';
 
 export default function Home() {
   const { profileCompleted, displayName } = useSelector((state: RootState) => state.auth);

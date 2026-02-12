@@ -1,28 +1,5 @@
 import { useState, useCallback } from "react";
-
-type FormValues = {
-  [key: string]: any;
-};
-
-type Errors = {
-  [key: string]: string;
-};
-
-type UseFormReturn = {
-  values: FormValues;
-  errors: Errors;
-  touched: { [key: string]: boolean };
-  handleChange: (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
-  ) => void;
-  handleBlur: (
-    e: React.FocusEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
-  ) => void;
-  handleSubmit: (onSubmit: (values: FormValues) => Promise<void>) => (e: React.FormEvent<HTMLFormElement>) => Promise<void>;
-  setFieldValue: (field: string, value: any) => void;
-  setFieldError: (field: string, error: string) => void;
-  resetForm: () => void;
-};
+import type { FormValues, Errors, UseFormReturn } from "@/core/types";
 
 export const useForm = (
   initialValues: FormValues,

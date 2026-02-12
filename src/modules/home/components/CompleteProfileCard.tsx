@@ -23,38 +23,38 @@ export default function CompleteProfileCard() {
 
   return (
     <div className="col-span-12">
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 p-6 shadow-xl">
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-primary to-secondary p-6 shadow-xl">
         <div className="relative z-10">
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <div className="flex items-center gap-3 mb-3">
-                <div className="flex items-center justify-center w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm">
+                <div className="flex items-center justify-center w-12 h-12 rounded-full bg-surface/60 backdrop-blur-sm">
                   <FontAwesomeIcon 
                     icon={["fas", "user-circle"]} 
-                    className="text-2xl text-white"
+                    className="text-2xl text-text-on-primary"
                   />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-white truncate max-w-[250px] sm:max-w-full">
+                  <h3 className="text-xl font-bold text-text-on-primary truncate max-w-[250px] sm:max-w-full">
                     {translate.pages.home.welcomeUser.replace('{name}', displayName || '')}
                   </h3>
-                  <p className="text-sm text-blue-100">
+                  <p className="text-sm text-primary-foreground">
                     {translate.pages.home.completeProfile}
                   </p>
                 </div>
               </div>
 
-              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 mb-4">
-                <p className="text-white text-sm mb-3">
+              <div className="bg-surface/70 backdrop-blur-sm rounded-lg p-4 mb-4">
+                <p className="text-text-on-primary text-sm mb-3">
                   {translate.pages.home.completeProfileMessage}
                 </p>
-                <ul className="space-y-2 text-sm text-white/90">
+                <ul className="space-y-2 text-sm text-text-on-primary/90">
                   <li className="flex items-center gap-2">
-                    <FontAwesomeIcon icon={["fas", "check-circle"]} className="text-green-300" />
+                    <FontAwesomeIcon icon={["fas", "check-circle"]} className="text-success" />
                     {translate.pages.home.completeProfileItems.birthdate}
                   </li>
                   <li className="flex items-center gap-2">
-                    <FontAwesomeIcon icon={["fas", "check-circle"]} className="text-green-300" />
+                    <FontAwesomeIcon icon={["fas", "check-circle"]} className="text-success" />
                     {translate.pages.home.completeProfileItems.nationality}
                   </li>
                   <li className="flex items-center gap-2">

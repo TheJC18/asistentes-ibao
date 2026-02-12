@@ -3,11 +3,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { UserCard } from '@/core/components/common';
 import Select from '@/core/components/form/Select';
 import Label from '@/core/components/form/Label';
-import { relationsES, relationsEN } from '@/i18n/relations';
-import { useLanguage } from '@/core/context/LanguageContext';
 import { useTranslation } from '@/core/context/LanguageContext';
 import { AddFamilyMemberModalProps } from '../types';
 import { useAddFamilyMemberModal } from '../hooks/useAddFamilyMemberModal';
+import { Button } from '@/core/components';
+import { useRelationUtils } from '@/core/hooks/useRelationUtils';
 
 export default function AddFamilyMemberModal({
   open,
@@ -16,9 +16,8 @@ export default function AddFamilyMemberModal({
   currentUserId,
   onMemberAdded
 }: AddFamilyMemberModalProps) {
-  const { language } = useLanguage();
   const translate = useTranslation();
-  const relations = language === "es" ? relationsES : relationsEN;
+  const { relations } = useRelationUtils();
   const {
     search,
     setSearch,
@@ -48,17 +47,15 @@ export default function AddFamilyMemberModal({
   if (!modalRoot) {
     return null;
   }
+  // Eliminar fragmento de JSX fuera del return
   return ReactDOM.createPortal(
     <div
-      className="fixed inset-0 z-[9999] flex items-start justify-center bg-black/60 backdrop-blur-sm overflow-y-auto p-4"
+      className="fixed inset-0 z-[9999] flex items-start justify-center bg-overlay/60 backdrop-blur-sm overflow-y-auto p-4"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div
-        className="relative w-full max-w-5xl bg-card rounded-2xl shadow-2xl my-8"
-        onClick={(e) => e.stopPropagation()}
-      >
+      <div className="relative w-full max-w-5xl bg-card rounded-2xl shadow-2xl my-8" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
         <div className="px-6 sm:px-8 pt-6 pb-4 border-b border-border">
           <div className="flex items-center justify-between">
@@ -114,11 +111,11 @@ export default function AddFamilyMemberModal({
                       showPhone={false}
                       showNationality={false}
                     />
-                    {selectedUser?.id === user.id && (
-                      <div className="absolute top-2 right-2 bg-brand-500 text-white rounded-full p-1">
+                    {selectedUser?.id === user.id ? (
+                      <div className="absolute top-2 right-2 bg-primary text-text-on-primary rounded-full p-1">
                         <FontAwesomeIcon icon={["fas", "check"]} className="text-sm" />
                       </div>
-                    )}
+                    ) : null}
                   </div>
                 ))
               )
@@ -134,7 +131,7 @@ export default function AddFamilyMemberModal({
                 name="relation"
                 value={selectedRelation}
                 onChange={setSelectedRelation}
-                options={relations.map(r => ({ value: r.code, label: r.name }))}
+                options={Array.isArray(relations) ? relations.map(r => ({ value: r.code, label: r.name })) : []}
                 placeholder={translate.form?.relationPlaceholder}
               />
             </div>
@@ -143,23 +140,29 @@ export default function AddFamilyMemberModal({
 
         {/* Footer */}
         <div className="px-6 sm:px-8 py-4 border-t border-border flex justify-end gap-3">
-          <button
+          <Button
             onClick={onClose}
             className="px-6 py-2 rounded-lg border border-border text-text-primary hover:bg-surface"
+            variant="outline"
+            type="button"
+            startIcon={null}
+            endIcon={null}
           >
             {translate.common.cancel}
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={async () => {
               const ok = await handleAddToFamily();
               if (ok) onClose();
             }}
             disabled={!selectedUser || !selectedRelation}
             className="px-6 py-2 rounded-lg bg-primary text-text-on-primary hover:bg-primary-hover disabled:opacity-50 disabled:cursor-not-allowed"
+            type="button"
+            startIcon={<FontAwesomeIcon icon={["fas", "user-plus"]} className="mr-2" />}
+            endIcon={null}
           >
-            <FontAwesomeIcon icon={["fas", "user-plus"]} className="mr-2" />
             {translate.pages?.family?.addFamiliar}
-          </button>
+          </Button>
         </div>
       </div>
     </div>,

@@ -1,19 +1,13 @@
-import type React from "react";
+// ...
 import { useEffect, useRef } from "react";
+import type { DropdownProps } from '../../types/index';
 
-interface DropdownProps {
-  isOpen: boolean;
-  onClose: () => void;
-  children: React.ReactNode;
-  className?: string;
-}
-
-export const Dropdown = ({
+const Dropdown = ({
   isOpen,
   onClose,
   children,
   className = "",
-}) => {
+}: DropdownProps) => {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -44,3 +38,6 @@ export const Dropdown = ({
     </div>
   );
 };
+
+export { Dropdown };
+export default Dropdown;

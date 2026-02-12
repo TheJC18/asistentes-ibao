@@ -1,3 +1,5 @@
+import { ReactNode } from 'react';
+
 export interface CheckOrCreateUserParams {
   uid: string;
   displayName: string;
@@ -20,16 +22,14 @@ export interface GetUserByUIDResult {
   user?: any;
   data?: any;
   error?: string;
-}
-
-export interface GetRoleParams {
-  uid: string;
+  errorMessage?: string;
 }
 
 export interface GetRoleResult {
   ok: boolean;
   role?: string;
   error?: string;
+  errorMessage?: string;
 }
 
 export interface GetProfileCompletedParams {
@@ -40,6 +40,7 @@ export interface GetProfileCompletedResult {
   ok: boolean;
   profileCompleted?: boolean;
   error?: string;
+  errorMessage?: string;
 }
 
 export interface UpdateProfileCompletedParams {
@@ -51,6 +52,7 @@ export interface UpdateProfileCompletedResult {
   ok: boolean;
   profileCompleted?: boolean;
   error?: string;
+  errorMessage?: string;
 }
 
 export interface CreateAuthUserResult {
@@ -61,15 +63,6 @@ export interface CreateAuthUserResult {
   errorMessage?: string;
   email?: string;
   canCleanup?: boolean;
-}
-
-export interface LinkEmailPasswordResult {
-  ok: boolean;
-  message?: string;
-  errorMessage?: string;
-  alreadyLinked?: boolean;
-  errorCode?: string;
-  requiresReauth?: boolean;
 }
 
 export interface LinkGoogleAccountResult {
@@ -103,117 +96,6 @@ export interface SendPasswordResetEmailResult {
   ok: boolean;
   message?: string;
   errorMessage?: string;
-}
-export interface CheckOrCreateUserParams {
-  uid: string;
-  displayName: string;
-  photoURL?: string;
-  email: string;
-  role?: string;
-}
-
-export interface CheckOrCreateUserResult {
-  isNewUser: boolean;
-}
-
-export interface GetUserByUIDParams {
-  uid: string;
-}
-
-export interface GetUserByUIDResult {
-  ok: boolean;
-  exists?: boolean;
-  user?: any;
-  data?: any;
-  error?: string;
-}
-
-export interface GetRoleParams {
-  uid: string;
-}
-
-export interface GetRoleResult {
-  ok: boolean;
-  role?: string;
-  error?: string;
-}
-
-export interface GetProfileCompletedParams {
-  uid: string;
-}
-
-export interface GetProfileCompletedResult {
-  ok: boolean;
-  profileCompleted?: boolean;
-  error?: string;
-}
-
-export interface UpdateProfileCompletedParams {
-  uid: string;
-  profileCompleted?: boolean;
-}
-
-export interface UpdateProfileCompletedResult {
-  ok: boolean;
-  profileCompleted?: boolean;
-  error?: string;
-}
-
-export interface CreateAuthUserResult {
-  ok: boolean;
-  uid?: string;
-  user?: any;
-  errorCode?: string;
-  errorMessage?: string;
-  email?: string;
-  canCleanup?: boolean;
-}
-
-export interface LinkEmailPasswordResult {
-  ok: boolean;
-  message?: string;
-  errorMessage?: string;
-  alreadyLinked?: boolean;
-  errorCode?: string;
-  requiresReauth?: boolean;
-}
-
-export interface LinkGoogleAccountResult {
-  ok: boolean;
-  message?: string;
-  errorMessage?: string;
-  alreadyLinked?: boolean;
-  errorCode?: string;
-  requiresReauth?: boolean;
-}
-
-export interface UpdateUserPasswordResult {
-  ok: boolean;
-  errorCode?: string;
-  errorMessage?: string;
-  requiresReauth?: boolean;
-}
-
-export interface SignOutUserResult {
-  ok: boolean;
-  errorMessage?: string;
-}
-
-export interface CleanupOrphanAuthUserResult {
-  ok: boolean;
-  message?: string;
-  errorMessage?: string;
-}
-
-export interface SendPasswordResetEmailResult {
-  ok: boolean;
-  message?: string;
-  errorMessage?: string;
-}
-export interface CreateUserParams {
-  displayName: string;
-  email: string;
-  password: string;
 }
 
 export interface LoginParams {
@@ -221,18 +103,6 @@ export interface LoginParams {
   password: string;
 }
 
-export interface GetRoleParams {
-  uid: string;
-}
-
-export interface UpdateProfileCompletedParams {
-  uid: string;
-  profileCompleted?: boolean;
-}
-
-export interface GetProfileCompletedParams {
-  uid: string;
-}
 export interface AuthState {
   status: 'checking' | 'not-authenticated' | 'authenticated';
   uid: string | null;
@@ -281,14 +151,13 @@ export interface SetRolePayload {
 export interface SetProfileCompletedPayload {
   profileCompleted: boolean;
 }
-import { ReactNode } from 'react';
 
 export interface AuthLayoutProps {
   children: ReactNode;
   title?: string;
   icon?: ReactNode;
 }
-// Tipos e interfaces para el módulo de autenticación
+
 export interface SignInFormData {
   email: string;
   password: string;
@@ -299,4 +168,17 @@ export interface RegisterFormData {
   email: string;
   password: string;
   confirmPassword: string;
+}
+
+export interface GetRoleParams {
+  uid: string;
+}
+
+export interface LinkEmailPasswordResult {
+  ok: boolean;
+  message?: string;
+  errorMessage?: string;
+  alreadyLinked?: boolean;
+  errorCode?: string;
+  requiresReauth?: boolean;
 }

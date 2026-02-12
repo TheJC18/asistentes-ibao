@@ -13,15 +13,18 @@ export interface EventData {
   title: string;
   description?: string;
   date: string; // ISO string
+  hour?: string;
   type?: string;
   color?: string;
   createdBy: string;
 }
 
 export interface EventFormData {
+  id?: string; // Permitir id opcional para edición
   title: string;
   description?: string;
   date: string;
+  hour?: string;
   type?: string;
   color?: string;
   createdBy: string;

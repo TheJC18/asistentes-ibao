@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useTranslation } from '@/core/context/LanguageContext';
 import { useSidebar } from "@/core/context/SidebarContext";
 import { useSelector } from "react-redux";
-import { ROLES } from "@/core/constants/roles";
+import { ROLES } from "@/core/helpers/roles";
 import { RootState } from "@/core/store";
 
 interface SubItem {
