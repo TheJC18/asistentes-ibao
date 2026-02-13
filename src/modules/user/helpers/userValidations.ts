@@ -16,9 +16,15 @@ export const validateUserForm = ({
   const isEdit = mode === 'edit';
   const isFamily = mode === 'family';
 
+
   // Validar nombre (obligatorio siempre)
   if (!formData.name || formData.name.trim() === '') {
     errors.push('• El nombre es obligatorio');
+  }
+
+  // Validar género (obligatorio siempre)
+  if (!formData.gender || formData.gender.trim() === '') {
+    errors.push('• El género es obligatorio');
   }
 
   // Validar relación en modo family

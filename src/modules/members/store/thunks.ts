@@ -1,5 +1,6 @@
 import { AppDispatch } from '@/core/store';
 import { getAllMembers } from '../firebase/memberQueries';
+import { convertDateFieldsToISO } from '@/core/helpers/dateUtils';
 import { GetAllMembersParams } from '../types';
 import { loadMembers, setLoading, setError } from './memberSlice';
 
@@ -11,7 +12,15 @@ export const fetchAllMembers = (params: GetAllMembersParams = {}) => {
       const result = await getAllMembers(params);
       
       if (result.ok && result.users) {
-        dispatch(loadMembers(result.users));
+        // Usar helper para convertir fechas
+        const serializableUsers = result.users.map(user => {
+          const userWithDates = convertDateFieldsToISO(user);
+          if (Array.isArray(userWithDates.family)) {
+            userWithDates.family = userWithDates.family.map(fam => convertDateFieldsToISO(fam));
+          }
+          return userWithDates;
+        });
+        dispatch(loadMembers(serializableUsers));
       } else {
         dispatch(setError(result.errorMessage || 'Error al cargar los miembros'));
       }

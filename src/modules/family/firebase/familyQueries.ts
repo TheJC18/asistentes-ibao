@@ -1,8 +1,9 @@
 import { collection,  doc,  getDoc, getDocs,  setDoc, deleteDoc, updateDoc, arrayUnion, arrayRemove, serverTimestamp } from 'firebase/firestore';
 import { FirebaseDB } from '@/firebase/config';
-import { CreateFamilyData, CreateFamilyResult, MemberData, AddUserToFamilyResult, RemoveUserFromFamilyResult, GetFamilyMembersResult, GetUserFamiliesResult, UpdateUserIdResult, GetUserByIdResult } from '@/modules/family/types';
+import { CreateFamilyData, CreateFamilyResult, MemberData, AddUserToFamilyResult, RemoveUserFromFamilyResult, GetFamilyMembersResult, GetUserFamiliesResult, UpdateUserIdResult, GetUserByIdResult, FamilyMember } from '@/modules/family/types';
 import type { User } from '@/types';
 import { ROLES } from '@/core/helpers/roles';
+import { convertDateFieldsToISO } from '@/core/helpers/dateUtils';
 
 /**
  * Crear una nueva familia
@@ -21,14 +22,7 @@ export const createFamily = async (familyData: CreateFamilyData, creatorUserId: 
         };
         
         await setDoc(familyRef, newFamily);
-        
-        // Agregar al creador como miembro de la familia
-        await addUserToFamily(familyId, creatorUserId, {
-            relation: 'Titular',
-            role: ROLES.ADMIN,
-            addedBy: creatorUserId,
-        });
-        
+        // Ya no se agrega al creador como miembro de la familia
         return {
             ok: true,
             familyId,
@@ -188,32 +182,40 @@ export const getFamilyMembers = async (familyId: string): Promise<GetFamilyMembe
 /**
  * Obtener familias de un usuario
  */
+
+/**
+ * Obtener familias de un usuario
+ */
 export const getUserFamilies = async (userId: string): Promise<GetUserFamiliesResult> => {
     try {
         const userRef = doc(FirebaseDB, 'users', userId);
         const userSnap = await getDoc(userRef);
-        
+
         if (!userSnap.exists()) {
             return { ok: false, families: [] };
         }
-        
+
         const familyIds = userSnap.data().families || [];
-        
+
         const familiesPromises = familyIds.map(async (familyId: string) => {
             const familyRef = doc(FirebaseDB, 'families', familyId);
             const familySnap = await getDoc(familyRef);
-            
+
             if (familySnap.exists()) {
+                const data = familySnap.data();
+                // Convertir campos Timestamp a string
                 return {
                     id: familyId,
-                    ...familySnap.data()
+                    ...data,
+                    createdAt: data.createdAt && data.createdAt.toDate ? data.createdAt.toDate().toISOString() : data.createdAt,
+                    updatedAt: data.updatedAt && data.updatedAt.toDate ? data.updatedAt.toDate().toISOString() : data.updatedAt,
                 };
             }
             return null;
         });
-        
+
         const families = (await Promise.all(familiesPromises)).filter(f => f !== null) as any[];
-        
+
         return {
             ok: true,
             families
@@ -373,20 +375,25 @@ export const deleteFamilyMember = async (familyId: string, userId: string): Prom
 /**
  * Buscar usuarios disponibles para agregar a la familia
  */
-export const searchUsersToAddToFamily = async (familyId: string, searchTerm: string = ''): Promise<{ ok: boolean; users: any[]; errorMessage?: string }> => {
+export const searchUsersToAddToFamily = async (
+  familyId: string,
+  searchTerm: string = '',
+  currentUserId: string
+): Promise<{ ok: boolean; users: any[]; errorMessage?: string }> => {
     try {
         // 1. Obtener todos los usuarios
         const usersRef = collection(FirebaseDB, 'users');
         const usersSnapshot = await getDocs(usersRef);
-        
+
         // 2. Obtener miembros actuales de la familia
         const membersRef = collection(FirebaseDB, `families/${familyId}/members`);
         const membersSnapshot = await getDocs(membersRef);
         const currentMemberIds = membersSnapshot.docs.map(doc => doc.id);
-        
-        // 3. Filtrar usuarios que no están en la familia
+
+        // 3. Filtrar usuarios que no están en la familia y que no sean el usuario actual
         let availableUsers: User[] = usersSnapshot.docs
             .filter(doc => !currentMemberIds.includes(doc.id))
+            .filter(doc => doc.id !== currentUserId)
             .map(doc => {
                 const data = doc.data() as Partial<User>;
                 return {
@@ -440,5 +447,112 @@ export const searchUsersToAddToFamily = async (familyId: string, searchTerm: str
             users: [],
             errorMessage: error.message
         };
+    }
+};
+
+/**
+ * Obtiene los familiares de un usuario (ignorando al titular)
+ */
+export const getFamilyByUserId = async (userId: string): Promise<FamilyMember[]> => {
+    // Buscar la familia donde el usuario es el creador (createdBy)
+    interface FamilyDocStrict {
+        id: string;
+        createdBy: string;
+        [key: string]: any;
+    }
+    const familiesCollectionRef = collection(FirebaseDB, 'families');
+    const familiesCollectionSnapshot = await getDocs(familiesCollectionRef);
+    const allFamiliesList: FamilyDocStrict[] = familiesCollectionSnapshot.docs
+        .map(doc => {
+            const data = doc.data();
+            return {
+                id: doc.id,
+                createdBy: typeof data.createdBy === 'string' ? data.createdBy : '',
+                ...data
+            };
+        });
+    const userOwnedFamily = allFamiliesList.find(familyItem => familyItem.createdBy === userId);
+
+    if (userOwnedFamily) {
+        // Mostrar miembros de su familia (excluyéndose a sí mismo)
+        const { ok: okMembers, members } = await getFamilyMembers(userOwnedFamily.id);
+        if (okMembers && members.length) {
+            return members.filter(member => member.id !== userId).map(member => convertDateFieldsToISO(member));
+        }
+        return [];
+    } else {
+        // Buscar familias donde es miembro (pero no titular)
+        const { ok, families } = await getUserFamilies(userId);
+        if (!ok || !families.length) return [];
+
+        let directRelations: FamilyMember[] = [];
+        for (const family of families) {
+            if (family.createdBy === userId) continue;
+            // Solo mostrar el creador de la familia como relación directa
+            const creatorId = family.createdBy;
+            const creatorUser = await getUserById(creatorId);
+            if (creatorUser.ok && creatorUser.user) {
+                // Buscar la relación entre el usuario y el creador
+                const memberRef = doc(FirebaseDB, `families/${family.id}/members`, userId);
+                const memberSnap = await getDoc(memberRef);
+                let relation = '';
+                if (memberSnap.exists()) {
+                    const memberData = memberSnap.data();
+                    relation = memberData.relation || '';
+                }
+                directRelations.push({
+                    id: creatorUser.user.id,
+                    ...creatorUser.user,
+                    relation,
+                });
+            }
+        }
+        // Eliminar duplicados por id
+        const uniqueRelations = directRelations.filter((member, index, self) =>
+            index === self.findIndex((m) => m.id === member.id)
+        );
+        return uniqueRelations;
+    }
+};
+
+/**
+ * Obtiene la familia donde el usuario es titular (createdBy) o la crea si no existe.
+ */
+export const getOrCreateFamilyByUserId = async (userId: string): Promise<{ ok: boolean; familyId?: string; family?: any; created?: boolean; errorMessage?: string }> => {
+    try {
+        const familiesCollectionRef = collection(FirebaseDB, 'families');
+        const familiesCollectionSnapshot = await getDocs(familiesCollectionRef);
+        const allFamiliesList = familiesCollectionSnapshot.docs.map(doc => {
+            const data = doc.data();
+            return {
+                id: doc.id,
+                createdBy: typeof data.createdBy === 'string' ? data.createdBy : '',
+                ...data
+            };
+        });
+        const ownFamily = allFamiliesList.find(fam => fam.createdBy === userId);
+        if (ownFamily) {
+            // Asegura que el usuario tenga el id de la familia en su array families
+            const userRef = doc(FirebaseDB, 'users', userId);
+            await updateDoc(userRef, {
+                families: [ownFamily.id],
+                updatedAt: serverTimestamp()
+            });
+            return { ok: true, familyId: ownFamily.id, family: ownFamily, created: false };
+        } else {
+            const result = await createFamily({ name: 'Mi Familia' }, userId);
+            if (result.ok && result.familyId) {
+                const userRef = doc(FirebaseDB, 'users', userId);
+                await updateDoc(userRef, {
+                    families: [result.familyId],
+                    updatedAt: serverTimestamp()
+                });
+                return { ok: true, familyId: result.familyId, family: result.family, created: true };
+            } else {
+                return { ok: false, errorMessage: result.errorMessage };
+            }
+        }
+    } catch (error: any) {
+        return { ok: false, errorMessage: error.message };
     }
 };

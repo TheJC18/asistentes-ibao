@@ -2,7 +2,6 @@ import Modal from '@/core/components/ui/modal/Modal';
 import { calculateBirthdayAge } from '@/core/helpers/dateUtils';
 
 export const BirthdayDetailModal = ({ open, birthday, age, date, onClose }) => {
-    console.log(birthday)
     if (!birthday) return null;
     const birthdayAge = age ?? calculateBirthdayAge(birthday.birthdate, date);
 

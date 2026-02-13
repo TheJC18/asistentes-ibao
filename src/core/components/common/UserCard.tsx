@@ -5,13 +5,15 @@ import { getCountryName } from "@/core/helpers/countries";
 import { getGenderName } from "@/core/helpers/genders";
 import { useLanguage, useTranslation } from "@/core/context/LanguageContext";
 import type { UserCardProps } from "../types/index";
+
 import { calculateAge } from '@/core/helpers/dateUtils';
 
 export function UserCard({ 
   user, 
   showRelation = true,
   showPhone = true,
-  showNationality = true
+  showNationality = true,
+  showFamilySection = false
 }: UserCardProps) {
   const { language } = useLanguage();
   const translate = useTranslation();
@@ -183,6 +185,30 @@ export function UserCard({
                   {user.hasWebAccess ? (translate.common?.yes || 'Sí') : (translate.common?.no || 'No')}
                 </span>
               </span>
+            </div>
+          )}
+
+          {/* Sección de familiares solo si showFamilySection y existen familiares */}
+          {showFamilySection && Array.isArray(user.family) && user.family.length > 0 && (
+            <div className="w-full mt-6">
+              <div className="mt-4">
+                <span className="block text-xs text-text-secondary font-bold mb-2">{translate.userCard?.family || 'Familiares'}</span>
+                <div className="flex flex-col gap-2">
+                  {user.family.map((relative: any, idx: number) => (
+                    <div key={relative.id + '-' + (relative.relation || '') + '-' + idx} className="flex items-center gap-2">
+                      <img
+                        src={relative.avatar || relative.photoURL || '/user_default.png'}
+                        alt={relative.name}
+                        className="w-7 h-7 rounded-full object-cover border border-border"
+                      />
+                      <span className="font-semibold">{relative.name}</span>
+                      {relative.relation && (
+                        <span className="text-xs text-text-secondary">({getRelationLabel(relative.relation, relative.gender, language)})</span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           )}
         </div>

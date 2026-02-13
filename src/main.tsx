@@ -11,7 +11,7 @@ import { AppRouter } from '@/router/AppRouter';
 import './index.css';
 
 createRoot(document.getElementById('root')!).render(
-  <StrictMode>
+  // <StrictMode>
     <Provider store={store}>
       <BrowserRouter>
         <ThemeProvider>
@@ -21,5 +21,5 @@ createRoot(document.getElementById('root')!).render(
         </ThemeProvider>
       </BrowserRouter>
     </Provider>
-  </StrictMode>,
+  // </StrictMode>,
 );

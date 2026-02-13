@@ -6,6 +6,7 @@ import Label from '@/core/components/form/Label';
 import { useTranslation } from '@/core/context/LanguageContext';
 import { AddFamilyMemberModalProps } from '../types';
 import { useAddFamilyMemberModal } from '../hooks/useAddFamilyMemberModal';
+import { useAuthUser } from '@/modules/auth/hooks/useAuthUser';
 import { Button } from '@/core/components';
 import { useRelationUtils } from '@/core/hooks/useRelationUtils';
 
@@ -13,9 +14,10 @@ export default function AddFamilyMemberModal({
   open,
   onClose,
   familyId,
-  currentUserId,
   onMemberAdded
-}: AddFamilyMemberModalProps) {
+}: Omit<AddFamilyMemberModalProps, 'currentUserId'>) {
+  const auth = useAuthUser();
+  const currentUserId = auth?.uid || auth?.id || '';
   const translate = useTranslation();
   const { relations } = useRelationUtils();
   const {

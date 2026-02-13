@@ -1,26 +1,28 @@
 // Tipos e interfaces de UI para componentes (migrados desde types global)
 export interface UserCardProps {
-	user: {
-		id: string;
-		uid?: string;
-		name?: string;
-		displayName?: string;
-		email?: string;
-		avatar?: string;
-		photoURL?: string;
-		birthdate?: string | Date;
-		age?: number | string;
-		phone?: string;
-		type?: string;
-		relation?: string;
-		gender?: string;
-		nationality?: string;
-		isMember?: boolean;
-		hasWebAccess?: boolean;
-	};
+ user: {
+	 id: string;
+	 uid?: string;
+	 name?: string;
+	 displayName?: string;
+	 email?: string;
+	 avatar?: string;
+	 photoURL?: string;
+	 birthdate?: string | Date;
+	 age?: number | string;
+	 phone?: string;
+	 type?: string;
+	 relation?: string;
+	 gender?: string;
+	 nationality?: string;
+	 isMember?: boolean;
+	 hasWebAccess?: boolean;
+	 family?: any[]; // Familiares del usuario
+ };
 	showRelation?: boolean;
 	showPhone?: boolean;
 	showNationality?: boolean;
+	showFamilySection?: boolean;
 }
 
 export interface UserDropdownProps {

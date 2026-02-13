@@ -123,6 +123,7 @@ export default function MemberListPage() {
 								showRelation={false}
 								showPhone={true}
 								showNationality={true}
+								showFamilySection={true}
 							/>
 						))}
 					</div>

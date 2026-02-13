@@ -275,7 +275,6 @@ export const en = {
     age: 'years old',
   },
   relations: {
-    titular: 'Owner',
     spouse: 'Wife',
     son: 'Son',
     daughter: 'Daughter',

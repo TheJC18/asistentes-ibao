@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { getUserFamilies, createFamily, getFamilyMembers, addUserToFamily, getUserById } from '@/modules/family/firebase/familyQueries';
+import { getUserFamilies, createFamily, getFamilyMembers, addUserToFamily, getUserById, getOrCreateFamilyByUserId } from '@/modules/family/firebase/familyQueries';
 import { ROLES } from '@/core/helpers/roles';
 import { getInverseRelation } from '@/core/helpers';
 import { UseFamilyListOptions } from '../types';
@@ -14,7 +14,18 @@ export function useFamilyList({ currentUserId }: UseFamilyListOptions) {
   const loadFamilyMembers = useCallback(async (fId: string) => {
     const result = await getFamilyMembers(fId);
     if (result.ok) {
-      setMembers(result.members);
+      // Procesar relaciones para que sean correctas según el contexto
+      const processedMembers = result.members.map(member => {
+        if (member.relation && [
+          'parent', 'child', 'grandparent', 'grandchild'
+        ].includes(member.relation)) {
+          // Invertir la relación según el género del usuario actual
+          const inverseRelation = getInverseRelation(member.relation, member.gender);
+          return { ...member, relation: inverseRelation };
+        }
+        return member;
+      });
+      setMembers(processedMembers);
     }
   }, []);
 
@@ -51,31 +62,15 @@ export function useFamilyList({ currentUserId }: UseFamilyListOptions) {
   useEffect(() => {
     const initializeFamily = async () => {
       if (!currentUserId) return;
-      const userFamiliesResult = await getUserFamilies(currentUserId);
-      if (userFamiliesResult.ok && userFamiliesResult.families.length > 0) {
-        const ownFamily = userFamiliesResult.families.find((fam: Family) => fam.createdBy === currentUserId);
-        if (ownFamily) {
-          setFamilyId(ownFamily.id);
-          loadFamilyMembers(ownFamily.id);
-        } else {
-          const result = await createFamily({ name: 'Mi Familia' }, currentUserId);
-          if (result.ok && result.familyId) {
-            setFamilyId(result.familyId);
-            await setupBidirectionalRelations(result.familyId, userFamiliesResult.families);
-            loadFamilyMembers(result.familyId);
-          }
-        }
-      } else {
-        const result = await createFamily({ name: 'Mi Familia' }, currentUserId);
-        if (result.ok && result.familyId) {
-          setFamilyId(result.familyId);
-          loadFamilyMembers(result.familyId);
-        }
+      const { ok, familyId } = await getOrCreateFamilyByUserId(currentUserId);
+      if (ok && familyId) {
+        setFamilyId(familyId);
+        loadFamilyMembers(familyId);
       }
       setLoading(false);
     };
     initializeFamily();
-  }, [currentUserId, loadFamilyMembers, setupBidirectionalRelations]);
+  }, [currentUserId, loadFamilyMembers]);
 
   // Eliminar miembro localmente
   const removeMember = (memberId: string) => {

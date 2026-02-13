@@ -83,7 +83,8 @@ export const convertDateFieldsToISO = <T extends Record<string, any>>(obj: T): T
   if (!obj) return obj;
 
   const result = { ...obj };
-  const dateFields = ['birthdate', 'createdAt', 'updatedAt', 'date'] as const;
+  // Agregamos 'joinedAt' a los campos de fecha a convertir
+  const dateFields = ['birthdate', 'createdAt', 'updatedAt', 'date', 'joinedAt'] as const;
 
   dateFields.forEach(field => {
     if (field in result && result[field as keyof T]) {

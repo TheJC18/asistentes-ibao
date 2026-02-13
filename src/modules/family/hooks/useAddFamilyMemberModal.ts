@@ -36,12 +36,12 @@ export function useAddFamilyMemberModal({
 
   const loadAvailableUsers = useCallback(async (searchTerm: string = '') => {
     setLoading(true);
-    const result = await searchUsersToAddToFamily(familyId, searchTerm);
+    const result = await searchUsersToAddToFamily(familyId, searchTerm, currentUserId);
     if (result.ok) {
       setAvailableUsers(result.users);
     }
     setLoading(false);
-  }, [familyId]);
+  }, [familyId, currentUserId]);
 
   const handleSearch = (value: string) => {
     setSearch(value);

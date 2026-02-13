@@ -6,6 +6,7 @@ import { FirebaseDB } from '@/firebase/config';
 import { dateToISOString } from '@/core/helpers';
 import { GetAllMembersParams, GetAllMembersResult } from '../types';
 import type { User } from '@/types';
+import { getFamilyByUserId } from '@/modules/family/firebase/familyQueries';
 
 // === OBTENER TODOS LOS USUARIOS (SIN PAGINACIÓN) ===
 export const getAllMembers = async (params: GetAllMembersParams = {}): Promise<GetAllMembersResult> => {
@@ -18,17 +19,14 @@ export const getAllMembers = async (params: GetAllMembersParams = {}): Promise<G
     // Obtener todos los usuarios
     const querySnapshot = await getDocs(usersRef);
     
-    // Mapear documentos a objetos
-    let users = querySnapshot.docs.map(doc => {
+    // Mapear documentos a objetos y obtener familia para cada usuario
+    let users = await Promise.all(querySnapshot.docs.map(async doc => {
       const data = doc.data();
-      
       const userData: User = {
         id: doc.id,
-        // Convertir todos los campos de fecha a ISO strings para ser serializables en Redux
         createdAt: data.createdAt ? dateToISOString(data.createdAt) : '',
         updatedAt: data.updatedAt ? dateToISOString(data.updatedAt) : '',
         birthdate: data.birthdate ? dateToISOString(data.birthdate) : null,
-        // Asegurar que todos los campos importantes estén incluidos
         profileCompleted: data.profileCompleted ?? false,
         role: data.role || 'user',
         name: data.name || data.displayName || '',
@@ -42,9 +40,38 @@ export const getAllMembers = async (params: GetAllMembersParams = {}): Promise<G
         status: data.status || 'active',
         hasWebAccess: data.hasWebAccess ?? true,
       };
-      
-      return userData;
-    });
+      // Obtener familia (usando createdBy como referencia de titularidad)
+      let family = await getFamilyByUserId(userData.id);
+      // Invertir relación solo si el familiar es padre/madre y el usuario es hijo/hija, o viceversa
+      if (Array.isArray(family)) {
+        const { getInverseRelation } = await import('@/core/helpers/relations');
+        family = family.map(fam => {
+          // Si la relación es parent y el familiar es padre/madre, mostrar como parent
+          // Si la relación es child y el familiar es hijo/hija, mostrar como child
+          // Si la relación es parent pero el familiar es hijo/hija, invertir
+          // Si la relación es child pero el familiar es padre/madre, invertir
+          if (fam.relation === 'parent' && fam.id !== userData.id) {
+            // El familiar es padre/madre del usuario
+            return { ...fam, relation: 'parent' };
+          }
+          if (fam.relation === 'child' && fam.id !== userData.id) {
+            // El familiar es hijo/hija del usuario
+            return { ...fam, relation: 'child' };
+          }
+          // Si la relación es parent y el familiar es hijo/hija, invertir
+          if (fam.relation === 'parent' && fam.id === userData.id) {
+            return { ...fam, relation: getInverseRelation('parent', fam.gender) };
+          }
+          // Si la relación es child y el familiar es padre/madre, invertir
+          if (fam.relation === 'child' && fam.id === userData.id) {
+            return { ...fam, relation: getInverseRelation('child', fam.gender) };
+          }
+          // Para otras relaciones, mantener
+          return fam;
+        });
+      }
+      return { ...userData, family };
+    }));
     
     // Ordenar por fecha de creación (más recientes primero)
     users.sort((a, b) => {
